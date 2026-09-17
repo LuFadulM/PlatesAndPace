@@ -160,6 +160,34 @@ export function assignRunKinds(model: AthleteModel): Map<number, RunKind> {
   return kinds
 }
 
+/** Labels in place: A, B, C1/C2 for a superset pair, D … */
+export function labelExercises(exercises: PlannedExercise[]): void {
+  let index = 0
+  let lastGroup: string | undefined
+  let groupCount = 0
+  for (const exercise of exercises) {
+    if (exercise.supersetGroup) {
+      if (exercise.supersetGroup !== lastGroup) {
+        lastGroup = exercise.supersetGroup
+        groupCount = 0
+        index += 1
+      }
+      groupCount += 1
+      exercise.label = `${LABELS[index - 1]}${groupCount}`
+    } else {
+      index += 1
+      lastGroup = undefined
+      exercise.label = LABELS[index - 1] ?? `${index}`
+    }
+  }
+}
+
+/** Eight minutes to warm up, forty seconds a set plus its rest, six for a finisher. */
+export function estimateSessionMinutes(exercises: readonly PlannedExercise[], hasFinisher: boolean): number {
+  const workSeconds = exercises.reduce((sum, e) => sum + e.sets * (40 + e.restSec), 0)
+  return Math.round(8 + workSeconds / 60 + (hasFinisher ? 6 : 0))
+}
+
 function repTarget(slot: { repMin: number; repMax: number }): number {
   return Math.round((slot.repMin + slot.repMax) / 2)
 }
@@ -261,28 +289,8 @@ function buildGymSession(
     }
   })
 
-  // Labels: A, B, C1/C2 for a superset pair, D …
-  let index = 0
-  let lastGroup: string | undefined
-  let groupCount = 0
-  for (const exercise of exercises) {
-    if (exercise.supersetGroup) {
-      if (exercise.supersetGroup !== lastGroup) {
-        lastGroup = exercise.supersetGroup
-        groupCount = 0
-        index += 1
-      }
-      groupCount += 1
-      exercise.label = `${LABELS[index - 1]}${groupCount}`
-    } else {
-      index += 1
-      lastGroup = undefined
-      exercise.label = LABELS[index - 1] ?? `${index}`
-    }
-  }
-
-  const workSeconds = exercises.reduce((sum, e) => sum + e.sets * (40 + e.restSec), 0)
-  const estimatedMinutes = Math.round(8 + workSeconds / 60 + (finisher ? 6 : 0))
+  labelExercises(exercises)
+  const estimatedMinutes = estimateSessionMinutes(exercises, finisher !== undefined)
 
   return {
     kind,

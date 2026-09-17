@@ -126,29 +126,3 @@ export async function saveRun(input: unknown) {
   revalidatePath('/', 'layout')
   return { ok: true as const }
 }
-
-export async function swapExercise(input: { date: string; from: string; to: string; scope: 'session' | 'global' }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { ok: false as const }
-  await supabase.from('exercise_preferences').insert({
-    user_id: user.id,
-    from_exercise_id: input.from,
-    to_exercise_id: input.to,
-    scope: input.scope,
-    date: input.scope === 'session' ? isoDate.parse(input.date) : null,
-  })
-  if (input.scope === 'session') {
-    // Rewrite today's planned content so the swap is visible immediately.
-    const { data } = await supabase.from('planned_sessions').select('id, content').eq('user_id', user.id).eq('date', input.date).maybeSingle()
-    if (data) {
-      const content = data.content as { gym?: { exercises: { exerciseId: string }[] } }
-      if (content.gym) {
-        for (const e of content.gym.exercises) if (e.exerciseId === input.from) e.exerciseId = input.to
-        await supabase.from('planned_sessions').update({ content: content as unknown as Json }).eq('id', data.id)
-      }
-    }
-  }
-  revalidatePath('/', 'layout')
-  return { ok: true as const }
-}

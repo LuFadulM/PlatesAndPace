@@ -78,3 +78,44 @@ export async function getGlobalExclusions(): Promise<string[]> {
 }
 
 export { fromISODate }
+
+export interface LastPerformance {
+  date: string
+  sets: { kg: number | null; reps: number | null; rpe: number | null }[]
+}
+
+/**
+ * The most recent completed sets per exercise before `beforeDate`: what the
+ * athlete actually did last time, shown next to today's prescription.
+ */
+export async function lastPerformances(exerciseIds: readonly string[], beforeDate: string): Promise<Record<string, LastPerformance>> {
+  if (exerciseIds.length === 0) return {}
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return {}
+  const { data } = await supabase
+    .from('set_logs')
+    .select('exercise_id, set_index, kg, reps, rpe, session_logs!inner(date)')
+    .eq('user_id', user.id)
+    .eq('done', true)
+    .in('exercise_id', [...exerciseIds])
+    .lt('session_logs.date', beforeDate)
+    .order('logged_at', { ascending: false })
+    .limit(400)
+
+  const result: Record<string, LastPerformance> = {}
+  for (const row of data ?? []) {
+    const rel = row.session_logs as unknown as { date: string } | { date: string }[] | null
+    const date = Array.isArray(rel) ? rel[0]?.date : rel?.date
+    if (!date) continue
+    const current = result[row.exercise_id]
+    if (!current || date > current.date) {
+      result[row.exercise_id] = { date, sets: [{ kg: row.kg === null ? null : Number(row.kg), reps: row.reps, rpe: row.rpe === null ? null : Number(row.rpe) }] }
+    } else if (date === current.date) {
+      current.sets.push({ kg: row.kg === null ? null : Number(row.kg), reps: row.reps, rpe: row.rpe === null ? null : Number(row.rpe) })
+    }
+  }
+  // Rows arrive newest first; a set list reads first set first.
+  for (const entry of Object.values(result)) entry.sets.reverse()
+  return result
+}

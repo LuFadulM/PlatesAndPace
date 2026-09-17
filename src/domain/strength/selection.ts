@@ -33,7 +33,8 @@ export interface SelectionContext {
 
 const TIER_RANK: Record<ExperienceTier, number> = { beginner: 0, intermediate: 1, advanced: 2 }
 
-function roleFits(slot: Slot, exercise: ExerciseDefinition): boolean {
+/** Whether an exercise's category can fill a slot of this role. */
+export function roleFits(slot: Pick<Slot, 'role'>, exercise: ExerciseDefinition): boolean {
   switch (slot.role) {
     case 'primary':
       return exercise.category === 'compound'

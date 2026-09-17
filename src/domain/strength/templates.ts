@@ -83,6 +83,11 @@ const SETS_BY_ROLE: Record<Exclude<SlotRole, 'finisher'>, number> = {
   core: 3,
 }
 
+/** Rep band, rest and default set count for a role under a goal — what an exercise added by hand inherits. */
+export function roleShape(goal: PrimaryGoal, role: Exclude<SlotRole, 'finisher'>): RoleShape & { sets: number } {
+  return { ...GOAL_SHAPES[goal][role], sets: SETS_BY_ROLE[role] }
+}
+
 type Blueprint = ReadonlyArray<[Exclude<SlotRole, 'finisher'>, MuscleGroup]>
 
 /** Muscle order per session kind, highest priority first. */
