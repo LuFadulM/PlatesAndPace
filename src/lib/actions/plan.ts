@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { addDays, compareDates, fromISODate, todayInZone, toISODate, type PlainDate } from '@/domain/dates'
 import { generatePlan, regenerateGymSession, type GeneratedPlan, type PlannedDay } from '@/domain/plan'
 import { buildAthleteModel } from '@/domain/profile/athlete'
-import { anyHealthFlag, questionnaireSchema } from '@/domain/profile/questionnaire'
+import { anyHealthFlag, hasRedFlag, questionnaireSchema } from '@/domain/profile/questionnaire'
 import { planSeed } from '@/domain/strength/rng'
 import { MUSCLE_GROUPS, type MuscleGroup } from '@/domain/strength/volume'
 import { exerciseIdsUsedSince, getSwaps, latestMaxes } from '@/lib/data/logs'
@@ -26,6 +26,8 @@ export async function saveAnswersAndGeneratePlan(raw: unknown): Promise<{ ok: tr
   const parsed = questionnaireSchema.safeParse(raw)
   if (!parsed.success) return { ok: false, errorKey: 'onboarding.errors.invalid' }
   const answers = parsed.data
+  // A red flag gates the plan behind the medical notice, whatever the client did.
+  if (hasRedFlag(answers.health) && !answers.health.medicalAcknowledged) return { ok: false, errorKey: 'onboarding.errors.medical' }
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

@@ -695,6 +695,118 @@
       "cue2": "Remadas largas y fluidas",
       "mistake1": "Jalar primero con los brazos",
       "mistake2": "Redondear la espalda"
+    },
+    "box_jump": {
+      "name": "Salto al cajón",
+      "cue1": "Balancea los brazos y aterriza suave con todo el pie",
+      "cue2": "Baja caminando, nunca de un salto",
+      "mistake1": "Aterrizar en sentadilla profunda con las rodillas hacia adentro",
+      "mistake2": "Elegir un cajón tan alto que aterrizas rígido"
+    },
+    "broad_jump": {
+      "name": "Salto horizontal",
+      "cue1": "Carga las caderas y lanza los brazos hacia adelante",
+      "cue2": "Clava el aterrizaje antes de la siguiente",
+      "mistake1": "Aterrizar sobre los talones con las piernas rectas",
+      "mistake2": "Encadenar repeticiones sin resetear"
+    },
+    "push_press": {
+      "name": "Push press",
+      "cue1": "Flexiona unos centímetros, empuja con las piernas y dispara la barra",
+      "cue2": "Termina con la barra sobre el medio del pie",
+      "mistake1": "Flexionar demasiado y convertirlo en sentadilla",
+      "mistake2": "Empujar con los brazos antes de que las piernas terminen"
+    },
+    "dumbbell_push_press": {
+      "name": "Push press con mancuernas",
+      "cue1": "Flexión corta, empuje rápido y bloqueo arriba",
+      "cue2": "Costillas abajo al terminar",
+      "mistake1": "Arquear la zona lumbar arriba",
+      "mistake2": "Dejar que las mancuernas se vayan hacia adelante"
+    },
+    "kettlebell_swing": {
+      "name": "Swing con kettlebell",
+      "cue1": "Bisagra de cadera y luego extiende las caderas con fuerza",
+      "cue2": "Los brazos son cuerdas; el trabajo lo hacen las caderas",
+      "mistake1": "Hacer sentadilla en vez de bisagra",
+      "mistake2": "Levantar con los hombros hasta el pecho"
+    },
+    "medicine_ball_slam": {
+      "name": "Lanzamiento de balón medicinal al suelo",
+      "cue1": "Estírate alto y lanza a través del suelo",
+      "cue2": "Atrapa el rebote y repite",
+      "mistake1": "Redondear la espalda al recoger el balón",
+      "mistake2": "Lanzar solo con los brazos"
+    },
+    "hip_flexor_stretch": {
+      "name": "Estiramiento de flexores de cadera de rodillas",
+      "cue1": "Mete la pelvis y aprieta el glúteo de atrás",
+      "cue2": "Exhala y deja que la cadera avance",
+      "mistake1": "Arquear la lumbar en vez de estirar la cadera",
+      "mistake2": "Inclinar el torso hacia adelante"
+    },
+    "worlds_greatest_stretch": {
+      "name": "El mejor estiramiento del mundo",
+      "cue1": "Zancada larga, codo al empeine y luego rota hacia arriba",
+      "cue2": "Lento, tres respiraciones en cada posición",
+      "mistake1": "La rodilla de adelante se va hacia adentro",
+      "mistake2": "Apurar la rotación"
+    },
+    "ninety_ninety_hip": {
+      "name": "Estiramiento de cadera 90/90",
+      "cue1": "Ambas rodillas a noventa grados, siéntate erguido",
+      "cue2": "Inclínate sobre la espinilla de adelante y cambia de lado",
+      "mistake1": "Redondear la espalda para bajar más",
+      "mistake2": "Aguantar la respiración"
+    },
+    "thoracic_rotation": {
+      "name": "Rotación torácica",
+      "cue1": "En cuatro apoyos, mano detrás de la cabeza y rota el codo al techo",
+      "cue2": "Sigue el codo con la mirada",
+      "mistake1": "Rotar desde la zona lumbar",
+      "mistake2": "Dejar que las caderas se muevan"
+    },
+    "cat_cow": {
+      "name": "Gato-vaca",
+      "cue1": "Redondea toda la columna y luego arquéala, vértebra a vértebra",
+      "cue2": "Exhala al redondear",
+      "mistake1": "Mover solo el cuello",
+      "mistake2": "Ir tan rápido que no sientes cada segmento"
+    },
+    "shoulder_dislocate": {
+      "name": "Pase de hombros con banda",
+      "cue1": "Agarre ancho de una banda o bastón, brazos rectos, por encima y atrás",
+      "cue2": "Cierra el agarre solo cuando sale fluido",
+      "mistake1": "Doblar los codos para pasar",
+      "mistake2": "Arquear la espalda arriba"
+    },
+    "wall_slide": {
+      "name": "Deslizamiento en la pared",
+      "cue1": "Espalda, codos y muñecas en la pared; desliza hacia arriba",
+      "cue2": "Costillas abajo, mantén el contacto",
+      "mistake1": "Perder el contacto de las muñecas para subir más",
+      "mistake2": "Encoger los hombros"
+    },
+    "calf_stretch": {
+      "name": "Estiramiento de pantorrilla en un escalón",
+      "cue1": "Talón fuera del borde, déjalo caer, rodilla recta",
+      "cue2": "Dobla un poco la rodilla para la pantorrilla profunda",
+      "mistake1": "Rebotar",
+      "mistake2": "Girar el pie hacia afuera"
+    },
+    "deep_squat_hold": {
+      "name": "Sentadilla profunda mantenida",
+      "cue1": "Siéntate abajo del todo, los codos empujan las rodillas hacia afuera",
+      "cue2": "Pecho alto y talones en el suelo",
+      "mistake1": "Talones que se levantan",
+      "mistake2": "Redondear mucho la zona lumbar"
+    },
+    "glute_bridge_hold": {
+      "name": "Puente de glúteo mantenido",
+      "cue1": "Aprieta los glúteos y mantén las caderas niveladas",
+      "cue2": "Costillas abajo, sin arquear",
+      "mistake1": "Empujar con los isquiotibiales en vez de los glúteos",
+      "mistake2": "Tensión en el cuello por mirar al frente"
     }
   },
   "muscles": {
@@ -721,7 +833,9 @@
     "accessory": "Accesorio",
     "isolation": "Aislamiento",
     "core": "Core",
-    "conditioning": "Acondicionamiento"
+    "conditioning": "Acondicionamiento",
+    "power": "Potencia",
+    "mobility": "Movilidad"
   },
   "sessions": {
     "full_body_a": {
@@ -794,7 +908,8 @@
     "errors": {
       "invalid": "Faltan respuestas o hay alguna inválida.",
       "underage": "Plates & Pace es para personas de 16 años o más.",
-      "save": "No pudimos guardar tus respuestas. Inténtalo de nuevo."
+      "save": "No pudimos guardar tus respuestas. Inténtalo de nuevo.",
+      "medical": "Confirma el aviso médico antes de continuar."
     },
     "title": "Arma tu plan",
     "stepOf": "Paso {step} de {total}",
@@ -838,17 +953,41 @@
         "otherNote": "Cuéntanos más (opcional)",
         "yes": "Sí",
         "no": "No",
-        "clearance": "Respondiste que sí a al menos una pregunta. Te recomendamos una autorización médica antes de entrenar fuerte. Tu plan empezará en modo cuidadoso: menos peso y menos volumen."
+        "clearance": "Respondiste que sí a al menos una pregunta. Te recomendamos una autorización médica antes de entrenar fuerte. Tu plan empezará en modo cuidadoso: menos peso y menos volumen.",
+        "recentSurgery": "¿Te operaron en los últimos seis meses?",
+        "disorderedEating": "¿Has tenido problemas con la alimentación (trastornos alimentarios)? Si es así, la app nunca te pedirá comer menos.",
+        "medicalTitle": "Habla primero con un médico",
+        "medicalBody": "Una de tus respuestas es una señal de alerta para el ejercicio intenso. Plates & Pace puede armarte un plan cuidadoso, pero es una guía de entrenamiento, no un consejo médico. Consulta con un médico antes de empezar.",
+        "medicalAck": "Entiendo, y me hago responsable de consultar con un médico antes de entrenar fuerte."
       },
       "goals": {
         "title": "Tu meta",
         "primary": "¿Qué es lo más importante ahora?",
-        "build_muscle": "Ganar músculo",
-        "get_strong": "Ganar fuerza",
-        "lose_fat": "Perder grasa",
-        "fit_and_firm": "Estar en forma y firme",
-        "run_faster": "Correr más rápido o más lejos",
-        "hybrid": "Ambas: pesas y correr",
+        "hypertrophy": "Ganar músculo",
+        "strength": "Fuerza máxima",
+        "fat_loss": "Perder grasa",
+        "recomposition": "Recomposición: perder grasa, conservar músculo",
+        "endurance": "Correr más lejos o más rápido",
+        "athletic_performance": "Rendimiento deportivo",
+        "general_health": "Salud general",
+        "mobility_rehab": "Movilidad o vuelta a entrenar",
+        "desc": {
+          "hypertrophy": "Más series cada semana, de 6 a 12 repeticiones cerca del fallo y una semana ligera cuando la necesites.",
+          "strength": "Series pesadas de 1 a 5, descansos largos y los levantamientos principales practicados a menudo.",
+          "fat_loss": "Conservas la fuerza, recortas el volumen, sumas pasos y cardio suave. La comida hace la mayor parte del trabajo.",
+          "recomposition": "Entrenas como para ganar músculo y comes en mantenimiento con mucha proteína. Lento, y funciona.",
+          "endurance": "Correr 80/20 con ritmos sacados de tu propia carrera reciente, y pesas que lo apoyan.",
+          "athletic_performance": "Primero potencia, luego levantamientos pesados, nada al fallo. Velocidad en los días de correr.",
+          "general_health": "Dos sesiones de cuerpo completo, 150 minutos de cardio suave y movilidad. La menor fricción posible.",
+          "mobility_rehab": "Movimiento lento y controlado, movilidad primero y cargas que suben con cuidado. El dolor tiene voz."
+        },
+        "secondary": "¿Algo más? (opcional)",
+        "also": {
+          "endurance": "También corro",
+          "hypertrophy": "También quiero músculo",
+          "strength": "También quiero fuerza",
+          "general_health": "También quiero cuidar la salud"
+        },
         "targetRace": "Distancia objetivo",
         "5k": "5K",
         "10k": "10K",
@@ -964,7 +1103,8 @@
       "straight": "series normales",
       "top_set_backoff": "serie pesada + respaldo",
       "drop_set": "serie descendente en la última",
-      "rest_pause": "pausa-descanso en la última"
+      "rest_pause": "pausa-descanso en la última",
+      "tempo": "tempo lento: 3 s bajando, 1 s de pausa, 3 s subiendo"
     },
     "readinessForm": {
       "sleep": "Sueño",

@@ -1,4 +1,5 @@
 import type { ExperienceTier, PrimaryGoal } from '../profile/types'
+import { goalPolicy } from './goals'
 import type { MuscleGroup } from './volume'
 
 /** The shape of one gym day (PLAN.md §6.2). */
@@ -32,17 +33,26 @@ export const MAX_GYM_DAYS = 6
 export function selectSplit(
   gymDays: number,
   experience: ExperienceTier,
-  _goal: PrimaryGoal,
+  goal: PrimaryGoal,
 ): SessionKind[] {
   if (!Number.isInteger(gymDays) || gymDays < MIN_GYM_DAYS || gymDays > MAX_GYM_DAYS) {
     throw new RangeError(`gym days must be an integer between ${MIN_GYM_DAYS} and ${MAX_GYM_DAYS}`)
+  }
+
+  // General health and a return to training want every session to touch the
+  // whole body: frequency over specialisation, and no day that wrecks one area.
+  if (goalPolicy(goal).fullBodyOnly) {
+    const cycle: SessionKind[] = ['full_body_a', 'full_body_b', 'full_body_c']
+    return Array.from({ length: gymDays }, (_, i) => cycle[i % cycle.length]!)
   }
 
   switch (gymDays) {
     case 2:
       return ['full_body_a', 'full_body_b']
     case 3:
-      return experience === 'beginner'
+      // A strength athlete practises the main lifts three times a week; a
+      // beginner needs the frequency too. Everyone else gets push/pull/legs.
+      return experience === 'beginner' || goal === 'strength'
         ? ['full_body_a', 'full_body_b', 'full_body_c']
         : ['push', 'pull', 'legs']
     case 4:
@@ -123,12 +133,11 @@ const UNRESTRICTED: InterferenceLimits = {
  * session the athlete abandons at 6 km.
  */
 export function interferenceLimits(
-  goal: PrimaryGoal,
+  runsMatter: boolean,
   todaysRun: RunKind,
   tomorrowsRun: RunKind,
 ): InterferenceLimits {
-  const runMatters = goal === 'run_faster' || goal === 'hybrid'
-  if (!runMatters) return UNRESTRICTED
+  if (!runsMatter) return UNRESTRICTED
 
   if (isHardRunDay(todaysRun)) {
     return { maxLowerBodySets: 4, maxLowerBodyRpe: 8, allowHeavyHinge: false }

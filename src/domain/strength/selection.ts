@@ -36,6 +36,10 @@ const TIER_RANK: Record<ExperienceTier, number> = { beginner: 0, intermediate: 1
 /** Whether an exercise's category can fill a slot of this role. */
 export function roleFits(slot: Pick<Slot, 'role'>, exercise: ExerciseDefinition): boolean {
   switch (slot.role) {
+    case 'power':
+      return exercise.category === 'power'
+    case 'mobility':
+      return exercise.category === 'mobility'
     case 'primary':
       return exercise.category === 'compound'
     case 'secondary':

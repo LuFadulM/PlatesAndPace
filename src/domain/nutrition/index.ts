@@ -8,19 +8,22 @@ import type { PrimaryGoal, Sex } from '../profile/types'
  * conservative mode, and a hard calorie floor in every case.
  */
 
+/** Within the 1.6–2.2 g/kg band; the top of it in a deficit. */
 export const PROTEIN_G_PER_KG: Record<PrimaryGoal, number> = {
-  lose_fat: 2.0,
-  build_muscle: 1.8,
-  get_strong: 1.8,
-  hybrid: 1.8,
-  fit_and_firm: 1.6,
-  run_faster: 1.5,
+  fat_loss: 2.2,
+  recomposition: 2.0,
+  hypertrophy: 1.8,
+  strength: 1.8,
+  athletic_performance: 1.8,
+  endurance: 1.6,
+  general_health: 1.6,
+  mobility_rehab: 1.6,
 }
 
 /** Applied to maintenance calories. Anything not listed holds at maintenance. */
 const GOAL_CALORIE_ADJUSTMENT: Partial<Record<PrimaryGoal, number>> = {
-  lose_fat: -0.2,
-  build_muscle: 0.1,
+  fat_loss: -0.2,
+  hypertrophy: 0.1,
 }
 
 export const MINIMUM_AGE = 16

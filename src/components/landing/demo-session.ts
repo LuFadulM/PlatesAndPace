@@ -29,7 +29,7 @@ export function demoAthlete(input: Pick<DemoInput, 'tier' | 'sessionMinutes' | '
     basics: { displayName: 'Demo', locale: 'es', timezone: 'America/Bogota', units: 'metric' },
     body: { sex: input.sex, birthDate: '1996-05-14', heightCm: 168, weightKg: input.sex === 'male' ? 78 : 62 },
     health: { heartCondition: false, chestPain: false, dizziness: false, jointProblem: false, bloodPressureMedication: false, pregnancy: false, other: false },
-    goals: { primary: 'build_muscle' },
+    goals: { primary: 'hypertrophy' },
     experience: { lifting: LIFTING[input.tier], knowsBigLifts: input.tier !== 'beginner', continuousRunMinutes: 0 },
     schedule: { gymDays: [1, 3, 5], runDays: [], sessionMinutes: input.sessionMinutes, startDate: '2026-09-14', blockWeeks: 8 },
     equipment: { setting: 'full_gym', unavailableMachines: [] },

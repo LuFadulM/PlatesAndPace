@@ -695,6 +695,118 @@
       "cue2": "Long, smooth strokes",
       "mistake1": "Pulling with the arms first",
       "mistake2": "Rounding the back"
+    },
+    "box_jump": {
+      "name": "Box jump",
+      "cue1": "Swing the arms, land softly on the whole foot",
+      "cue2": "Step down, never jump down",
+      "mistake1": "Landing in a deep squat with the knees caving",
+      "mistake2": "Choosing a box so high you land stiff"
+    },
+    "broad_jump": {
+      "name": "Broad jump",
+      "cue1": "Load the hips, throw the arms forward",
+      "cue2": "Stick the landing before the next rep",
+      "mistake1": "Landing on the heels with straight legs",
+      "mistake2": "Rushing reps without resetting"
+    },
+    "push_press": {
+      "name": "Push press",
+      "cue1": "Dip a few inches, drive with the legs, punch the bar up",
+      "cue2": "Finish with the bar over the mid-foot",
+      "mistake1": "Dipping too deep and turning it into a squat",
+      "mistake2": "Pressing before the legs have finished driving"
+    },
+    "dumbbell_push_press": {
+      "name": "Dumbbell push press",
+      "cue1": "Short dip, fast drive, lock out overhead",
+      "cue2": "Keep the ribs down as you finish",
+      "mistake1": "Arching the lower back at the top",
+      "mistake2": "Letting the dumbbells drift forward"
+    },
+    "kettlebell_swing": {
+      "name": "Kettlebell swing",
+      "cue1": "Hinge, then snap the hips forward",
+      "cue2": "The arms are ropes; the hips do the work",
+      "mistake1": "Squatting the swing instead of hinging",
+      "mistake2": "Lifting with the shoulders to chest height"
+    },
+    "medicine_ball_slam": {
+      "name": "Medicine ball slam",
+      "cue1": "Reach tall, then slam through the floor",
+      "cue2": "Catch the bounce and go again",
+      "mistake1": "Rounding the back to pick the ball up",
+      "mistake2": "Slamming with the arms only"
+    },
+    "hip_flexor_stretch": {
+      "name": "Kneeling hip flexor stretch",
+      "cue1": "Tuck the pelvis, squeeze the back glute",
+      "cue2": "Breathe out and let the hip sink forward",
+      "mistake1": "Arching the lower back instead of stretching the hip",
+      "mistake2": "Leaning the torso forward"
+    },
+    "worlds_greatest_stretch": {
+      "name": "World's greatest stretch",
+      "cue1": "Long lunge, elbow to instep, then rotate up",
+      "cue2": "Slow, three breaths at each position",
+      "mistake1": "Front knee drifting inward",
+      "mistake2": "Rushing through the rotation"
+    },
+    "ninety_ninety_hip": {
+      "name": "90/90 hip stretch",
+      "cue1": "Both knees at ninety, sit tall",
+      "cue2": "Hinge over the front shin, then switch sides",
+      "mistake1": "Rounding the back to get lower",
+      "mistake2": "Holding the breath"
+    },
+    "thoracic_rotation": {
+      "name": "Thoracic rotation",
+      "cue1": "On all fours, hand behind head, rotate the elbow to the ceiling",
+      "cue2": "Follow the elbow with your eyes",
+      "mistake1": "Rotating from the lower back",
+      "mistake2": "Letting the hips shift"
+    },
+    "cat_cow": {
+      "name": "Cat-cow",
+      "cue1": "Round the whole spine, then arch it, one vertebra at a time",
+      "cue2": "Breathe out as you round",
+      "mistake1": "Moving only the neck",
+      "mistake2": "Going too fast to feel each segment"
+    },
+    "shoulder_dislocate": {
+      "name": "Shoulder pass-through",
+      "cue1": "Wide grip on a band or stick, arms straight, over and back",
+      "cue2": "Narrow the grip only when it stays smooth",
+      "mistake1": "Bending the elbows to get through",
+      "mistake2": "Arching the back at the top"
+    },
+    "wall_slide": {
+      "name": "Wall slide",
+      "cue1": "Back, elbows and wrists on the wall, slide up",
+      "cue2": "Ribs down, keep the contact",
+      "mistake1": "Losing wrist contact to get higher",
+      "mistake2": "Shrugging the shoulders"
+    },
+    "calf_stretch": {
+      "name": "Calf stretch on a step",
+      "cue1": "Heel over the edge, let it drop, knee straight",
+      "cue2": "Bend the knee slightly for the deeper calf",
+      "mistake1": "Bouncing",
+      "mistake2": "Rolling the foot outward"
+    },
+    "deep_squat_hold": {
+      "name": "Deep squat hold",
+      "cue1": "Sit into the bottom, elbows push the knees out",
+      "cue2": "Keep the chest tall and the heels down",
+      "mistake1": "Heels lifting",
+      "mistake2": "Rounding hard through the lower back"
+    },
+    "glute_bridge_hold": {
+      "name": "Glute bridge hold",
+      "cue1": "Squeeze the glutes, hold the hips level",
+      "cue2": "Ribs down, no arching",
+      "mistake1": "Pushing through the hamstrings instead of the glutes",
+      "mistake2": "Neck strain from looking forward"
     }
   },
   "muscles": {
@@ -721,7 +833,9 @@
     "accessory": "Accessory",
     "isolation": "Isolation",
     "core": "Core",
-    "conditioning": "Conditioning"
+    "conditioning": "Conditioning",
+    "power": "Power",
+    "mobility": "Mobility"
   },
   "sessions": {
     "full_body_a": {
@@ -794,7 +908,8 @@
     "errors": {
       "invalid": "Some answers are missing or invalid.",
       "underage": "Plates & Pace is for people aged 16 and over.",
-      "save": "We could not save your answers. Try again."
+      "save": "We could not save your answers. Try again.",
+      "medical": "Please confirm the medical notice before continuing."
     },
     "title": "Set up your plan",
     "stepOf": "Step {step} of {total}",
@@ -838,17 +953,41 @@
         "otherNote": "Tell us more (optional)",
         "yes": "Yes",
         "no": "No",
-        "clearance": "You answered yes to at least one question. We recommend getting medical clearance before hard training. Your plan will start in a careful mode: lighter weights and less volume."
+        "clearance": "You answered yes to at least one question. We recommend getting medical clearance before hard training. Your plan will start in a careful mode: lighter weights and less volume.",
+        "recentSurgery": "Have you had surgery in the last six months?",
+        "disorderedEating": "Have you struggled with disordered eating? If so, the app will never ask you to eat less.",
+        "medicalTitle": "Talk to a doctor first",
+        "medicalBody": "One of your answers is a red flag for hard exercise. Plates & Pace can still build you a careful plan, but it is training guidance, not medical advice. Please check with a doctor before you start.",
+        "medicalAck": "I understand, and I take responsibility for getting medical advice before training hard."
       },
       "goals": {
         "title": "Your goal",
         "primary": "What matters most right now?",
-        "build_muscle": "Build muscle",
-        "get_strong": "Get strong",
-        "lose_fat": "Lose fat",
-        "fit_and_firm": "Get fit and firm",
-        "run_faster": "Run faster or further",
-        "hybrid": "Both: lift and run",
+        "hypertrophy": "Build muscle",
+        "strength": "Get as strong as possible",
+        "fat_loss": "Lose fat",
+        "recomposition": "Recomposition: lose fat, keep muscle",
+        "endurance": "Run further or faster",
+        "athletic_performance": "Athletic performance",
+        "general_health": "General health",
+        "mobility_rehab": "Mobility, or a return to training",
+        "desc": {
+          "hypertrophy": "More sets each week, 6 to 12 reps close to failure, a lighter week when you need one.",
+          "strength": "Heavy sets of 1 to 5, long rests, the main lifts practised often.",
+          "fat_loss": "Keep the strength, trim the volume, add steps and easy cardio. Food does most of the work.",
+          "recomposition": "Train like you are building muscle, eat at maintenance with plenty of protein. Slow, and it works.",
+          "endurance": "80/20 running with paces from your own recent run, and lifting that supports it.",
+          "athletic_performance": "Power first, heavy lifts second, nothing to failure. Speed work on run days.",
+          "general_health": "Two full-body sessions, 150 minutes of easy cardio, mobility. The least friction possible.",
+          "mobility_rehab": "Slow, controlled movement, mobility first, loads that climb carefully. Pain gets a say."
+        },
+        "secondary": "Anything else? (optional)",
+        "also": {
+          "endurance": "I also run",
+          "hypertrophy": "I also want muscle",
+          "strength": "I also want to get strong",
+          "general_health": "I also want to stay healthy"
+        },
         "targetRace": "Target distance",
         "5k": "5K",
         "10k": "10K",
@@ -964,7 +1103,8 @@
       "straight": "straight sets",
       "top_set_backoff": "top set + back-offs",
       "drop_set": "drop set on the last",
-      "rest_pause": "rest-pause on the last"
+      "rest_pause": "rest-pause on the last",
+      "tempo": "slow tempo: 3 s down, 1 s pause, 3 s up"
     },
     "readinessForm": {
       "sleep": "Sleep",

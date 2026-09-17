@@ -26,6 +26,7 @@ import {
   type RunKind,
   type SessionKind,
 } from '../strength/splits'
+import { goalPolicy } from '../strength/goals'
 import { sessionTemplate, type SlotRole } from '../strength/templates'
 import type { MuscleGroup } from '../strength/volume'
 
@@ -35,7 +36,7 @@ import type { MuscleGroup } from '../strength/volume'
  * and seed always produce the same plan.
  */
 
-export type Technique = 'straight' | 'top_set_backoff' | 'drop_set' | 'rest_pause'
+export type Technique = 'straight' | 'top_set_backoff' | 'drop_set' | 'rest_pause' | 'tempo'
 
 export interface PlannedExercise {
   /** A, B, C1, C2 … as shown in the Today list. */
@@ -51,6 +52,8 @@ export interface PlannedExercise {
   restSec: number
   supersetGroup?: string
   technique: Technique
+  /** For timed work (holds, stretches): seconds per set; reps then read as seconds. */
+  holdSeconds?: number
 }
 
 export interface GymSession {
@@ -204,7 +207,8 @@ function buildGymSession(
   focus?: readonly MuscleGroup[],
 ): GymSession {
   const phase = phaseParameters(week, model.blockWeeks)
-  const limits = interferenceLimits(model.goal, todaysRun, tomorrowsRun)
+  const policy = goalPolicy(model.goal)
+  const limits = interferenceLimits(model.runsMatter, todaysRun, tomorrowsRun)
   const template = sessionTemplate(kind, model.goal, model.tier, model.sessionMinutes, focus)
   const lowerBody = isLowerBodySession(kind, focus)
   // Custom sessions keep continuity per muscle combination, so the same
@@ -222,7 +226,7 @@ function buildGymSession(
   const exercises: PlannedExercise[] = []
   let finisher: PlannedExercise | undefined
   let lowerSets = 0
-  const volumeScale = phase.volumeMultiplier * (week === 1 ? (options.reviewVolumeMultiplier ?? 1) : 1)
+  const volumeScale = phase.volumeMultiplier * policy.volumeScale * (week === 1 ? (options.reviewVolumeMultiplier ?? 1) : 1)
 
   template.forEach((slot, slotIndex) => {
     const continuityKey = `${continuityPrefix}:${slotIndex}`
@@ -231,23 +235,42 @@ function buildGymSession(
     chosen.add(exercise.id)
     continuity.set(continuityKey, exercise.id)
 
-    let sets = Math.max(1, Math.round(slot.sets * volumeScale))
+    const timed = exercise.timed === true
+    // Mobility and power ride outside the volume ramp: a hold is a hold.
+    const scale = slot.role === 'mobility' || slot.role === 'power' ? 1 : volumeScale
+    let sets = Math.max(1, Math.round(slot.sets * scale))
     const isLower = exercise.region === 'lower'
-    if (isLower && lowerBody) {
+    if (isLower && lowerBody && slot.role !== 'mobility') {
       const room = limits.maxLowerBodySets - lowerSets
       if (room <= 0) return
       sets = Math.min(sets, room)
       lowerSets += sets
     }
 
+    // The phase sets the target; the goal, the athlete and the movement cap it.
+    // Compounds never reach failure, a big barbell lift stays two reps shy for
+    // anyone not yet advanced, and power work is never a grind.
     let rpeTarget = Math.min(phase.rpeTarget, model.maxRpe)
+    if (slot.role === 'power') rpeTarget = Math.min(rpeTarget, policy.maxRpe.power)
+    else if (slot.role === 'isolation' || slot.role === 'core') {
+      rpeTarget = Math.min(rpeTarget, policy.isolationToFailure && phase.intensityTechnique ? policy.maxRpe.isolation : Math.min(policy.maxRpe.isolation, 9))
+    } else rpeTarget = Math.min(rpeTarget, policy.maxRpe.compound)
+    if (exercise.bigLift && model.tier !== 'advanced') rpeTarget = Math.min(rpeTarget, 8)
     if (isLower) rpeTarget = Math.min(rpeTarget, limits.maxLowerBodyRpe)
     if (slot.role === 'finisher') rpeTarget = Math.min(rpeTarget, 8)
+    if (slot.role === 'mobility') rpeTarget = 5
 
-    const reps = repTarget(slot)
+    let repMin = slot.repMin
+    let repMax = slot.repMax
+    if (slot.role === 'primary' && phase.intensityTechnique && policy.primaryRepShiftOnIntensify !== 0) {
+      repMin = Math.max(1, repMin + policy.primaryRepShiftOnIntensify)
+      repMax = Math.max(repMin + 1, repMax + policy.primaryRepShiftOnIntensify)
+    }
+    const reps = repTarget({ repMin, repMax })
+
     const previous = options.previousMaxes?.[exercise.id]
     let loadKg = 0
-    if (exercise.implement !== 'bodyweight' && exercise.category !== 'conditioning') {
+    if (exercise.implement !== 'bodyweight' && exercise.category !== 'conditioning' && !timed) {
       const base = previous
         ? loadForTarget(previous, reps, rpeTarget)
         : startingLoadKg({
@@ -260,26 +283,30 @@ function buildGymSession(
             units: model.units,
             conservativeMode: model.conservativeMode,
           })
-      const scaled = base * phase.loadMultiplier * (week === 1 ? (options.reviewLoadMultiplier ?? 1) : 1)
+      // Power work moves 30–60% of what the lift could carry, as fast as possible.
+      const powerScale = exercise.category === 'power' ? 0.5 : 1
+      const scaled = base * powerScale * phase.loadMultiplier * (week === 1 ? (options.reviewLoadMultiplier ?? 1) : 1)
       loadKg = roundToIncrement(scaled, exercise.implement, model.units)
     }
 
     let technique: Technique = 'straight'
-    if (slot.role === 'primary' && phase.topSet) technique = 'top_set_backoff'
-    if (phase.intensityTechnique && slot.role === 'isolation' && !finisher) technique = 'drop_set'
+    if (slot.role === 'primary' && phase.topSet && policy.tempoWeeks === 0) technique = 'top_set_backoff'
+    if (phase.intensityTechnique && slot.role === 'isolation' && !finisher && policy.isolationToFailure) technique = 'drop_set'
+    if (week <= policy.tempoWeeks && (slot.role === 'primary' || slot.role === 'secondary')) technique = 'tempo'
 
     const planned: PlannedExercise = {
       label: '',
       exerciseId: exercise.id,
       role: slot.role,
       sets,
-      repMin: slot.repMin,
-      repMax: slot.repMax,
+      repMin,
+      repMax,
       rpeTarget,
       loadKg,
       restSec: slot.restSec,
       supersetGroup: slot.supersetGroup,
       technique,
+      ...(timed ? { holdSeconds: reps } : {}),
     }
 
     if (slot.role === 'finisher') {

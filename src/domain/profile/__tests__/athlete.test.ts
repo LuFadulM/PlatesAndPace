@@ -57,7 +57,7 @@ describe('questionnaire validation', () => {
 
   it('requires a target distance for a running goal', () => {
     expect(() =>
-      answers({ goals: { primary: 'run_faster' } as QuestionnaireAnswers['goals'] }),
+      answers({ goals: { primary: 'endurance' } as unknown as QuestionnaireAnswers['goals'] }),
     ).toThrow()
   })
 

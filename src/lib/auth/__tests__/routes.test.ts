@@ -17,19 +17,19 @@ describe('parsePath', () => {
     })
   })
 
-  it('falls back to the default locale when the prefix is missing', () => {
-    expect(parsePath('/today').locale).toBe('en')
+  it('falls back to the default locale (Spanish) when the prefix is missing', () => {
+    expect(parsePath('/today').locale).toBe('es')
     expect(parsePath('/today').segment).toBe('today')
   })
 
   it('handles the locale root and the bare root', () => {
     expect(parsePath('/es')).toEqual({ locale: 'es', rest: '/', segment: '' })
-    expect(parsePath('/')).toEqual({ locale: 'en', rest: '/', segment: '' })
+    expect(parsePath('/')).toEqual({ locale: 'es', rest: '/', segment: '' })
   })
 
   it('does not mistake a path segment for a locale', () => {
-    // 'english' starts with 'en' but is not a locale.
-    expect(parsePath('/english/today').locale).toBe('en')
+    // 'english' starts with 'en' but is not a locale, so the default applies.
+    expect(parsePath('/english/today').locale).toBe('es')
     expect(parsePath('/english/today').segment).toBe('english')
   })
 })

@@ -12,7 +12,7 @@ const BASE: NutritionInput = {
   ageYears: 28,
   weightKg: 62,
   heightCm: 166,
-  goal: 'lose_fat',
+  goal: 'fat_loss',
   sessionsPerWeek: 3,
   sessionMinutes: 60,
 }
@@ -63,14 +63,14 @@ describe('estimateNutrition', () => {
   })
 
   it('applies a 10% surplus for building muscle', () => {
-    const result = estimateNutrition({ ...BASE, goal: 'build_muscle' })
+    const result = estimateNutrition({ ...BASE, goal: 'hypertrophy' })
 
     expect(result.targetKcal).toBe(Math.round(result.maintenanceKcal * 1.1))
     expect(result.deficitApplied).toBe(false)
   })
 
   it('holds every other goal at maintenance', () => {
-    for (const goal of ['get_strong', 'fit_and_firm', 'run_faster', 'hybrid'] as const) {
+    for (const goal of ['strength', 'general_health', 'endurance', 'recomposition', 'athletic_performance', 'mobility_rehab'] as const) {
       const result = estimateNutrition({ ...BASE, goal })
       expect(result.targetKcal).toBe(Math.round(result.maintenanceKcal))
     }
@@ -100,7 +100,7 @@ describe('estimateNutrition', () => {
   })
 
   it('still allows a surplus in conservative mode — only deficits are suppressed', () => {
-    const careful = estimateNutrition({ ...BASE, goal: 'build_muscle', conservativeMode: true })
+    const careful = estimateNutrition({ ...BASE, goal: 'hypertrophy', conservativeMode: true })
 
     expect(careful.targetKcal).toBe(Math.round(careful.maintenanceKcal * 1.1))
   })

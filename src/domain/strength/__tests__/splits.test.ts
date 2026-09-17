@@ -15,24 +15,24 @@ import {
 
 describe('selectSplit', () => {
   it('follows the table in the brief for each day count', () => {
-    expect(selectSplit(2, 'intermediate', 'build_muscle')).toEqual([
+    expect(selectSplit(2, 'intermediate', 'hypertrophy')).toEqual([
       'full_body_a',
       'full_body_b',
     ])
-    expect(selectSplit(4, 'intermediate', 'build_muscle')).toEqual([
+    expect(selectSplit(4, 'intermediate', 'hypertrophy')).toEqual([
       'upper',
       'lower',
       'upper',
       'lower',
     ])
-    expect(selectSplit(5, 'intermediate', 'fit_and_firm')).toEqual([
+    expect(selectSplit(5, 'intermediate', 'hypertrophy')).toEqual([
       'lower_a',
       'upper_a',
       'glutes_lower_b',
       'upper_b',
       'full_body_a',
     ])
-    expect(selectSplit(6, 'advanced', 'build_muscle')).toEqual([
+    expect(selectSplit(6, 'advanced', 'hypertrophy')).toEqual([
       'push',
       'pull',
       'legs',
@@ -43,25 +43,30 @@ describe('selectSplit', () => {
   })
 
   it('gives a three-day beginner full body and a three-day lifter PPL', () => {
-    expect(selectSplit(3, 'beginner', 'build_muscle')).toEqual([
+    expect(selectSplit(3, 'beginner', 'hypertrophy')).toEqual([
       'full_body_a',
       'full_body_b',
       'full_body_c',
     ])
-    expect(selectSplit(3, 'intermediate', 'build_muscle')).toEqual(['push', 'pull', 'legs'])
-    expect(selectSplit(3, 'advanced', 'get_strong')).toEqual(['push', 'pull', 'legs'])
+    expect(selectSplit(3, 'intermediate', 'hypertrophy')).toEqual(['push', 'pull', 'legs'])
+    expect(selectSplit(3, 'advanced', 'hypertrophy')).toEqual(['push', 'pull', 'legs'])
+    // Strength practises the main lifts three times a week, whatever the experience.
+    expect(selectSplit(3, 'advanced', 'strength')).toEqual(['full_body_a', 'full_body_b', 'full_body_c'])
+    // General health and a return to training stay full body at any day count.
+    expect(selectSplit(4, 'intermediate', 'general_health')).toEqual(['full_body_a', 'full_body_b', 'full_body_c', 'full_body_a'])
+    expect(selectSplit(2, 'advanced', 'mobility_rehab')).toEqual(['full_body_a', 'full_body_b'])
   })
 
   it('always returns one session per gym day', () => {
     for (let days = 2; days <= 6; days += 1) {
-      expect(selectSplit(days, 'intermediate', 'hybrid')).toHaveLength(days)
+      expect(selectSplit(days, 'intermediate', 'endurance')).toHaveLength(days)
     }
   })
 
   it('rejects a day count it has no split for', () => {
-    expect(() => selectSplit(1, 'beginner', 'lose_fat')).toThrow(RangeError)
-    expect(() => selectSplit(7, 'advanced', 'build_muscle')).toThrow(RangeError)
-    expect(() => selectSplit(3.5, 'advanced', 'build_muscle')).toThrow(RangeError)
+    expect(() => selectSplit(1, 'beginner', 'fat_loss')).toThrow(RangeError)
+    expect(() => selectSplit(7, 'advanced', 'hypertrophy')).toThrow(RangeError)
+    expect(() => selectSplit(3.5, 'advanced', 'hypertrophy')).toThrow(RangeError)
   })
 
   it('knows which sessions load the legs', () => {
@@ -83,28 +88,28 @@ describe('interference between lifting and running', () => {
   })
 
   it('caps leg work on a hard run day for a hybrid athlete', () => {
-    const limits = interferenceLimits('hybrid', 'interval', 'none')
+    const limits = interferenceLimits(true, 'interval', 'none')
 
     expect(limits.maxLowerBodySets).toBe(4)
     expect(limits.allowHeavyHinge).toBe(false)
   })
 
   it('keeps legs fresh the day before a long run', () => {
-    const limits = interferenceLimits('hybrid', 'none', 'long')
+    const limits = interferenceLimits(true, 'none', 'long')
 
     expect(limits.maxLowerBodyRpe).toBeLessThanOrEqual(7)
     expect(limits.allowHeavyHinge).toBe(false)
   })
 
   it('leaves a pure lifter unrestricted, whatever the running', () => {
-    const limits = interferenceLimits('build_muscle', 'interval', 'long')
+    const limits = interferenceLimits(false, 'interval', 'long')
 
     expect(limits.maxLowerBodySets).toBe(Number.POSITIVE_INFINITY)
     expect(limits.allowHeavyHinge).toBe(true)
   })
 
   it('leaves an easy run day alone even for a hybrid athlete', () => {
-    expect(interferenceLimits('hybrid', 'easy', 'none').allowHeavyHinge).toBe(true)
+    expect(interferenceLimits(true, 'easy', 'none').allowHeavyHinge).toBe(true)
   })
 })
 

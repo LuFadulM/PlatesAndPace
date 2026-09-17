@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { MUSCLE_GROUPS, type MuscleGroup } from '../strength/volume'
-import { RACE_DISTANCES_KM } from './types'
+import { LEGACY_GOALS, PRIMARY_GOALS, RACE_DISTANCES_KM, SECONDARY_GOALS, normaliseGoal, type PrimaryGoal, type SecondaryGoal } from './types'
 
 /**
  * The nine onboarding steps (PLAN.md §2), as one schema per step.
@@ -29,7 +29,11 @@ export const bodySchema = z.object({
   waistCm: z.number().min(40).max(250).optional(),
 })
 
-/** PAR-Q. Any yes triggers the medical-clearance notice and a careful start. */
+/**
+ * PAR-Q plus two screens of our own. Any yes starts the athlete carefully; a
+ * red flag (everything but a joint problem) also gates the plan behind an
+ * explicit acknowledgement that a doctor should be consulted first.
+ */
 export const healthSchema = z.object({
   heartCondition: z.boolean(),
   chestPain: z.boolean(),
@@ -37,27 +41,56 @@ export const healthSchema = z.object({
   jointProblem: z.boolean(),
   bloodPressureMedication: z.boolean(),
   pregnancy: z.boolean(),
+  recentSurgery: z.boolean().default(false),
+  /** A history of disordered eating: the app never prescribes a deficit. */
+  disorderedEating: z.boolean().default(false),
   other: z.boolean(),
   otherNote: z.string().max(500).optional(),
+  /** Set by the athlete on the medical screen; required when a red flag is up. */
+  medicalAcknowledged: z.boolean().default(false),
 })
 
+export type HealthAnswers = z.infer<typeof healthSchema>
+
+export const RED_FLAG_KEYS = ['heartCondition', 'chestPain', 'dizziness', 'bloodPressureMedication', 'pregnancy', 'recentSurgery', 'other'] as const
+
+/** True when the athlete must acknowledge medical advice before a plan is built. */
+export function hasRedFlag(health: HealthAnswers): boolean {
+  return RED_FLAG_KEYS.some((key) => health[key])
+}
+
+const anyGoal = z.enum([...PRIMARY_GOALS, ...LEGACY_GOALS] as [string, ...string[]])
+
+export function involvesRunning(goals: { primary: PrimaryGoal; secondary?: SecondaryGoal }): boolean {
+  return goals.primary === 'endurance' || goals.secondary === 'endurance'
+}
+
+/**
+ * Accepts both vocabularies on the way in and always yields the current one,
+ * so answers written by the first version of the questionnaire keep working
+ * without a data migration.
+ */
 export const goalsSchema = z
   .object({
-    primary: z.enum([
-      'build_muscle',
-      'get_strong',
-      'lose_fat',
-      'fit_and_firm',
-      'run_faster',
-      'hybrid',
-    ]),
+    primary: anyGoal,
+    secondary: z.enum(SECONDARY_GOALS as unknown as [SecondaryGoal, ...SecondaryGoal[]]).optional(),
     targetRace: z.enum(['5k', '10k', 'half']).optional(),
     raceDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   })
-  .refine(
-    (goals) => goals.primary !== 'run_faster' || goals.targetRace !== undefined,
-    { message: 'a running goal needs a target distance', path: ['targetRace'] },
-  )
+  .transform((goals) => {
+    const mapped = normaliseGoal(goals.primary)
+    const secondary = goals.secondary ?? mapped.secondary
+    return {
+      primary: mapped.primary,
+      secondary: secondary !== undefined && secondary !== mapped.primary ? secondary : undefined,
+      targetRace: goals.targetRace,
+      raceDate: goals.raceDate,
+    }
+  })
+  .refine((goals) => !involvesRunning(goals) || goals.targetRace !== undefined, {
+    message: 'a running goal needs a target distance',
+    path: ['targetRace'],
+  })
 
 export const experienceSchema = z
   .object({

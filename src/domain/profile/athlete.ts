@@ -4,6 +4,7 @@ import {
   ADULT_AGE,
   MINIMUM_AGE,
   anyHealthFlag,
+  involvesRunning,
   type QuestionnaireAnswers,
 } from './questionnaire'
 import {
@@ -16,6 +17,7 @@ import {
   type IntensityPreference,
   type LiftingExperience,
   type PrimaryGoal,
+  type SecondaryGoal,
   type Sex,
   type Units,
 } from './types'
@@ -62,6 +64,9 @@ export interface AthleteModel {
   weightKg: number
 
   goal: PrimaryGoal
+  goalSecondary?: SecondaryGoal
+  /** Running is part of the goal, so run days shape the lifting around them. */
+  runsMatter: boolean
   targetRace?: '5k' | '10k' | 'half'
   raceDate?: PlainDate
 
@@ -102,6 +107,8 @@ export interface AthleteModel {
   /** Under-18s and careful starts never train to a true maximum. */
   maxRpe: number
   allowCalorieDeficit: boolean
+  /** Why a deficit is off, when it is, so the UI can say so. */
+  deficitBlockedBy?: 'minor' | 'medical' | 'disordered_eating'
 }
 
 export class UnderageError extends RangeError {
@@ -146,6 +153,12 @@ export function buildAthleteModel(
     ? { km: answers.experience.recentRun.km, seconds: answers.experience.recentRun.minutes * 60 }
     : undefined
 
+  // A history of disordered eating turns a fat-loss goal into recomposition:
+  // the same training, food at maintenance, and no number to chase down.
+  const disorderedEating = answers.health.disorderedEating
+  const goal: PrimaryGoal = disorderedEating && answers.goals.primary === 'fat_loss' ? 'recomposition' : answers.goals.primary
+  const deficitBlockedBy = isMinor ? 'minor' : needsMedicalClearance ? 'medical' : disorderedEating ? 'disordered_eating' : undefined
+
   return {
     displayName: answers.basics.displayName,
     locale: answers.basics.locale,
@@ -158,7 +171,9 @@ export function buildAthleteModel(
     heightCm: answers.body.heightCm,
     weightKg: answers.body.weightKg,
 
-    goal: answers.goals.primary,
+    goal,
+    goalSecondary: answers.goals.secondary,
+    runsMatter: involvesRunning(answers.goals),
     targetRace: answers.goals.targetRace,
     raceDate: answers.goals.raceDate ? fromISODate(answers.goals.raceDate) : undefined,
 
@@ -193,7 +208,8 @@ export function buildAthleteModel(
     // A minor or a flagged athlete never goes to a true maximum, whatever
     // intensity they asked for.
     maxRpe: isMinor || needsMedicalClearance ? 8 : 10,
-    allowCalorieDeficit: !isMinor && !needsMedicalClearance,
+    allowCalorieDeficit: deficitBlockedBy === undefined,
+    deficitBlockedBy,
   }
 }
 

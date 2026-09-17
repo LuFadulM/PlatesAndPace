@@ -23,7 +23,7 @@ function answers(overrides: Partial<QuestionnaireAnswers['schedule']> = {}): Que
     basics: { displayName: 'Lu', locale: 'es', timezone: 'America/Bogota', units: 'metric' },
     body: { sex: 'female', birthDate: '1996-05-14', heightCm: 165, weightKg: 60 },
     health: { heartCondition: false, chestPain: false, dizziness: false, jointProblem: false, bloodPressureMedication: false, pregnancy: false, other: false },
-    goals: { primary: 'build_muscle' },
+    goals: { primary: 'hypertrophy' },
     experience: { lifting: '1_to_3_years', knowsBigLifts: true, continuousRunMinutes: 0 },
     schedule: { gymDays: [1, 2, 3, 4, 5], runDays: [], splitMode: 'custom', customSplit: CUSTOM_WEEK, sessionMinutes: 75, startDate: '2026-09-14', blockWeeks: 8, ...overrides },
     equipment: { setting: 'full_gym', unavailableMachines: [] },
@@ -68,7 +68,7 @@ describe('customBlueprint', () => {
   })
 
   it('feeds sessionTemplate, which then fills every slot with a real exercise', () => {
-    const slots = sessionTemplate('custom', 'build_muscle', 'intermediate', 75, ['chest', 'shoulders', 'triceps'])
+    const slots = sessionTemplate('custom', 'hypertrophy', 'intermediate', 75, ['chest', 'shoulders', 'triceps'])
     expect(slots[0]?.role).toBe('primary')
     expect(slots[0]?.muscle).toBe('chest')
     expect(slots.length).toBe(7)
@@ -144,8 +144,8 @@ describe('regenerateGymSession — choosing muscles on the day', () => {
   })
 
   it('still respects the run scheduled for tomorrow', () => {
-    const free = regenerateGymSession({ ...model, goal: 'hybrid' }, { focus: ['quads', 'hamstrings', 'glutes'], week: 2, todaysRun: 'none', tomorrowsRun: 'none', seed: 's' })
-    const beforeLong = regenerateGymSession({ ...model, goal: 'hybrid' }, { focus: ['quads', 'hamstrings', 'glutes'], week: 2, todaysRun: 'none', tomorrowsRun: 'long', seed: 's' })
+    const free = regenerateGymSession({ ...model, runsMatter: true }, { focus: ['quads', 'hamstrings', 'glutes'], week: 2, todaysRun: 'none', tomorrowsRun: 'none', seed: 's' })
+    const beforeLong = regenerateGymSession({ ...model, runsMatter: true }, { focus: ['quads', 'hamstrings', 'glutes'], week: 2, todaysRun: 'none', tomorrowsRun: 'long', seed: 's' })
     const lowerSets = (s: typeof free) => s.exercises.filter((e) => getExercise(e.exerciseId).region === 'lower').reduce((n, e) => n + e.sets, 0)
     expect(lowerSets(beforeLong)).toBeLessThanOrEqual(6)
     expect(lowerSets(beforeLong)).toBeLessThanOrEqual(lowerSets(free))

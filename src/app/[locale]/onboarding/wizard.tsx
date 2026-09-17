@@ -12,11 +12,15 @@ import {
   QUESTIONNAIRE_STEPS,
   STEP_SCHEMAS,
   anyHealthFlag,
+  hasRedFlag,
+  involvesRunning,
   toCm,
   toKg,
+  type HealthAnswers,
   type QuestionnaireAnswers,
   type QuestionnaireStep,
 } from '@/domain/profile/questionnaire'
+import { PRIMARY_GOALS, type PrimaryGoal, type SecondaryGoal } from '@/domain/profile/types'
 import { saveAnswersAndGeneratePlan } from '@/lib/actions/plan'
 
 type Draft = { [K in QuestionnaireStep]: Partial<QuestionnaireAnswers[K]> }
@@ -29,7 +33,7 @@ function initialDraft(locale: Locale, initial: QuestionnaireAnswers | null): Dra
   return {
     basics: { locale, timezone, units: 'metric', displayName: '' },
     body: { sex: 'unspecified' },
-    health: { heartCondition: false, chestPain: false, dizziness: false, jointProblem: false, bloodPressureMedication: false, pregnancy: false, other: false },
+    health: { heartCondition: false, chestPain: false, dizziness: false, jointProblem: false, bloodPressureMedication: false, pregnancy: false, recentSurgery: false, disorderedEating: false, other: false, medicalAcknowledged: false },
     goals: {},
     experience: { knowsBigLifts: false },
     schedule: { gymDays: [], runDays: [], splitMode: 'auto', customSplit: {}, sessionMinutes: 60, startDate: toISODate(todayInZone(timezone)), blockWeeks: 8 },
@@ -66,6 +70,11 @@ export function OnboardingWizard({ locale, initial, editing }: { locale: Locale;
   const validateCurrent = (): boolean => {
     const result = STEP_SCHEMAS[key].safeParse(draft[key])
     if (result.success) {
+      // A red flag is not a validation error, but the plan waits on the acknowledgement.
+      if (key === 'health' && hasRedFlag(result.data as HealthAnswers) && !(result.data as HealthAnswers).medicalAcknowledged) {
+        setErrors(['medicalAcknowledged'])
+        return false
+      }
       setErrors([])
       return true
     }
@@ -145,7 +154,7 @@ export function OnboardingWizard({ locale, initial, editing }: { locale: Locale;
       {key === 'health' && (
         <div className="flex flex-col gap-4">
           <p className="text-sm text-(--color-ink-muted)">{t('steps.health.intro')}</p>
-          {(['heartCondition', 'chestPain', 'dizziness', 'jointProblem', 'bloodPressureMedication', 'pregnancy', 'other'] as const).map((q) => (
+          {(['heartCondition', 'chestPain', 'dizziness', 'jointProblem', 'bloodPressureMedication', 'pregnancy', 'recentSurgery', 'disorderedEating', 'other'] as const).map((q) => (
             <fieldset key={q} className="flex items-center justify-between gap-3"><legend className="sr-only">{t(`steps.health.${q}`)}</legend>
               <span className="text-sm">{t(`steps.health.${q}`)}</span>
               <div className="flex shrink-0 gap-1">
@@ -155,16 +164,42 @@ export function OnboardingWizard({ locale, initial, editing }: { locale: Locale;
             </fieldset>
           ))}
           {draft.health.other && <label className={label}>{t('steps.health.otherNote')}<input className={field} value={draft.health.otherNote ?? ''} onChange={(e) => update('health', { otherNote: e.target.value })} /></label>}
-          {anyHealthFlag(draft.health as QuestionnaireAnswers['health']) && <p role="status" className="rounded-lg border border-(--color-plate-yellow) bg-(--color-surface) p-3 text-sm">{t('steps.health.clearance')}</p>}
+          {anyHealthFlag(draft.health as HealthAnswers) && <p role="status" className="rounded-lg border border-(--color-plate-yellow) bg-(--color-surface) p-3 text-sm">{t('steps.health.clearance')}</p>}
+          {hasRedFlag(draft.health as HealthAnswers) && (
+            <div role="region" aria-labelledby="medical-title" className="rounded-xl border-2 border-(--color-plate-red) bg-(--color-surface) p-4">
+              <h3 id="medical-title" className="font-display text-xl font-bold">{t('steps.health.medicalTitle')}</h3>
+              <p className="mt-1 text-sm">{t('steps.health.medicalBody')}</p>
+              <label className="mt-3 flex min-h-11 items-start gap-3 text-sm font-medium">
+                <input type="checkbox" className="mt-1 h-5 w-5 shrink-0" checked={draft.health.medicalAcknowledged ?? false} onChange={(e) => update('health', { medicalAcknowledged: e.target.checked })} />
+                <span>{t('steps.health.medicalAck')}</span>
+              </label>
+            </div>
+          )}
         </div>
       )}
 
       {key === 'goals' && (
         <div className="flex flex-col gap-4">
           <fieldset><legend className="mb-1.5 text-sm font-medium">{t('steps.goals.primary')}</legend>
-            <div className="flex flex-col gap-2">{(['build_muscle', 'get_strong', 'lose_fat', 'fit_and_firm', 'run_faster', 'hybrid'] as const).map((g) => <button type="button" key={g} className={`${chip(draft.goals.primary === g)} text-left`} onClick={() => update('goals', { primary: g })}>{t(`steps.goals.${g}`)}</button>)}</div>
+            <div className="flex flex-col gap-2">
+              {PRIMARY_GOALS.map((g: PrimaryGoal) => (
+                <button type="button" key={g} aria-pressed={draft.goals.primary === g} className={`${chip(draft.goals.primary === g)} min-h-14 rounded-xl py-2 text-left`} onClick={() => update('goals', { primary: g, secondary: draft.goals.secondary === g ? undefined : draft.goals.secondary })}>
+                  <span className="block">{t(`steps.goals.${g}`)}</span>
+                  <span className={`block text-xs font-normal ${draft.goals.primary === g ? 'text-white/85' : 'text-(--color-ink-muted)'}`}>{t(`steps.goals.desc.${g}`)}</span>
+                </button>
+              ))}
+            </div>
           </fieldset>
-          {(draft.goals.primary === 'run_faster' || draft.goals.primary === 'hybrid') && (
+          {draft.goals.primary && (
+            <fieldset><legend className="mb-1.5 text-sm font-medium">{t('steps.goals.secondary')}</legend>
+              <div className="flex flex-wrap gap-2">
+                {((draft.goals.primary === 'endurance' ? ['hypertrophy', 'strength', 'general_health'] : ['endurance']) as SecondaryGoal[]).map((g) => (
+                  <button type="button" key={g} aria-pressed={draft.goals.secondary === g} className={chip(draft.goals.secondary === g)} onClick={() => update('goals', { secondary: draft.goals.secondary === g ? undefined : g })}>{t(`steps.goals.also.${g}`)}</button>
+                ))}
+              </div>
+            </fieldset>
+          )}
+          {draft.goals.primary && involvesRunning({ primary: draft.goals.primary, secondary: draft.goals.secondary }) && (
             <>
               <fieldset><legend className="mb-1.5 text-sm font-medium">{t('steps.goals.targetRace')}</legend>
                 <div className="flex gap-2">{(['5k', '10k', 'half'] as const).map((r) => <button type="button" key={r} className={chip(draft.goals.targetRace === r)} onClick={() => update('goals', { targetRace: r })}>{t(`steps.goals.${r}`)}</button>)}</div>
