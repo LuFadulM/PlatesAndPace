@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+build/
+coverage/
+test-results/
+playwright-report/
+.env
+.env*.local
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts
+public/sw.js
+public/sw.js.map
+supabase/.temp/
+supabase/.branches/

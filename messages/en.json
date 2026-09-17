@@ -1,0 +1,34 @@
+{
+  "app": {
+    "name": "Plates & Pace",
+    "tagline": "Your plan, your pace."
+  },
+  "nav": {
+    "today": "Today",
+    "plan": "Plan",
+    "progress": "Progress",
+    "library": "Library",
+    "group": "Group",
+    "settings": "Settings"
+  },
+  "landing": {
+    "headline": "Training that adapts to you",
+    "body": "Answer a few questions and get a workout for every day — built around your goals, your schedule, your equipment and how your last session actually went.",
+    "getStarted": "Get started",
+    "signIn": "Sign in"
+  },
+  "locale": {
+    "switchLabel": "Language",
+    "en": "English",
+    "es": "Español"
+  },
+  "disclaimer": {
+    "short": "General training guidance, not medical advice.",
+    "long": "Plates & Pace gives general training and nutrition guidance. It is not medical advice, diagnosis or treatment. Talk to a doctor before starting hard training, especially if you have a health condition or any symptoms."
+  },
+  "dates": {
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "yesterday": "Yesterday"
+  }
+}

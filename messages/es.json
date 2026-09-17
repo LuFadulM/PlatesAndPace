@@ -1,0 +1,34 @@
+{
+  "app": {
+    "name": "Plates & Pace",
+    "tagline": "Tu plan, tu ritmo."
+  },
+  "nav": {
+    "today": "Hoy",
+    "plan": "Plan",
+    "progress": "Progreso",
+    "library": "Ejercicios",
+    "group": "Grupo",
+    "settings": "Ajustes"
+  },
+  "landing": {
+    "headline": "Entrenamiento que se adapta a ti",
+    "body": "Responde unas preguntas y recibe un entrenamiento para cada día — armado según tus metas, tus horarios, tu equipo y cómo te fue de verdad en la última sesión.",
+    "getStarted": "Empezar",
+    "signIn": "Iniciar sesión"
+  },
+  "locale": {
+    "switchLabel": "Idioma",
+    "en": "English",
+    "es": "Español"
+  },
+  "disclaimer": {
+    "short": "Guía general de entrenamiento, no consejo médico.",
+    "long": "Plates & Pace da una guía general de entrenamiento y nutrición. No es consejo médico, diagnóstico ni tratamiento. Consulta a un médico antes de empezar a entrenar fuerte, sobre todo si tienes alguna condición de salud o algún síntoma."
+  },
+  "dates": {
+    "today": "Hoy",
+    "tomorrow": "Mañana",
+    "yesterday": "Ayer"
+  }
+}
