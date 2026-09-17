@@ -16,7 +16,78 @@
     "headline": "Training that adapts to you",
     "body": "Answer a few questions and get a workout for every day — built around your goals, your schedule, your equipment and how your last session actually went.",
     "getStarted": "Get started",
-    "signIn": "Sign in"
+    "signIn": "Sign in",
+    "nav": {
+      "how": "How it works",
+      "programs": "Your focus",
+      "why": "Why it works",
+      "menu": "Menu"
+    },
+    "stats": {
+      "exercises": "70 exercises, each one animated",
+      "everyDay": "A session for every day",
+      "languages": "English + Español"
+    },
+    "heroCard": {
+      "today": "Today's session",
+      "sample": "Lower A · 4 lifts · 62 min"
+    },
+    "how": {
+      "title": "How it works",
+      "step1": {
+        "title": "Answer nine questions",
+        "body": "Goal, days, equipment, injuries, experience. About three minutes."
+      },
+      "step2": {
+        "title": "Get every day planned",
+        "body": "Gym days built from a split or from the muscles you choose. Runs paced from your own times."
+      },
+      "step3": {
+        "title": "Log it, and the plan learns",
+        "body": "Tap sets as you go, even offline. Next week's weights come from what you actually lifted."
+      }
+    },
+    "programs": {
+      "title": "Choose what you train",
+      "body": "Pick a split, or name the muscles for each day. Any day can be rebuilt on the spot.",
+      "legs": "Quads, hamstrings, glutes and calves in one session.",
+      "glutes_hamstrings": "A glute day with hamstring support.",
+      "push": "Chest, shoulders and triceps.",
+      "pull": "Back and biceps.",
+      "upper": "The whole upper body in one go.",
+      "full_body": "Everything, three times a week.",
+      "run": {
+        "title": "Run too",
+        "body": "Easy, long and interval runs paced from a run you did last month. 5K, 10K or half marathon."
+      }
+    },
+    "why": {
+      "title": "Built for your first week and your fifth year",
+      "safe": {
+        "title": "Safe starts",
+        "body": "Beginners start lighter, on machines, with two reps in reserve. Health answers make the first weeks careful."
+      },
+      "progress": {
+        "title": "Real progression",
+        "body": "Rate how hard each set felt and the next load follows. A lighter week every fourth."
+      },
+      "gear": {
+        "title": "Your body, your gear",
+        "body": "Injuries remove movement patterns, not the session. No rack? No problem."
+      },
+      "group": {
+        "title": "Train together, keep it private",
+        "body": "Groups see names, sessions done and streaks. Never your weights or body data."
+      }
+    },
+    "cta": {
+      "title": "Your plan is nine questions away",
+      "body": "No password, no card. A sign-in link by email and you are in.",
+      "button": "Build my plan"
+    },
+    "footer": {
+      "madeFor": "Made for phones. Add it to your home screen and it works offline in the gym."
+    }
   },
   "locale": {
     "switchLabel": "Language",
