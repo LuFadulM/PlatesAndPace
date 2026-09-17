@@ -11,7 +11,7 @@ import { nearestLoadable, roundToIncrement, type PlateInventory } from '@/domain
 import { getExercise } from '@/domain/exercises/library'
 import type { NutritionEstimate } from '@/domain/nutrition'
 import { createOutbox, setLogKey, type Outbox } from '@/lib/offline'
-import { finishSession, saveReadiness, saveRun, saveSets } from '@/lib/actions/logs'
+import { finishSession, logWeight, saveReadiness, saveRun, saveSets } from '@/lib/actions/logs'
 import type { LastPerformance, MaxDetail } from '@/lib/data/logs'
 import type { Units } from '@/domain/profile/types'
 import { ExerciseFigure } from '@/components/figure/exercise-figure'
@@ -43,6 +43,7 @@ interface Props {
   alreadyDone: boolean
   initialNotes: string | null
   nutrition: NutritionEstimate | null
+  latestWeightKg: number | null
   /** Per exercise id, what it may be swapped for; empty when the day cannot be edited. */
   alternatives: Record<string, string[]>
   /** Everything that may be added to the day. */
@@ -64,7 +65,7 @@ function Section({ title, children, defaultOpen = false }: { title: string; chil
 
 const input = 'min-h-11 w-full rounded-lg border border-(--color-border) px-2 text-center'
 
-export function SessionView({ date, day, units, plates, maxes, initialSets, initialReadiness, alreadyDone, initialNotes, nutrition, alternatives, catalogue, lastTime, editable }: Props) {
+export function SessionView({ date, day, units, plates, maxes, initialSets, initialReadiness, alreadyDone, initialNotes, nutrition, latestWeightKg, alternatives, catalogue, lastTime, editable }: Props) {
   const t = useTranslations('today')
   const tEx = useTranslations('exercises')
   const tCoach = useTranslations()
@@ -313,12 +314,7 @@ export function SessionView({ date, day, units, plates, maxes, initialSets, init
 
           <Section title={t('warmup')}><p className="text-sm">{tCoach(gym.warmupKey)}</p></Section>
 
-          {nutrition && (
-            <Section title={t('fuel')}>
-              <p className="text-sm">{t('fuelLine', { kcal: nutrition.targetKcal, protein: nutrition.proteinG, water: (nutrition.waterMlPerTrainingDay / 1000).toFixed(1) })}</p>
-              <p className="mt-1 text-xs text-(--color-ink-muted)">{tCoach('nutrition.notes.estimateOnly')}</p>
-            </Section>
-          )}
+          {nutrition && <FuelCard nutrition={nutrition} trainingDay date={date} units={units} latestWeightKg={latestWeightKg} />}
 
           <ol className="flex flex-col gap-2" aria-label={t('exercises')}>
             {exercises.map((e, index) => {
@@ -405,6 +401,8 @@ export function SessionView({ date, day, units, plates, maxes, initialSets, init
         </>
       )}
 
+      {!gym && nutrition && <FuelCard nutrition={nutrition} trainingDay={run !== undefined} date={date} units={units} latestWeightKg={latestWeightKg} />}
+
       {run && day.order === 'lift_first' && gym && <p role="note" className="rounded-full bg-(--color-plate-yellow) px-3 py-1 text-center text-xs font-semibold">{t('liftFirst')}</p>}
       {run && <RunCard run={run} date={date} locale={locale} />}
 
@@ -427,6 +425,44 @@ export function SessionView({ date, day, units, plates, maxes, initialSets, init
       )}
       {done && notes.trim() && <p className="rounded-xl border border-(--color-border) bg-(--color-surface) px-4 py-3 text-sm whitespace-pre-wrap">{notes}</p>}
     </div>
+  )
+}
+
+/**
+ * The day's food targets: calories and macros for a training or a rest day,
+ * every caveat the estimator raised, and the scale reading that keeps the
+ * adaptive loop honest.
+ */
+function FuelCard({ nutrition, trainingDay, date, units, latestWeightKg }: { nutrition: NutritionEstimate; trainingDay: boolean; date: string; units: Units; latestWeightKg: number | null }) {
+  const t = useTranslations('today')
+  const tN = useTranslations()
+  const [weight, setWeight] = useState('')
+  const [pending, startTransition] = useTransition()
+  const [saved, setSaved] = useState(false)
+  const day = trainingDay ? nutrition.trainingDay : nutrition.restDay
+  const kcal = trainingDay ? nutrition.trainingDayKcal : nutrition.restDayKcal
+  const unit = unitLabel(units)
+  return (
+    <Section title={t('fuel')}>
+      <p className="text-sm font-semibold">{t(trainingDay ? 'fuelTraining' : 'fuelRest', { kcal })}</p>
+      <dl className="mt-2 grid grid-cols-4 gap-2 text-center">
+        {([['protein', day.proteinG], ['carbs', day.carbsG], ['fat', day.fatG], ['fibre', day.fibreG]] as const).map(([k, g]) => (
+          <div key={k} className="rounded-lg bg-(--color-surface-2) py-2"><dt className="text-[10px] uppercase text-(--color-ink-muted)">{t(`macro.${k}`)}</dt><dd className="font-display text-lg font-bold tabular-nums">{t('grams', { g })}</dd></div>
+        ))}
+      </dl>
+      <p className="mt-2 text-xs text-(--color-ink-muted)">{t('fuelWater', { water: (nutrition.waterMlPerTrainingDay / 1000).toFixed(1) })} · {t('fuelPredicted', { kg: Math.abs(nutrition.predictedWeeklyChangeKg).toFixed(2), direction: nutrition.predictedWeeklyChangeKg < 0 ? t('fuelDown') : nutrition.predictedWeeklyChangeKg > 0 ? t('fuelUp') : t('fuelHold') })}</p>
+      <ul className="mt-2 flex flex-col gap-1 text-xs text-(--color-ink-muted)">
+        {nutrition.noteKeys.map((key) => <li key={key}>{tN(key)}</li>)}
+      </ul>
+      <form className="mt-3 flex items-end gap-2" onSubmit={(e) => { e.preventDefault(); const v = Number(weight); if (!v) return; startTransition(async () => { const r = await logWeight({ date, weightKg: toKg(v, units) }); if (r.ok) setSaved(true) }) }}>
+        <label className="flex flex-1 flex-col gap-1 text-xs font-medium">
+          {t('weighIn', { unit, last: latestWeightKg ? displayLoad(latestWeightKg, units) : '–' })}
+          <input type="number" inputMode="decimal" step="0.1" value={weight} onChange={(e) => { setWeight(e.target.value); setSaved(false) }} className="min-h-11 w-full rounded-lg border border-(--color-border) bg-(--color-surface) px-3 text-base font-normal" />
+        </label>
+        <button type="submit" disabled={pending || !weight} className="min-h-11 rounded-lg bg-(--color-ink) px-4 text-sm font-semibold text-(--color-bg) disabled:opacity-60">{t('weighInSave')}</button>
+      </form>
+      {saved && <p role="status" className="mt-1 text-xs font-semibold text-(--color-plate-green)">{t('weighInSaved')}</p>}
+    </Section>
   )
 }
 

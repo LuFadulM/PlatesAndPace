@@ -162,7 +162,12 @@
       "estimateOnly": "Son estimados para empezar, no consejo médico. Ajústalos según cómo te sientas y cómo te vaya entrenando.",
       "noDeficitUnder18": "Eres menor de 18 años, así que este plan no usa déficit de calorías.",
       "conservativeMode": "Tus respuestas de salud indican un inicio prudente, así que este plan no usa déficit de calorías.",
-      "calorieFloorApplied": "Esto se subió a un mínimo seguro en vez de bajar más."
+      "calorieFloorApplied": "Esto se subió a un mínimo seguro en vez de bajar más.",
+      "disorderedEating": "Nos contaste sobre un historial de trastornos alimentarios, así que este plan nunca usa déficit. Entrena para la fuerza; come para sostenerla.",
+      "rateCapped": "El cambio se limitó a un ritmo semanal seguro.",
+      "adaptedUp": "Tu tendencia de dos semanas fue más rápida de lo planeado, así que el objetivo subió un poco.",
+      "adaptedDown": "Tu tendencia de dos semanas va más lenta de lo planeado, así que el objetivo bajó un poco.",
+      "recompPatience": "La recomposición es lenta a propósito: come en mantenimiento, entrena fuerte y juzga por el espejo y la barra en meses, no por la báscula en días."
     }
   },
   "auth": {
@@ -1207,7 +1212,24 @@
       "lthr": "según tu umbral de lactato (Friel)"
     },
     "zoneMaxEstimated": "el máximo es una estimación por tu edad",
-    "liftFirst": "Primero pesas, luego correr: las series duras nunca van antes de piernas pesadas."
+    "liftFirst": "Primero pesas, luego correr: las series duras nunca van antes de piernas pesadas.",
+    "fuelTraining": "Día de entreno: unas {kcal} kcal",
+    "fuelRest": "Día de descanso: unas {kcal} kcal",
+    "macro": {
+      "protein": "Proteína",
+      "carbs": "Carbos",
+      "fat": "Grasa",
+      "fibre": "Fibra"
+    },
+    "fuelWater": "{water} L de agua",
+    "fuelPredicted": "a este ritmo, alrededor de {kg} kg por semana {direction}",
+    "fuelDown": "menos",
+    "fuelUp": "más",
+    "fuelHold": "estable",
+    "weighIn": "Peso de la mañana ({unit}) · último {last}",
+    "weighInSave": "Registrar",
+    "weighInSaved": "Peso registrado. El plan lee la tendencia de dos semanas, no una mañana.",
+    "grams": "{g} g"
   },
   "plan": {
     "title": "Plan",

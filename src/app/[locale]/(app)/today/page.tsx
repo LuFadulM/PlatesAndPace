@@ -13,7 +13,7 @@ import type { Readiness } from '@/domain/strength/autoregulation'
 import { isLocale } from '@/i18n/routing'
 import { getSessionLogWithSets, lastPerformances, latestMaxDetails, type MaxDetail } from '@/lib/data/logs'
 import { getCurrentPlan, getDoneDates, getPlannedDay, getPlannedDays } from '@/lib/data/plan'
-import { getActiveAnswers, getLatestWeightKg, requireProfile } from '@/lib/data/profile'
+import { getActiveAnswers, getLatestWeightKg, getRecentWeights, requireProfile } from '@/lib/data/profile'
 
 export default async function TodayPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ date?: string }> }) {
   const { locale } = await params
@@ -37,6 +37,7 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
     getActiveAnswers(),
     getLatestWeightKg(),
   ])
+  const recentWeights = await getRecentWeights(toISODate(today))
   const maxes = Object.fromEntries(Object.entries(maxDetails).map(([id, d]) => [id, d.e1rm]))
   const units = profile.units as 'metric' | 'imperial'
   const plates = answers?.equipment.plates ?? DEFAULT_PLATES[units]
@@ -87,6 +88,8 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
       sessionsPerWeek: answers.schedule.gymDays.length + answers.schedule.runDays.length,
       sessionMinutes: answers.schedule.sessionMinutes,
       conservativeMode: profile.conservative_mode,
+      disorderedEating: answers.health.disorderedEating,
+      recentWeights,
     })
   }
 
@@ -104,6 +107,7 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
         alreadyDone={log?.done ?? false}
         initialNotes={log?.notes ?? null}
         nutrition={nutrition}
+        latestWeightKg={recentWeights.at(-1)?.kg ?? weightKg}
         alternatives={alternatives}
         catalogue={catalogue}
         lastTime={lastTime}

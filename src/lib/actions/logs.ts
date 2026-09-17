@@ -126,3 +126,20 @@ export async function saveRun(input: unknown) {
   revalidatePath('/', 'layout')
   return { ok: true as const }
 }
+
+const weightSchema = z.object({ date: isoDate, weightKg: z.number().min(25).max(400) })
+
+/** One weight per day; a second entry for the same day replaces the first. */
+export async function logWeight(input: unknown) {
+  const parsed = weightSchema.safeParse(input)
+  if (!parsed.success) return { ok: false as const }
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { ok: false as const }
+  const { error } = await supabase
+    .from('body_measurements')
+    .upsert({ user_id: user.id, date: parsed.data.date, weight_kg: Math.round(parsed.data.weightKg * 100) / 100 }, { onConflict: 'user_id,date' })
+  if (error) return { ok: false as const }
+  revalidatePath('/', 'layout')
+  return { ok: true as const }
+}

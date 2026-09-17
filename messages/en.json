@@ -162,7 +162,12 @@
       "estimateOnly": "These are estimates to start from, not medical advice. Adjust them to how you feel and how your training goes.",
       "noDeficitUnder18": "You are under 18, so this plan does not use a calorie deficit.",
       "conservativeMode": "Your health answers put you in a careful start, so this plan does not use a calorie deficit.",
-      "calorieFloorApplied": "This has been raised to a safe minimum rather than going lower."
+      "calorieFloorApplied": "This has been raised to a safe minimum rather than going lower.",
+      "disorderedEating": "You told us about a history of disordered eating, so this plan never uses a deficit. Train for strength; eat to fuel it.",
+      "rateCapped": "The change has been capped at a safe weekly rate.",
+      "adaptedUp": "Your two-week trend moved faster than planned, so the target has come up a little.",
+      "adaptedDown": "Your two-week trend is slower than planned, so the target has come down a little.",
+      "recompPatience": "Recomposition is slow by design: eat at maintenance, lift hard, judge by the mirror and the bar over months, not the scale over days."
     }
   },
   "auth": {
@@ -1207,7 +1212,24 @@
       "lthr": "from your lactate threshold (Friel)"
     },
     "zoneMaxEstimated": "max is an estimate from your age",
-    "liftFirst": "Lift first, run after: hard intervals never go before heavy legs."
+    "liftFirst": "Lift first, run after: hard intervals never go before heavy legs.",
+    "fuelTraining": "Training day: about {kcal} kcal",
+    "fuelRest": "Rest day: about {kcal} kcal",
+    "macro": {
+      "protein": "Protein",
+      "carbs": "Carbs",
+      "fat": "Fat",
+      "fibre": "Fibre"
+    },
+    "fuelWater": "{water} L of water",
+    "fuelPredicted": "at this rate about {kg} kg a week {direction}",
+    "fuelDown": "down",
+    "fuelUp": "up",
+    "fuelHold": "steady",
+    "weighIn": "Morning weight ({unit}) · last {last}",
+    "weighInSave": "Log",
+    "weighInSaved": "Weight logged. The plan reads the two-week trend, not one morning.",
+    "grams": "{g} g"
   },
   "plan": {
     "title": "Plan",
