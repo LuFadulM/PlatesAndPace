@@ -11,10 +11,13 @@ import { getExercise } from '@/domain/exercises/library'
 import type { NutritionEstimate } from '@/domain/nutrition'
 import { createOutbox, setLogKey, type Outbox } from '@/lib/offline'
 import { finishSession, saveReadiness, saveRun, saveSets } from '@/lib/actions/logs'
+import type { LastPerformance } from '@/lib/data/logs'
 import type { Units } from '@/domain/profile/types'
 import { ExerciseFigure } from '@/components/figure/exercise-figure'
+import { AddExercise, ExerciseTools } from './exercise-editor'
 import { FocusPicker } from './focus-picker'
 import { RestTimer } from './rest-timer'
+import { displayLoad, toKg, unitLabel } from './units'
 
 export interface LoggedSet {
   exerciseId: string
@@ -33,13 +36,17 @@ interface Props {
   initialSets: LoggedSet[]
   initialReadiness: Readiness | null
   alreadyDone: boolean
+  initialNotes: string | null
   nutrition: NutritionEstimate | null
+  /** Per exercise id, what it may be swapped for; empty when the day cannot be edited. */
+  alternatives: Record<string, string[]>
+  /** Everything that may be added to the day. */
+  catalogue: string[]
+  /** What the athlete did the last time they met each exercise. */
+  lastTime: Record<string, LastPerformance>
+  /** Today or later, and not yet finished: the session may still be changed. */
+  editable: boolean
 }
-
-const KG_PER_LB = 0.45359237
-const displayLoad = (kg: number, units: Units) => (units === 'imperial' ? Math.round(kg / KG_PER_LB) : Math.round(kg * 2) / 2)
-const unitLabel = (units: Units) => (units === 'imperial' ? 'lb' : 'kg')
-const toKg = (value: number, units: Units) => (units === 'imperial' ? value * KG_PER_LB : value)
 
 function Section({ title, children, defaultOpen = false }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
   return (
@@ -50,7 +57,9 @@ function Section({ title, children, defaultOpen = false }: { title: string; chil
   )
 }
 
-export function SessionView({ date, day, units, initialSets, initialReadiness, alreadyDone, nutrition }: Props) {
+const input = 'min-h-11 w-full rounded-lg border border-(--color-border) px-2 text-center'
+
+export function SessionView({ date, day, units, initialSets, initialReadiness, alreadyDone, initialNotes, nutrition, alternatives, catalogue, lastTime, editable }: Props) {
   const t = useTranslations('today')
   const tEx = useTranslations('exercises')
   const tCoach = useTranslations()
@@ -65,6 +74,9 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
   const [offline, setOffline] = useState(false)
   const outbox = useRef<Outbox | null>(null)
   const [done, setDone] = useState(alreadyDone)
+  const [notes, setNotes] = useState(initialNotes ?? '')
+  // Bumped when a set is marked done, so the rest timer starts by itself.
+  const [restKey, setRestKey] = useState(0)
 
   useEffect(() => {
     outbox.current = createOutbox()
@@ -139,6 +151,36 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
     }
     setSets((m) => new Map(m).set(key, entry))
     void outbox.current?.enqueue({ kind: 'set_log', key, payload: entry, updatedAt: entry.updatedAt })
+    // Rest starts itself after a completed set, unless it was the last one.
+    if (patch.done === true && !previous?.done && setIndex < exercise.sets - 1) setRestKey((k) => k + 1)
+  }
+
+  /** One tap: every set at the suggested load, the middle of the rep range, the target RPE. */
+  const logAllPlanned = (exercise: PlannedExercise) => {
+    const now = Date.now()
+    const entries: [string, LoggedSet][] = []
+    for (let i = 0; i < exercise.sets; i += 1) {
+      const key = setLogKey(date, exercise.exerciseId, i)
+      const previous = sets.get(key)
+      entries.push([
+        key,
+        {
+          exerciseId: exercise.exerciseId,
+          setIndex: i,
+          kg: previous?.kg ?? (exercise.loadKg ? loadFor(exercise, i) : null),
+          reps: previous?.reps ?? Math.round((exercise.repMin + exercise.repMax) / 2),
+          rpe: previous?.rpe ?? exercise.rpeTarget,
+          done: true,
+          updatedAt: now,
+        },
+      ])
+    }
+    setSets((m) => {
+      const next = new Map(m)
+      for (const [key, entry] of entries) next.set(key, entry)
+      return next
+    })
+    for (const [key, entry] of entries) void outbox.current?.enqueue({ kind: 'set_log', key, payload: entry, updatedAt: now })
   }
 
   const doneCount = (exercise: PlannedExercise) => {
@@ -146,6 +188,22 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
     for (let i = 0; i < exercise.sets; i += 1) if (sets.get(setLogKey(date, exercise.exerciseId, i))?.done) n += 1
     return n
   }
+
+  const totals = useMemo(() => {
+    let planned = 0
+    let completed = 0
+    let volumeKg = 0
+    for (const e of exercises) {
+      planned += e.sets
+      for (let i = 0; i < e.sets; i += 1) {
+        const logged = sets.get(setLogKey(date, e.exerciseId, i))
+        if (!logged?.done) continue
+        completed += 1
+        if (logged.kg && logged.reps) volumeKg += logged.kg * logged.reps
+      }
+    }
+    return { planned, completed, volumeKg }
+  }, [exercises, sets, date])
 
   const submitReadiness = (r: Readiness) => {
     setReadiness(r)
@@ -157,7 +215,7 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
   const finish = () => {
     startTransition(async () => {
       await flush()
-      const result = await finishSession({ date })
+      const result = await finishSession({ date, notes: notes.trim() || undefined })
       if (result.ok) {
         setDone(true)
         router.refresh()
@@ -168,17 +226,32 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
   if (!day) return <p className="text-(--color-ink-muted)">{t('noPlan')}</p>
 
   const run = day.run
+  const unit = unitLabel(units)
   const gymTitle = gym
     ? gym.kind === 'custom' && gym.focus && gym.focus.length > 0
       ? gym.focus.map((m) => tMuscles(m)).join(' · ')
       : tCoach(gym.titleKey)
     : ''
-  const summaryOf = (e: PlannedExercise) => `${e.sets} × ${e.repMin}–${e.repMax}${e.loadKg ? `, ${displayLoad(e.loadKg * (adjustment?.loadMultiplier ?? 1), units)} ${unitLabel(units)}` : ''}`
+  const summaryOf = (e: PlannedExercise) => `${e.sets} × ${e.repMin}–${e.repMax}${e.loadKg ? `, ${displayLoad(e.loadKg * (adjustment?.loadMultiplier ?? 1), units)} ${unit}` : ''}`
+  const shortDate = (iso: string) => new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(new Date(`${iso}T12:00:00`))
+  const lastLine = (e: PlannedExercise) => {
+    const last = lastTime[e.exerciseId]
+    if (!last || last.sets.length === 0) return t('firstTime')
+    const parts = last.sets.map((s) => (s.kg ? `${displayLoad(s.kg, units)}×${s.reps ?? '–'}` : `${s.reps ?? '–'}`))
+    return t('lastTime', { date: shortDate(last.date), sets: parts.join(', ') })
+  }
+  const volume = displayLoad(totals.volumeKg, units)
+  const canEdit = editable && !done
 
   return (
     <div className="flex flex-col gap-4">
       {offline && <p role="status" className="rounded-full bg-(--color-plate-yellow) px-3 py-1 text-center text-xs font-semibold">{t('savedOffline')}</p>}
-      {done && <p role="status" className="rounded-xl bg-(--color-plate-green) px-4 py-3 text-center font-semibold text-white">{t('sessionDone')}</p>}
+      {done && (
+        <div role="status" className="rounded-xl bg-(--color-plate-green) px-4 py-3 text-center text-white">
+          <p className="font-semibold">{t('sessionDone')}</p>
+          {gym && <p className="text-sm">{t('summary', { done: totals.completed, total: totals.planned, amount: volume, unit })}</p>}
+        </div>
+      )}
 
       {gym && (
         <>
@@ -186,6 +259,18 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
             <h2 className="font-display text-3xl font-bold">{gymTitle}</h2>
             <p className="text-sm text-(--color-ink-muted)">{tCoach(gym.intentKey)} · {t('estimate', { minutes: gym.estimatedMinutes })}</p>
           </div>
+
+          {totals.planned > 0 && (
+            <div aria-live="polite">
+              <div className="flex items-baseline justify-between text-sm">
+                <span className="font-semibold tabular-nums">{t('progress', { done: totals.completed, total: totals.planned })}</span>
+                {totals.volumeKg > 0 && <span className="text-(--color-ink-muted) tabular-nums">{t('volume', { amount: volume, unit })}</span>}
+              </div>
+              <div className="mt-1 h-2 overflow-hidden rounded-full bg-(--color-surface-2)" role="progressbar" aria-valuemin={0} aria-valuemax={totals.planned} aria-valuenow={totals.completed}>
+                <div className="h-full rounded-full bg-(--color-plate-green) transition-[width] duration-500" style={{ width: `${Math.round((totals.completed / totals.planned) * 100)}%` }} />
+              </div>
+            </div>
+          )}
 
           <Section title={t('readiness')} defaultOpen={!readiness && !done}>
             {readiness ? (
@@ -204,8 +289,8 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
             </Section>
           )}
 
-          <ol className="flex flex-col gap-2">
-            {exercises.map((e) => {
+          <ol className="flex flex-col gap-2" aria-label={t('exercises')}>
+            {exercises.map((e, index) => {
               const isOpen = open === e.exerciseId
               const count = doneCount(e)
               const complete = count >= e.sets
@@ -214,7 +299,7 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
                   <button type="button" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? null : e.exerciseId)} className="flex min-h-14 w-full items-center gap-3 px-3 text-left">
                     <span className={`w-7 font-display text-lg font-bold ${complete ? 'text-(--color-plate-green)' : 'text-(--color-plate-blue)'}`}>{e.label}</span>
                     <ExerciseFigure animation={getExercise(e.exerciseId).animation} title={tEx(`${e.exerciseId}.name`)} className="h-12 w-12 shrink-0 text-(--color-ink)" />
-                    <span className="flex-1">
+                    <span className="min-w-0 flex-1">
                       <span className="block font-semibold">{tEx(`${e.exerciseId}.name`)}</span>
                       <span className="block text-xs text-(--color-ink-muted)">{summaryOf(e)}{e.technique !== 'straight' ? ` · ${t(`technique.${e.technique}`)}` : ''}</span>
                     </span>
@@ -230,6 +315,7 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
                           <p className="mt-1 text-(--color-plate-red)">{tEx(`${e.exerciseId}.mistake1`)}</p>
                         </div>
                       </div>
+                      <p className="text-xs font-semibold text-(--color-plate-blue)">{lastLine(e)}</p>
                       {Array.from({ length: e.sets }, (_, i) => {
                         const logged = sets.get(setLogKey(date, e.exerciseId, i))
                         const suggested = loadFor(e, i)
@@ -238,22 +324,42 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
                             <span className="text-sm font-semibold">{i + 1}</span>
                             <label className="text-xs">
                               <span className="sr-only">{t('kg')}</span>
-                              <input type="number" inputMode="decimal" step={units === 'imperial' ? 5 : 0.5} aria-label={`${t('kg')} ${i + 1}`} className="min-h-11 w-full rounded-lg border border-(--color-border) px-2 text-center" placeholder={e.loadKg ? String(displayLoad(suggested, units)) : '—'} value={logged?.kg !== null && logged?.kg !== undefined ? displayLoad(logged.kg, units) : ''} onChange={(ev) => logSet(e, i, { kg: ev.target.value === '' ? null : toKg(Number(ev.target.value), units) })} />
+                              <input type="number" inputMode="decimal" step={units === 'imperial' ? 5 : 0.5} aria-label={`${t('kg')} ${i + 1}`} className={input} placeholder={e.loadKg ? String(displayLoad(suggested, units)) : '—'} value={logged?.kg !== null && logged?.kg !== undefined ? displayLoad(logged.kg, units) : ''} onChange={(ev) => logSet(e, i, { kg: ev.target.value === '' ? null : toKg(Number(ev.target.value), units) })} />
                             </label>
-                            <input type="number" inputMode="numeric" aria-label={`${t('reps')} ${i + 1}`} className="min-h-11 w-full rounded-lg border border-(--color-border) px-2 text-center" placeholder={`${e.repMin}–${e.repMax}`} value={logged?.reps ?? ''} onChange={(ev) => logSet(e, i, { reps: ev.target.value === '' ? null : Number(ev.target.value) })} />
-                            <input type="number" inputMode="decimal" step={0.5} min={1} max={10} aria-label={`${t('rpe')} ${i + 1}`} className="min-h-11 w-full rounded-lg border border-(--color-border) px-2 text-center" placeholder={String(e.rpeTarget)} value={logged?.rpe ?? ''} onChange={(ev) => logSet(e, i, { rpe: ev.target.value === '' ? null : Number(ev.target.value) })} />
+                            <input type="number" inputMode="numeric" aria-label={`${t('reps')} ${i + 1}`} className={input} placeholder={`${e.repMin}–${e.repMax}`} value={logged?.reps ?? ''} onChange={(ev) => logSet(e, i, { reps: ev.target.value === '' ? null : Number(ev.target.value) })} />
+                            <input type="number" inputMode="decimal" step={0.5} min={1} max={10} aria-label={`${t('rpe')} ${i + 1}`} className={input} placeholder={String(e.rpeTarget)} value={logged?.rpe ?? ''} onChange={(ev) => logSet(e, i, { rpe: ev.target.value === '' ? null : Number(ev.target.value) })} />
                             <button type="button" aria-pressed={logged?.done ?? false} aria-label={`${t('setDone')} ${i + 1}`} onClick={() => logSet(e, i, { done: !(logged?.done ?? false) })} className={`min-h-11 rounded-lg font-bold ${logged?.done ? 'bg-(--color-plate-green) text-white' : 'border border-(--color-border)'}`}><svg aria-hidden="true" viewBox="0 0 20 20" className="mx-auto h-5 w-5" fill="none" stroke="currentColor" strokeWidth="3"><path d="M4 10.5l4 4 8-9" /></svg></button>
                           </div>
                         )
                       })}
-                      <div className="grid grid-cols-[2rem_1fr_1fr_1fr_2.75rem] gap-2 text-center text-[10px] uppercase text-(--color-ink-muted)"><span /><span>{unitLabel(units)}</span><span>{t('reps')}</span><span>{t('rpe')}</span><span /></div>
-                      <RestTimer seconds={e.restSec} />
+                      <div className="grid grid-cols-[2rem_1fr_1fr_1fr_2.75rem] gap-2 text-center text-[10px] uppercase text-(--color-ink-muted)"><span /><span>{unit}</span><span>{t('reps')}</span><span>{t('rpe')}</span><span /></div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <RestTimer seconds={e.restSec} autoStartKey={restKey} />
+                        {!complete && !done && (
+                          <button type="button" onClick={() => logAllPlanned(e)} className="min-h-11 rounded-lg bg-(--color-plate-green)/15 px-3 text-sm font-semibold text-(--color-plate-green)">
+                            {t('logAllPlanned')}
+                          </button>
+                        )}
+                      </div>
+                      {canEdit && (
+                        <ExerciseTools
+                          date={date}
+                          exercise={e}
+                          alternatives={alternatives[e.exerciseId] ?? []}
+                          units={units}
+                          canMoveUp={index > 0}
+                          canMoveDown={index < exercises.length - 1}
+                          onSwapped={(to) => setOpen(to)}
+                        />
+                      )}
                     </div>
                   )}
                 </li>
               )
             })}
           </ol>
+
+          {canEdit && <AddExercise date={date} catalogue={catalogue} />}
 
           {gym.finisher && (
             <Section title={t('finisher')}>
@@ -273,10 +379,17 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
       )}
 
       {!done && (gym || run) && (
-        <button type="button" disabled={pending} onClick={finish} className="min-h-12 rounded-xl bg-(--color-plate-green) font-display text-lg font-bold text-white disabled:opacity-60">
-          {t('finish')}
-        </button>
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-semibold">
+            <span className="mb-1 block">{t('notes')}</span>
+            <textarea value={notes} onChange={(ev) => setNotes(ev.target.value)} rows={2} maxLength={1000} placeholder={t('notesPlaceholder')} className="w-full rounded-lg border border-(--color-border) bg-(--color-surface) px-3 py-2 text-sm font-normal" />
+          </label>
+          <button type="button" disabled={pending} onClick={finish} className="min-h-12 rounded-xl bg-(--color-plate-green) font-display text-lg font-bold text-white disabled:opacity-60">
+            {t('finish')}
+          </button>
+        </div>
       )}
+      {done && notes.trim() && <p className="rounded-xl border border-(--color-border) bg-(--color-surface) px-4 py-3 text-sm whitespace-pre-wrap">{notes}</p>}
     </div>
   )
 }

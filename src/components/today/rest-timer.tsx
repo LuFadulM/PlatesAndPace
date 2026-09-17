@@ -24,7 +24,12 @@ function beep() {
   }
 }
 
-export function RestTimer({ seconds, onDone }: { seconds: number; onDone?: () => void }) {
+/**
+ * Counts down the rest between sets. Starts on tap, or by itself when
+ * `autoStartKey` changes — the session bumps it each time a set is marked done
+ * so the athlete never has to reach for the timer mid-workout.
+ */
+export function RestTimer({ seconds, onDone, autoStartKey = 0 }: { seconds: number; onDone?: () => void; autoStartKey?: number }) {
   const t = useTranslations('today')
   const locale = useLocale()
   const [remaining, setRemaining] = useState<number | null>(null)
@@ -49,6 +54,15 @@ export function RestTimer({ seconds, onDone }: { seconds: number; onDone?: () =>
     endAt.current = Date.now() + seconds * 1000
     setRemaining(seconds)
   }
+
+  // Only a change after mount starts the clock: opening another exercise
+  // while a key is already set must not begin a rest nobody asked for.
+  const seenKey = useRef(autoStartKey)
+  useEffect(() => {
+    if (autoStartKey === seenKey.current) return
+    seenKey.current = autoStartKey
+    start()
+  }, [autoStartKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return remaining === null ? (
     <button type="button" onClick={start} className="min-h-11 rounded-lg border border-(--color-border) px-3 text-sm font-semibold">

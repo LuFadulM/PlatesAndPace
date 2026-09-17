@@ -4,11 +4,13 @@ import { DayHeader, type StripDay } from '@/components/today/day-header'
 import { SessionView, type LoggedSet } from '@/components/today/session-view'
 import { ageOn } from '@/domain/profile/types'
 import { estimateNutrition, type NutritionEstimate } from '@/domain/nutrition'
-import { fromISODate, isValidPlainDate, todayInZone, toISODate, weekStrip } from '@/domain/dates'
+import { compareDates, fromISODate, isValidPlainDate, todayInZone, toISODate, weekStrip } from '@/domain/dates'
 import { resolveLoads } from '@/domain/plan'
+import { alternativesFor, catalogueFor } from '@/domain/plan/edit'
+import { buildAthleteModel } from '@/domain/profile/athlete'
 import type { Readiness } from '@/domain/strength/autoregulation'
 import { isLocale } from '@/i18n/routing'
-import { getSessionLogWithSets, latestMaxes } from '@/lib/data/logs'
+import { getSessionLogWithSets, lastPerformances, latestMaxes } from '@/lib/data/logs'
 import { getCurrentPlan, getDoneDates, getPlannedDay, getPlannedDays } from '@/lib/data/plan'
 import { getActiveAnswers, getLatestWeightKg, requireProfile } from '@/lib/data/profile'
 
@@ -38,6 +40,23 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
   const resolved = day?.gym && plan ? { ...day, gym: resolveLoads(day.gym, day.week, plan.weeks, maxes, profile.units as 'metric' | 'imperial') } : day
 
   const stripDays: StripDay[] = days.map((d) => ({ date: d.date, type: d.type, done: doneDates.has(d.date) }))
+
+  // What the athlete may change today: swaps per slot and the add catalogue,
+  // both filtered by the same rules the generator applies. The past is history.
+  const editable = compareDates(selected, today) >= 0 && !(log?.done ?? false)
+  let alternatives: Record<string, string[]> = {}
+  let catalogue: string[] = []
+  if (editable && resolved?.gym && answers) {
+    try {
+      const model = buildAthleteModel(answers, today)
+      const gym = resolved.gym
+      alternatives = Object.fromEntries(gym.exercises.map((e) => [e.exerciseId, alternativesFor(gym, e.exerciseId, model).map((a) => a.id)]))
+      catalogue = catalogueFor(gym, model).map((e) => e.id)
+    } catch {
+      // An athlete the model refuses (e.g. a birth date that makes them under age) can still log; they just cannot edit.
+    }
+  }
+  const lastTime = resolved?.gym ? await lastPerformances(resolved.gym.exercises.map((e) => e.exerciseId), iso) : {}
 
   const initialSets: LoggedSet[] = sets.map((s) => ({
     exerciseId: s.exercise_id,
@@ -73,7 +92,12 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
         initialSets={initialSets}
         initialReadiness={(log?.readiness as Readiness | null) ?? null}
         alreadyDone={log?.done ?? false}
+        initialNotes={log?.notes ?? null}
         nutrition={nutrition}
+        alternatives={alternatives}
+        catalogue={catalogue}
+        lastTime={lastTime}
+        editable={editable}
       />
     </main>
   )
