@@ -30,5 +30,13 @@
     "today": "Today",
     "tomorrow": "Tomorrow",
     "yesterday": "Yesterday"
+  },
+  "nutrition": {
+    "notes": {
+      "estimateOnly": "These are estimates to start from, not medical advice. Adjust them to how you feel and how your training goes.",
+      "noDeficitUnder18": "You are under 18, so this plan does not use a calorie deficit.",
+      "conservativeMode": "Your health answers put you in a careful start, so this plan does not use a calorie deficit.",
+      "calorieFloorApplied": "This has been raised to a safe minimum rather than going lower."
+    }
   }
 }

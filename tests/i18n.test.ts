@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { NUTRITION_NOTE_KEYS } from '../src/domain/nutrition'
 import en from '../messages/en.json'
 import es from '../messages/es.json'
 
@@ -86,5 +87,17 @@ describe('message catalogues', () => {
       .map(([key]) => key)
 
     expect(suspicious).toEqual([])
+  })
+
+  it('defines every message key the domain engine emits', () => {
+    const missing: string[] = []
+
+    for (const key of NUTRITION_NOTE_KEYS) {
+      for (const locale of Object.keys(catalogs)) {
+        if (!flat[locale]!.has(key)) missing.push(`${locale}:${key}`)
+      }
+    }
+
+    expect(missing).toEqual([])
   })
 })
