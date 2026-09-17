@@ -56,5 +56,24 @@
       "linkExpired": "That link has expired. Ask for a new one.",
       "linkInvalid": "That link did not work. Ask for a new one."
     }
+  },
+  "coach": {
+    "phase": {
+      "calibration": "Finding your weights this week. Leave two reps in the tank on every set.",
+      "build": "One heavy set, then back-offs. This is where the progress comes from.",
+      "intensify": "Hardest week of the block. Push the last set of the day.",
+      "deload": "Deload. Light and easy on purpose — you are recovering, not slacking."
+    },
+    "readiness": {
+      "good": "You are fresh. Full session today.",
+      "moderate": "A bit flat. Same work, slightly lighter.",
+      "low": "Rough day. Shorter session, lighter weights — showing up is the win."
+    },
+    "review": {
+      "struggling": "Tough week — only {done} of {planned} sessions happened. I have trimmed next week so you can finish it.",
+      "grinding": "You were grinding. Same weights next week, a bit less of them.",
+      "thriving": "That looked easy — {done} of {planned} done and well within yourself. Stepping it up.",
+      "onTrack": "{done} of {planned} sessions done. Right where you should be — same again."
+    }
   }
 }

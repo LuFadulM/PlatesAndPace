@@ -1,0 +1,188 @@
+import { fromISODate, type PlainDate } from '../dates'
+import {
+  ADULT_AGE,
+  MINIMUM_AGE,
+  anyHealthFlag,
+  type QuestionnaireAnswers,
+} from './questionnaire'
+import {
+  ageOn,
+  experienceTier,
+  type EquipmentSetting,
+  type ExperienceTier,
+  type FocusArea,
+  type InjuryArea,
+  type IntensityPreference,
+  type LiftingExperience,
+  type PrimaryGoal,
+  type Sex,
+  type Units,
+} from './types'
+
+/**
+ * Movement patterns rather than exercise names.
+ *
+ * An injury rules out a way of loading a joint, not a list of exercise ids —
+ * so the filter keeps working when the exercise library changes, and a new
+ * exercise is covered the moment it declares its patterns.
+ */
+export type MovementPattern =
+  | 'deep_knee_flexion'
+  | 'loaded_lunge'
+  | 'knee_extension_loaded'
+  | 'spinal_loading'
+  | 'loaded_hip_hinge'
+  | 'overhead_press'
+  | 'behind_neck'
+  | 'upright_row'
+  | 'deep_hip_flexion'
+  | 'loaded_wrist_extension'
+  | 'neck_loading'
+
+const INJURY_PATTERNS: Record<InjuryArea, readonly MovementPattern[]> = {
+  knees: ['deep_knee_flexion', 'loaded_lunge', 'knee_extension_loaded'],
+  lower_back: ['spinal_loading', 'loaded_hip_hinge'],
+  shoulders: ['overhead_press', 'behind_neck', 'upright_row'],
+  hips: ['deep_hip_flexion', 'loaded_lunge'],
+  wrists: ['loaded_wrist_extension'],
+  neck: ['neck_loading', 'behind_neck'],
+}
+
+export interface AthleteModel {
+  displayName: string
+  locale: 'en' | 'es'
+  timezone: string
+  units: Units
+
+  sex: Sex
+  birthDate: PlainDate
+  ageYears: number
+  heightCm: number
+  weightKg: number
+
+  goal: PrimaryGoal
+  targetRace?: '5k' | '10k' | 'half'
+  raceDate?: PlainDate
+
+  experience: LiftingExperience
+  tier: ExperienceTier
+  knowsBigLifts: boolean
+  recentRun?: { km: number; seconds: number }
+  continuousRunMinutes?: number
+
+  gymDays: number[]
+  runDays: number[]
+  longRunDay?: number
+  sessionMinutes: number
+  startDate: PlainDate
+  blockWeeks: number
+
+  equipment: EquipmentSetting
+  unavailableMachines: string[]
+
+  injuries: InjuryArea[]
+  /** Patterns no exercise in this athlete's plan may use. */
+  bannedPatterns: Set<MovementPattern>
+  injuryNote: string
+
+  focusAreas: FocusArea[]
+  intensity: IntensityPreference
+  avoidExerciseIds: string[]
+
+  /** Any PAR-Q yes: 15% lighter starts, 20% less volume, clearance notice. */
+  conservativeMode: boolean
+  needsMedicalClearance: boolean
+  isMinor: boolean
+  /** Under-18s and careful starts never train to a true maximum. */
+  maxRpe: number
+  allowCalorieDeficit: boolean
+}
+
+export class UnderageError extends RangeError {
+  constructor(age: number) {
+    super(`Plates & Pace is for athletes aged ${MINIMUM_AGE} and over; this one is ${age}`)
+    this.name = 'UnderageError'
+  }
+}
+
+/**
+ * Normalises questionnaire answers into the single shape the engine reads.
+ *
+ * `today` is passed in rather than read from the clock so that age — and every
+ * guard that depends on it — is computed in the athlete's own time zone by the
+ * caller, and so the result is testable.
+ */
+export function buildAthleteModel(
+  answers: QuestionnaireAnswers,
+  today: PlainDate,
+): AthleteModel {
+  const birthDate = fromISODate(answers.body.birthDate)
+  const ageYears = ageOn(birthDate, today)
+
+  if (ageYears < MINIMUM_AGE) throw new UnderageError(ageYears)
+
+  const needsMedicalClearance = anyHealthFlag(answers.health)
+  const isMinor = ageYears < ADULT_AGE
+
+  const bannedPatterns = new Set<MovementPattern>()
+  for (const area of answers.injuries.areas) {
+    for (const pattern of INJURY_PATTERNS[area]) bannedPatterns.add(pattern)
+  }
+
+  const recentRun = answers.experience.recentRun
+    ? { km: answers.experience.recentRun.km, seconds: answers.experience.recentRun.minutes * 60 }
+    : undefined
+
+  return {
+    displayName: answers.basics.displayName,
+    locale: answers.basics.locale,
+    timezone: answers.basics.timezone,
+    units: answers.basics.units,
+
+    sex: answers.body.sex,
+    birthDate,
+    ageYears,
+    heightCm: answers.body.heightCm,
+    weightKg: answers.body.weightKg,
+
+    goal: answers.goals.primary,
+    targetRace: answers.goals.targetRace,
+    raceDate: answers.goals.raceDate ? fromISODate(answers.goals.raceDate) : undefined,
+
+    experience: answers.experience.lifting,
+    tier: experienceTier(answers.experience.lifting),
+    knowsBigLifts: answers.experience.knowsBigLifts,
+    recentRun,
+    continuousRunMinutes: answers.experience.continuousRunMinutes,
+
+    gymDays: [...answers.schedule.gymDays].sort((a, b) => a - b),
+    runDays: [...answers.schedule.runDays].sort((a, b) => a - b),
+    longRunDay: answers.schedule.longRunDay,
+    sessionMinutes: answers.schedule.sessionMinutes,
+    startDate: fromISODate(answers.schedule.startDate),
+    blockWeeks: answers.schedule.blockWeeks,
+
+    equipment: answers.equipment.setting,
+    unavailableMachines: answers.equipment.unavailableMachines,
+
+    injuries: answers.injuries.areas,
+    bannedPatterns,
+    injuryNote: answers.injuries.note,
+
+    focusAreas: answers.preferences.focusAreas,
+    intensity: answers.preferences.intensity,
+    avoidExerciseIds: answers.preferences.avoidExerciseIds,
+
+    conservativeMode: needsMedicalClearance,
+    needsMedicalClearance,
+    isMinor,
+    // A minor or a flagged athlete never goes to a true maximum, whatever
+    // intensity they asked for.
+    maxRpe: isMinor || needsMedicalClearance ? 8 : 10,
+    allowCalorieDeficit: !isMinor && !needsMedicalClearance,
+  }
+}
+
+export function patternsForInjury(area: InjuryArea): readonly MovementPattern[] {
+  return INJURY_PATTERNS[area]
+}
