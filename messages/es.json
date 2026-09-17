@@ -68,6 +68,12 @@
       "good": "Vienes con energía. Sesión completa hoy.",
       "moderate": "Se nota algo de cansancio. El mismo trabajo, un poco más ligero.",
       "low": "Día difícil. Sesión más corta y pesos más ligeros: presentarte ya es ganar."
+    },
+    "review": {
+      "struggling": "Semana dura: salieron {done} de {planned} sesiones. Recorté la próxima para que puedas terminarla.",
+      "grinding": "Te costó bastante. La próxima semana, los mismos pesos pero un poco menos volumen.",
+      "thriving": "Se te vio fácil: {done} de {planned} y con margen de sobra. Subimos un escalón.",
+      "onTrack": "{done} de {planned} sesiones hechas. Justo donde toca: seguimos igual."
     }
   }
 }

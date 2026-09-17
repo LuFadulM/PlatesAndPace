@@ -68,6 +68,12 @@
       "good": "You are fresh. Full session today.",
       "moderate": "A bit flat. Same work, slightly lighter.",
       "low": "Rough day. Shorter session, lighter weights — showing up is the win."
+    },
+    "review": {
+      "struggling": "Tough week — only {done} of {planned} sessions happened. I have trimmed next week so you can finish it.",
+      "grinding": "You were grinding. Same weights next week, a bit less of them.",
+      "thriving": "That looked easy — {done} of {planned} done and well within yourself. Stepping it up.",
+      "onTrack": "{done} of {planned} sessions done. Right where you should be — same again."
     }
   }
 }
