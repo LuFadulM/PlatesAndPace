@@ -27,10 +27,10 @@ port = 54324
 [auth]
 enabled = true
 site_url = "http://localhost:3000"
-additional_redirect_urls = [
-  "http://localhost:3000/en/auth/callback",
-  "http://localhost:3000/es/auth/callback",
-]
+# The callback lives at /auth/callback, outside the locale prefix. A glob
+# keeps local development simple; production lists its exact URL in the
+# Supabase dashboard.
+additional_redirect_urls = ["http://localhost:3000/**"]
 jwt_expiry = 3600
 enable_signup = true
 

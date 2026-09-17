@@ -18,17 +18,25 @@ export async function createUser(email: string) {
   return data.user
 }
 
+export const BASE_URL = process.env.E2E_BASE_URL ?? 'http://localhost:3000'
+
 /**
- * Signs the browser in by exchanging a generated magic link, which is the same
- * path a real user takes minus the inbox.
+ * Signs the browser in the way a real magic link does, minus the inbox: the
+ * link's token hash goes straight to the app's callback, which verifies it
+ * server-side and writes the session cookies. No redirect through the auth
+ * server, so no dependence on its redirect allowlist.
  */
 export async function signIn(page: Page, email: string, locale: 'en' | 'es' = 'en') {
   const { data, error } = await admin().auth.admin.generateLink({ type: 'magiclink', email })
   if (error || !data.properties) throw error ?? new Error('no link')
-  const url = new URL(data.properties.action_link)
-  url.searchParams.set('redirect_to', `${page.context()._options.baseURL ?? 'http://localhost:3000'}/auth/callback?locale=${locale}`)
+  const url = new URL('/auth/callback', BASE_URL)
+  url.searchParams.set('token_hash', data.properties.hashed_token)
+  url.searchParams.set('type', 'magiclink')
+  url.searchParams.set('locale', locale)
   await page.goto(url.toString())
-  await page.waitForURL(/\/(en|es)\//)
+  // Only a signed-in visitor reaches either of these; a bounce to sign-in
+  // fails here, loudly, rather than 60 s later on a missing field.
+  await page.waitForURL(/\/(en|es)\/(today|onboarding)/, { timeout: 30_000 })
 }
 
 export async function completeOnboarding(page: Page, locale: 'en' | 'es', opts: { name: string; runner?: boolean }) {
