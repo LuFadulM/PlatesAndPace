@@ -56,5 +56,18 @@
       "linkExpired": "Ese enlace ya venció. Pide uno nuevo.",
       "linkInvalid": "Ese enlace no funcionó. Pide uno nuevo."
     }
+  },
+  "coach": {
+    "phase": {
+      "calibration": "Esta semana buscamos tus pesos. Deja dos repeticiones en reserva en cada serie.",
+      "build": "Una serie pesada y luego series de respaldo. De aquí sale el progreso.",
+      "intensify": "La semana más dura del bloque. Aprieta en la última serie del día.",
+      "deload": "Semana de descarga. Ligero a propósito: estás recuperando, no aflojando."
+    },
+    "readiness": {
+      "good": "Vienes con energía. Sesión completa hoy.",
+      "moderate": "Se nota algo de cansancio. El mismo trabajo, un poco más ligero.",
+      "low": "Día difícil. Sesión más corta y pesos más ligeros: presentarte ya es ganar."
+    }
   }
 }
