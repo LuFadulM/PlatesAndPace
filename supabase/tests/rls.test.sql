@@ -231,10 +231,19 @@ select public.assert(
     || public.training_streak('11111111-1111-1111-1111-111111111111'));
 
 -- An unfinished session today must not read as a miss.
+--
+-- The isolation fixture above logged a completed session for Ana on the
+-- server's current_date, which is Bogotá's today for most of the day (and
+-- Bogotá's tomorrow after 19:00). Make today explicitly unfinished so this
+-- assertion means the same thing whatever the hour.
 insert into public.planned_sessions (user_id, plan_id, date, type, content)
 values ('11111111-1111-1111-1111-111111111111', 'aaaaaaaa-0000-0000-0000-000000000001',
         (now() at time zone 'America/Bogota')::date, 'gym', '{}'::jsonb)
 on conflict (user_id, date) do update set type = 'gym';
+
+insert into public.session_logs (user_id, date, done)
+values ('11111111-1111-1111-1111-111111111111', (now() at time zone 'America/Bogota')::date, false)
+on conflict (user_id, date) do update set done = false;
 
 select public.assert(
   public.training_streak('11111111-1111-1111-1111-111111111111') = 1,
