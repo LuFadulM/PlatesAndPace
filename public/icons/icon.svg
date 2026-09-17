@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#14181c"/>
+  <!-- A barbell: blue plates, yellow bar — the plate colours of the app. -->
+  <rect x="96" y="176" width="48" height="160" rx="12" fill="#1d4ed8"/>
+  <rect x="368" y="176" width="48" height="160" rx="12" fill="#1d4ed8"/>
+  <rect x="136" y="200" width="40" height="112" rx="10" fill="#5b8dff"/>
+  <rect x="336" y="200" width="40" height="112" rx="10" fill="#5b8dff"/>
+  <rect x="64" y="240" width="384" height="32" rx="16" fill="#e0a800"/>
+</svg>

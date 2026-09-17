@@ -32,6 +32,10 @@ describe('middleware matcher', () => {
     expect(matcher.test('/auth')).toBe(false)
   })
 
+  it('does not capture the service worker offline fallback', () => {
+    expect(matcher.test('/offline')).toBe(false)
+  })
+
   it('still captures localised app routes', () => {
     expect(matcher.test('/es/today')).toBe(true)
     expect(matcher.test('/en/plan')).toBe(true)

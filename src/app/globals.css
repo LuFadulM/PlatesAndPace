@@ -15,6 +15,13 @@
   --color-plate-green: #15803d;
   --color-plate-red: #dc2626;
 
+  /* Chart series, in fixed order. Validated colourblind-safe against the light
+     surface with the dataviz palette script; never cycled past four. */
+  --color-chart-1: #1d4ed8;
+  --color-chart-2: #b8860b;
+  --color-chart-3: #7e22ce;
+  --color-chart-4: #0d9488;
+
   --font-display: var(--font-barlow-condensed), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-barlow), ui-sans-serif, system-ui, sans-serif;
 }
@@ -37,6 +44,10 @@
       --color-plate-yellow: #f5c542;
       --color-plate-green: #3fbc69;
       --color-plate-red: #ff6b60;
+      --color-chart-1: #5b8dff;
+      --color-chart-2: #b08900;
+      --color-chart-3: #a855f7;
+      --color-chart-4: #0d9488;
     }
   }
 
@@ -52,6 +63,10 @@
     --color-plate-yellow: #f5c542;
     --color-plate-green: #3fbc69;
     --color-plate-red: #ff6b60;
+    --color-chart-1: #5b8dff;
+    --color-chart-2: #b08900;
+    --color-chart-3: #a855f7;
+    --color-chart-4: #0d9488;
   }
 
   body {

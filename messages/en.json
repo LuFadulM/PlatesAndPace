@@ -9,7 +9,8 @@
     "progress": "Progress",
     "library": "Library",
     "group": "Group",
-    "settings": "Settings"
+    "settings": "Settings",
+    "primary": "Main navigation"
   },
   "landing": {
     "headline": "Training that adapts to you",
@@ -29,7 +30,8 @@
   "dates": {
     "today": "Today",
     "tomorrow": "Tomorrow",
-    "yesterday": "Yesterday"
+    "yesterday": "Yesterday",
+    "weekStrip": "This week"
   },
   "nutrition": {
     "notes": {
@@ -54,7 +56,8 @@
       "invalidEmail": "That does not look like an email address.",
       "sendFailed": "We could not send the link. Try again in a moment.",
       "linkExpired": "That link has expired. Ask for a new one.",
-      "linkInvalid": "That link did not work. Ask for a new one."
+      "linkInvalid": "That link did not work. Ask for a new one.",
+      "signedOut": "You have been signed out. Sign in again to continue."
     }
   },
   "coach": {
@@ -75,5 +78,930 @@
       "thriving": "That looked easy — {done} of {planned} done and well within yourself. Stepping it up.",
       "onTrack": "{done} of {planned} sessions done. Right where you should be — same again."
     }
+  },
+  "exercises": {
+    "back_squat": {
+      "name": "Back squat",
+      "cue1": "Brace your trunk before you descend",
+      "cue2": "Push the floor away, knees tracking over toes",
+      "mistake1": "Knees caving inward",
+      "mistake2": "Heels lifting off the floor"
+    },
+    "front_squat": {
+      "name": "Front squat",
+      "cue1": "Elbows high, bar resting on the shoulders",
+      "cue2": "Stay upright all the way down",
+      "mistake1": "Elbows dropping and the bar rolling forward",
+      "mistake2": "Rounding the upper back"
+    },
+    "goblet_squat": {
+      "name": "Goblet squat",
+      "cue1": "Hold the weight against your chest",
+      "cue2": "Sit down between your heels",
+      "mistake1": "Leaning forward as you go down",
+      "mistake2": "Only going halfway"
+    },
+    "leg_press": {
+      "name": "Leg press",
+      "cue1": "Lower until your thighs meet your torso",
+      "cue2": "Keep your lower back on the pad",
+      "mistake1": "Locking the knees at the top",
+      "mistake2": "Letting the hips roll off the seat"
+    },
+    "hack_squat": {
+      "name": "Hack squat",
+      "cue1": "Shoulders under the pads, feet mid-platform",
+      "cue2": "Control the descent, drive up through the whole foot",
+      "mistake1": "Bouncing out of the bottom",
+      "mistake2": "Heels rising"
+    },
+    "bulgarian_split_squat": {
+      "name": "Bulgarian split squat",
+      "cue1": "Rear foot on the bench, front foot a long stride ahead",
+      "cue2": "Drop straight down, front shin near vertical",
+      "mistake1": "Standing too close to the bench",
+      "mistake2": "Pushing off the back foot"
+    },
+    "walking_lunge": {
+      "name": "Walking lunge",
+      "cue1": "Long step, back knee toward the floor",
+      "cue2": "Torso tall, drive through the front heel",
+      "mistake1": "Short steps that jam the front knee",
+      "mistake2": "Leaning forward"
+    },
+    "step_up": {
+      "name": "Step-up",
+      "cue1": "Whole foot on the box",
+      "cue2": "Push through the top leg, not the bottom one",
+      "mistake1": "Bouncing off the floor leg",
+      "mistake2": "Box too high for control"
+    },
+    "bodyweight_squat": {
+      "name": "Bodyweight squat",
+      "cue1": "Arms forward for balance",
+      "cue2": "Sit back and down, chest up",
+      "mistake1": "Knees collapsing inward",
+      "mistake2": "Rushing the reps"
+    },
+    "reverse_lunge": {
+      "name": "Reverse lunge",
+      "cue1": "Step back and lower the rear knee",
+      "cue2": "Front shin stays near vertical",
+      "mistake1": "Leaning forward",
+      "mistake2": "Twisting the hips"
+    },
+    "leg_extension": {
+      "name": "Leg extension",
+      "cue1": "Pad just above the ankles",
+      "cue2": "Pause for a second at the top",
+      "mistake1": "Swinging the weight up",
+      "mistake2": "Lifting the hips off the seat"
+    },
+    "conventional_deadlift": {
+      "name": "Deadlift",
+      "cue1": "Bar over mid-foot, shins to the bar",
+      "cue2": "Push the floor away, keep the bar close",
+      "mistake1": "Rounding the lower back",
+      "mistake2": "Jerking the bar off the floor"
+    },
+    "romanian_deadlift": {
+      "name": "Romanian deadlift",
+      "cue1": "Soft knees, push the hips back",
+      "cue2": "Lower until you feel the hamstrings, then stand",
+      "mistake1": "Bending the knees into a squat",
+      "mistake2": "Bar drifting away from the legs"
+    },
+    "dumbbell_rdl": {
+      "name": "Dumbbell Romanian deadlift",
+      "cue1": "Dumbbells brushing the thighs",
+      "cue2": "Hinge at the hips, flat back",
+      "mistake1": "Rounding the back",
+      "mistake2": "Turning it into a squat"
+    },
+    "leg_curl": {
+      "name": "Leg curl",
+      "cue1": "Pad on the lower calves",
+      "cue2": "Squeeze at the top, control the way back",
+      "mistake1": "Lifting the hips",
+      "mistake2": "Letting the weight drop"
+    },
+    "nordic_curl": {
+      "name": "Nordic curl",
+      "cue1": "Hips straight, lower as slowly as you can",
+      "cue2": "Catch yourself with your hands",
+      "mistake1": "Breaking at the hips",
+      "mistake2": "Dropping the last half"
+    },
+    "hip_thrust": {
+      "name": "Hip thrust",
+      "cue1": "Shoulder blades on the bench, chin tucked",
+      "cue2": "Drive up until the hips are level, squeeze",
+      "mistake1": "Overarching the lower back at the top",
+      "mistake2": "Feet too far forward"
+    },
+    "dumbbell_hip_thrust": {
+      "name": "Dumbbell hip thrust",
+      "cue1": "Dumbbell across the hips",
+      "cue2": "Pause at the top for a second",
+      "mistake1": "Pushing through the toes",
+      "mistake2": "Rushing the reps"
+    },
+    "glute_bridge": {
+      "name": "Glute bridge",
+      "cue1": "Heels close to the hips",
+      "cue2": "Squeeze the glutes, not the lower back",
+      "mistake1": "Arching the back",
+      "mistake2": "Not going all the way up"
+    },
+    "cable_kickback": {
+      "name": "Cable kickback",
+      "cue1": "Slight forward lean, hold the frame",
+      "cue2": "Kick back and slightly up",
+      "mistake1": "Swinging with momentum",
+      "mistake2": "Arching the lower back"
+    },
+    "hip_abduction": {
+      "name": "Hip abduction",
+      "cue1": "Lean slightly forward",
+      "cue2": "Pause at the widest point",
+      "mistake1": "Bouncing the pads together",
+      "mistake2": "Too much weight"
+    },
+    "single_leg_glute_bridge": {
+      "name": "Single-leg glute bridge",
+      "cue1": "Other knee to chest",
+      "cue2": "Hips level as you rise",
+      "mistake1": "Hips tilting to one side",
+      "mistake2": "Pushing with the toes"
+    },
+    "standing_calf_raise": {
+      "name": "Standing calf raise",
+      "cue1": "Full stretch at the bottom",
+      "cue2": "Pause at the top",
+      "mistake1": "Bouncing",
+      "mistake2": "Bending the knees"
+    },
+    "dumbbell_calf_raise": {
+      "name": "Dumbbell calf raise",
+      "cue1": "Toes on a step for range",
+      "cue2": "Slow on the way down",
+      "mistake1": "Half reps",
+      "mistake2": "Leaning on the wall too much"
+    },
+    "bodyweight_calf_raise": {
+      "name": "Calf raise",
+      "cue1": "Rise as high as you can",
+      "cue2": "Lower slowly",
+      "mistake1": "Bouncing",
+      "mistake2": "Rushing"
+    },
+    "bench_press": {
+      "name": "Bench press",
+      "cue1": "Shoulder blades pulled together, feet planted",
+      "cue2": "Bar to the lower chest, press up and slightly back",
+      "mistake1": "Bouncing the bar off the chest",
+      "mistake2": "Flaring the elbows out wide"
+    },
+    "dumbbell_bench_press": {
+      "name": "Dumbbell bench press",
+      "cue1": "Elbows at about 45 degrees",
+      "cue2": "Lower to chest level",
+      "mistake1": "Clanging the dumbbells at the top",
+      "mistake2": "Shortening the range"
+    },
+    "incline_dumbbell_press": {
+      "name": "Incline dumbbell press",
+      "cue1": "Bench at 30 degrees",
+      "cue2": "Lower to the upper chest",
+      "mistake1": "Bench too steep",
+      "mistake2": "Arching off the bench"
+    },
+    "chest_press_machine": {
+      "name": "Chest press machine",
+      "cue1": "Handles at chest height",
+      "cue2": "Squeeze the chest at the end",
+      "mistake1": "Shoulders rolling forward",
+      "mistake2": "Locking the elbows hard"
+    },
+    "push_up": {
+      "name": "Push-up",
+      "cue1": "Body in one straight line",
+      "cue2": "Chest to the floor, elbows tucked",
+      "mistake1": "Hips sagging",
+      "mistake2": "Only going halfway"
+    },
+    "cable_fly": {
+      "name": "Cable fly",
+      "cue1": "Slight bend in the elbows",
+      "cue2": "Bring the hands together in front of the chest",
+      "mistake1": "Turning it into a press",
+      "mistake2": "Too much weight"
+    },
+    "dumbbell_fly": {
+      "name": "Dumbbell fly",
+      "cue1": "Wide arc, elbows soft",
+      "cue2": "Stop when you feel the stretch",
+      "mistake1": "Going too deep",
+      "mistake2": "Bending the elbows into a press"
+    },
+    "overhead_press": {
+      "name": "Overhead press",
+      "cue1": "Bar at the collarbones, glutes tight",
+      "cue2": "Press straight up, head through at the top",
+      "mistake1": "Leaning back",
+      "mistake2": "Pressing forward around the face"
+    },
+    "dumbbell_shoulder_press": {
+      "name": "Dumbbell shoulder press",
+      "cue1": "Start at ear height",
+      "cue2": "Press until the arms are straight",
+      "mistake1": "Arching the lower back",
+      "mistake2": "Clanging the dumbbells"
+    },
+    "machine_shoulder_press": {
+      "name": "Machine shoulder press",
+      "cue1": "Handles level with the shoulders",
+      "cue2": "Control the way down",
+      "mistake1": "Shrugging the shoulders",
+      "mistake2": "Half reps"
+    },
+    "pike_push_up": {
+      "name": "Pike push-up",
+      "cue1": "Hips high, head toward the floor",
+      "cue2": "Press back up to the start",
+      "mistake1": "Hips dropping",
+      "mistake2": "Elbows flaring"
+    },
+    "lateral_raise": {
+      "name": "Lateral raise",
+      "cue1": "Slight bend in the elbows",
+      "cue2": "Raise to shoulder height, lead with the elbows",
+      "mistake1": "Swinging the weight up",
+      "mistake2": "Shrugging"
+    },
+    "face_pull": {
+      "name": "Face pull",
+      "cue1": "Rope at face height",
+      "cue2": "Pull to the face, elbows high and wide",
+      "mistake1": "Too heavy",
+      "mistake2": "Elbows dropping"
+    },
+    "rear_delt_fly": {
+      "name": "Rear delt fly",
+      "cue1": "Hinge forward, flat back",
+      "cue2": "Raise out to the sides",
+      "mistake1": "Standing too upright",
+      "mistake2": "Swinging"
+    },
+    "barbell_row": {
+      "name": "Barbell row",
+      "cue1": "Hinge to about 45 degrees",
+      "cue2": "Pull to the lower ribs, squeeze the back",
+      "mistake1": "Standing up as you pull",
+      "mistake2": "Rounding the back"
+    },
+    "dumbbell_row": {
+      "name": "Dumbbell row",
+      "cue1": "Hand and knee on the bench",
+      "cue2": "Pull to the hip, not the shoulder",
+      "mistake1": "Twisting the torso",
+      "mistake2": "Yanking the weight"
+    },
+    "chest_supported_row": {
+      "name": "Chest-supported row",
+      "cue1": "Chest stays on the pad",
+      "cue2": "Squeeze the shoulder blades together",
+      "mistake1": "Lifting the chest off",
+      "mistake2": "Shrugging"
+    },
+    "seated_cable_row": {
+      "name": "Seated cable row",
+      "cue1": "Sit tall, chest up",
+      "cue2": "Pull to the stomach, elbows back",
+      "mistake1": "Leaning back too far",
+      "mistake2": "Rounding forward at the start"
+    },
+    "lat_pulldown": {
+      "name": "Lat pulldown",
+      "cue1": "Grip a bit wider than the shoulders",
+      "cue2": "Pull to the upper chest, elbows down",
+      "mistake1": "Leaning way back",
+      "mistake2": "Pulling behind the neck"
+    },
+    "pull_up": {
+      "name": "Pull-up",
+      "cue1": "Start from a dead hang",
+      "cue2": "Chin over the bar, control the descent",
+      "mistake1": "Kipping",
+      "mistake2": "Half reps"
+    },
+    "inverted_row": {
+      "name": "Inverted row",
+      "cue1": "Body straight, heels on the floor",
+      "cue2": "Pull the chest to the bar",
+      "mistake1": "Hips sagging",
+      "mistake2": "Short range"
+    },
+    "superman": {
+      "name": "Superman",
+      "cue1": "Lift arms and legs together",
+      "cue2": "Hold for a second at the top",
+      "mistake1": "Jerking up",
+      "mistake2": "Holding your breath"
+    },
+    "dumbbell_curl": {
+      "name": "Dumbbell curl",
+      "cue1": "Elbows pinned to the sides",
+      "cue2": "Lower slowly",
+      "mistake1": "Swinging the body",
+      "mistake2": "Elbows drifting forward"
+    },
+    "hammer_curl": {
+      "name": "Hammer curl",
+      "cue1": "Palms facing each other",
+      "cue2": "Squeeze at the top",
+      "mistake1": "Swinging",
+      "mistake2": "Rushing the descent"
+    },
+    "cable_curl": {
+      "name": "Cable curl",
+      "cue1": "Constant tension through the rep",
+      "cue2": "Elbows still",
+      "mistake1": "Leaning back",
+      "mistake2": "Half reps"
+    },
+    "barbell_curl": {
+      "name": "Barbell curl",
+      "cue1": "Shoulder-width grip",
+      "cue2": "Elbows stay by your sides",
+      "mistake1": "Swinging the hips",
+      "mistake2": "Too heavy"
+    },
+    "triceps_pushdown": {
+      "name": "Triceps pushdown",
+      "cue1": "Elbows pinned, push down until straight",
+      "cue2": "Control the way up",
+      "mistake1": "Elbows flaring",
+      "mistake2": "Leaning over the cable"
+    },
+    "overhead_triceps_extension": {
+      "name": "Overhead triceps extension",
+      "cue1": "Elbows close to the head",
+      "cue2": "Lower behind the head, extend fully",
+      "mistake1": "Elbows drifting apart",
+      "mistake2": "Arching the back"
+    },
+    "bench_dip": {
+      "name": "Bench dip",
+      "cue1": "Hands on the bench, feet forward",
+      "cue2": "Lower until the elbows are at 90 degrees",
+      "mistake1": "Going too deep",
+      "mistake2": "Shoulders rolling forward"
+    },
+    "skull_crusher": {
+      "name": "Skull crusher",
+      "cue1": "Lower toward the forehead",
+      "cue2": "Elbows pointing at the ceiling",
+      "mistake1": "Elbows flaring",
+      "mistake2": "Turning it into a press"
+    },
+    "plank": {
+      "name": "Plank",
+      "cue1": "Straight line from head to heels",
+      "cue2": "Squeeze the glutes and abs",
+      "mistake1": "Hips sagging or too high",
+      "mistake2": "Holding your breath"
+    },
+    "side_plank": {
+      "name": "Side plank",
+      "cue1": "Elbow under the shoulder",
+      "cue2": "Hips stacked and lifted",
+      "mistake1": "Hips dropping",
+      "mistake2": "Rolling forward"
+    },
+    "dead_bug": {
+      "name": "Dead bug",
+      "cue1": "Lower back pressed into the floor",
+      "cue2": "Extend the opposite arm and leg slowly",
+      "mistake1": "Back arching off the floor",
+      "mistake2": "Rushing"
+    },
+    "hanging_knee_raise": {
+      "name": "Hanging knee raise",
+      "cue1": "Knees to chest, then lower with control",
+      "cue2": "Slight posterior tilt of the pelvis",
+      "mistake1": "Swinging",
+      "mistake2": "Using the hip flexors only"
+    },
+    "cable_crunch": {
+      "name": "Cable crunch",
+      "cue1": "Rope behind the head",
+      "cue2": "Curl the ribs toward the hips",
+      "mistake1": "Pulling with the arms",
+      "mistake2": "Hinging at the hips"
+    },
+    "pallof_press": {
+      "name": "Pallof press",
+      "cue1": "Cable at chest height, side-on",
+      "cue2": "Press out and hold, do not let it twist you",
+      "mistake1": "Twisting toward the cable",
+      "mistake2": "Too much weight"
+    },
+    "bicycle_crunch": {
+      "name": "Bicycle crunch",
+      "cue1": "Elbow to opposite knee",
+      "cue2": "Slow and controlled",
+      "mistake1": "Pulling on the neck",
+      "mistake2": "Going too fast"
+    },
+    "burpee": {
+      "name": "Burpee",
+      "cue1": "Chest to the floor, then jump",
+      "cue2": "Land softly",
+      "mistake1": "Sagging through the push-up",
+      "mistake2": "Landing stiff-legged"
+    },
+    "jump_squat": {
+      "name": "Jump squat",
+      "cue1": "Land soft, absorb into the next rep",
+      "cue2": "Arms swing for height",
+      "mistake1": "Landing with locked knees",
+      "mistake2": "Knees caving"
+    },
+    "mountain_climber": {
+      "name": "Mountain climber",
+      "cue1": "Hands under the shoulders",
+      "cue2": "Drive the knees fast, hips low",
+      "mistake1": "Hips rising",
+      "mistake2": "Bouncing the shoulders"
+    },
+    "jumping_jack": {
+      "name": "Jumping jack",
+      "cue1": "Light on the feet",
+      "cue2": "Arms all the way overhead",
+      "mistake1": "Landing flat-footed",
+      "mistake2": "Half arm swing"
+    },
+    "farmers_carry": {
+      "name": "Farmer's carry",
+      "cue1": "Stand tall, shoulders back",
+      "cue2": "Walk with short, quick steps",
+      "mistake1": "Leaning to one side",
+      "mistake2": "Shrugging"
+    },
+    "dumbbell_swing": {
+      "name": "Dumbbell swing",
+      "cue1": "Hinge, then snap the hips forward",
+      "cue2": "Arms are just a rope",
+      "mistake1": "Squatting instead of hinging",
+      "mistake2": "Lifting with the arms"
+    },
+    "bike_intervals": {
+      "name": "Bike intervals",
+      "cue1": "Hard effort, then easy spin",
+      "cue2": "Keep the cadence up",
+      "mistake1": "Starting the hard bit too hard",
+      "mistake2": "Slumping over the bars"
+    },
+    "rower_intervals": {
+      "name": "Rower intervals",
+      "cue1": "Legs, then back, then arms",
+      "cue2": "Long, smooth strokes",
+      "mistake1": "Pulling with the arms first",
+      "mistake2": "Rounding the back"
+    }
+  },
+  "muscles": {
+    "quads": "Quads",
+    "hamstrings": "Hamstrings",
+    "glutes": "Glutes",
+    "calves": "Calves",
+    "chest": "Chest",
+    "back": "Back",
+    "shoulders": "Shoulders",
+    "biceps": "Biceps",
+    "triceps": "Triceps",
+    "abs": "Abs"
+  },
+  "implements": {
+    "barbell": "Barbell",
+    "dumbbell": "Dumbbells",
+    "machine": "Machine",
+    "cable": "Cable",
+    "bodyweight": "Bodyweight"
+  },
+  "categories": {
+    "compound": "Compound",
+    "accessory": "Accessory",
+    "isolation": "Isolation",
+    "core": "Core",
+    "conditioning": "Conditioning"
+  },
+  "sessions": {
+    "full_body_a": {
+      "title": "Full body A"
+    },
+    "full_body_b": {
+      "title": "Full body B"
+    },
+    "full_body_c": {
+      "title": "Full body C"
+    },
+    "push": {
+      "title": "Push"
+    },
+    "pull": {
+      "title": "Pull"
+    },
+    "legs": {
+      "title": "Legs"
+    },
+    "upper": {
+      "title": "Upper body"
+    },
+    "lower": {
+      "title": "Lower body"
+    },
+    "lower_a": {
+      "title": "Lower A"
+    },
+    "upper_a": {
+      "title": "Upper A"
+    },
+    "glutes_lower_b": {
+      "title": "Glutes & lower B"
+    },
+    "upper_b": {
+      "title": "Upper B"
+    }
+  },
+  "runs": {
+    "easy": {
+      "title": "Easy run",
+      "intent": "Conversational pace. If you cannot talk, slow down."
+    },
+    "long": {
+      "title": "Long run",
+      "intent": "Steady and relaxed. The distance is the point, not the speed."
+    },
+    "threshold": {
+      "title": "Threshold run",
+      "intent": "Comfortably hard: 20 min easy, then hold the threshold pace."
+    },
+    "interval": {
+      "title": "Intervals",
+      "intent": "Warm up 15 min, then fast reps with easy jogs between."
+    },
+    "run_walk": {
+      "title": "Run / walk",
+      "intent": "Run the interval, walk the break, repeat. Do not skip the walks."
+    }
+  },
+  "warmup": {
+    "lower": "5 min easy cardio, then bodyweight squats, leg swings and two light sets of your first lift.",
+    "upper": "5 min easy cardio, then arm circles, band or light rows, and two light sets of your first lift."
+  },
+  "onboarding": {
+    "errors": {
+      "invalid": "Some answers are missing or invalid.",
+      "underage": "Plates & Pace is for people aged 16 and over.",
+      "save": "We could not save your answers. Try again."
+    },
+    "title": "Set up your plan",
+    "stepOf": "Step {step} of {total}",
+    "next": "Next",
+    "back": "Back",
+    "finish": "Build my plan",
+    "building": "Building your plan…",
+    "disclaimer": "Plates & Pace gives general training guidance, not medical advice. If you have a health condition, talk to a doctor before training hard.",
+    "steps": {
+      "basics": {
+        "title": "About you",
+        "displayName": "What should we call you?",
+        "locale": "Language",
+        "timezone": "Time zone",
+        "units": "Units",
+        "metric": "kg / cm",
+        "imperial": "lb / in"
+      },
+      "body": {
+        "title": "Your body",
+        "sex": "Sex",
+        "female": "Female",
+        "male": "Male",
+        "unspecified": "Prefer not to say",
+        "birthDate": "Date of birth",
+        "height": "Height",
+        "weight": "Weight",
+        "waist": "Waist (optional)",
+        "sexHelp": "Used only to estimate starting weights and calories."
+      },
+      "health": {
+        "title": "Health check",
+        "intro": "Answer honestly. A yes does not stop you training — it makes your first weeks more careful.",
+        "heartCondition": "Has a doctor ever said you have a heart condition?",
+        "chestPain": "Do you feel chest pain during physical activity?",
+        "dizziness": "Do you lose balance from dizziness, or ever lose consciousness?",
+        "jointProblem": "Do you have a bone or joint problem that exercise could make worse?",
+        "bloodPressureMedication": "Do you take medication for blood pressure or a heart condition?",
+        "pregnancy": "Are you pregnant, or gave birth in the last six months?",
+        "other": "Is there any other reason you should not do hard physical activity?",
+        "otherNote": "Tell us more (optional)",
+        "yes": "Yes",
+        "no": "No",
+        "clearance": "You answered yes to at least one question. We recommend getting medical clearance before hard training. Your plan will start in a careful mode: lighter weights and less volume."
+      },
+      "goals": {
+        "title": "Your goal",
+        "primary": "What matters most right now?",
+        "build_muscle": "Build muscle",
+        "get_strong": "Get strong",
+        "lose_fat": "Lose fat",
+        "fit_and_firm": "Get fit and firm",
+        "run_faster": "Run faster or further",
+        "hybrid": "Both: lift and run",
+        "targetRace": "Target distance",
+        "5k": "5K",
+        "10k": "10K",
+        "half": "Half marathon",
+        "raceDate": "Race date (optional)"
+      },
+      "experience": {
+        "title": "Experience",
+        "lifting": "How long have you been lifting?",
+        "none": "I have not started",
+        "under_1_year": "Under a year",
+        "1_to_3_years": "1 to 3 years",
+        "3_plus_years": "More than 3 years",
+        "knowsBigLifts": "I know how to squat, deadlift and bench press with a barbell",
+        "running": "Running",
+        "canRun": "I can run continuously",
+        "cannotRun": "I can't run continuously yet",
+        "recentKm": "A recent run: distance (km)",
+        "recentMinutes": "and time (minutes)",
+        "continuousMinutes": "How many minutes can you run without stopping?"
+      },
+      "schedule": {
+        "title": "Your week",
+        "gymDays": "Gym days",
+        "runDays": "Run days",
+        "longRunDay": "Long run day",
+        "sessionMinutes": "Session length",
+        "minutes": "{n} min",
+        "startDate": "Start date",
+        "blockWeeks": "Block length",
+        "weeks": "{n} weeks",
+        "startHelp": "Plans start on the Monday of that week."
+      },
+      "equipment": {
+        "title": "Equipment",
+        "setting": "Where do you train?",
+        "full_gym": "Full gym with machines",
+        "dumbbells_bench": "Dumbbells and a bench",
+        "home_none": "At home, no equipment",
+        "unavailable": "Machines you do not have (optional)"
+      },
+      "injuries": {
+        "title": "Injuries and limits",
+        "intro": "We will skip or swap exercises that load these areas.",
+        "knees": "Knees",
+        "lower_back": "Lower back",
+        "shoulders": "Shoulders",
+        "hips": "Hips",
+        "wrists": "Wrists",
+        "neck": "Neck",
+        "note": "Anything else we should know? (optional)"
+      },
+      "preferences": {
+        "title": "Preferences",
+        "focusAreas": "Areas to focus on",
+        "glutes": "Glutes",
+        "legs": "Legs",
+        "arms": "Arms",
+        "shoulders": "Shoulders",
+        "back": "Back",
+        "chest": "Chest",
+        "abs": "Abs",
+        "intensity": "How hard do you want it?",
+        "moderate": "Moderate",
+        "hard": "Hard",
+        "very_hard": "Very hard",
+        "avoid": "Exercises to avoid (optional)"
+      }
+    },
+    "days": {
+      "1": "Mon",
+      "2": "Tue",
+      "3": "Wed",
+      "4": "Thu",
+      "5": "Fri",
+      "6": "Sat",
+      "7": "Sun"
+    },
+    "editingNote": "Saving regenerates your plan from today onward. Past sessions and logs are kept."
+  },
+  "today": {
+    "noPlan": "Nothing planned for this day. Rest, or check the Plan tab.",
+    "estimate": "~{minutes} min",
+    "readiness": "How are you today?",
+    "warmup": "Warm-up",
+    "fuel": "Fuel",
+    "fuelLine": "About {kcal} kcal today, {protein} g protein, {water} L water.",
+    "finisher": "Finisher",
+    "finisherLine": "8–12 minutes, steady. Stop with something left.",
+    "finish": "Finish session",
+    "sessionDone": "Session done. Nice work.",
+    "savedOffline": "Offline — saving on this device, will sync when back online",
+    "rest": "Rest {time}",
+    "skipRest": "Skip",
+    "kg": "Load",
+    "reps": "Reps",
+    "rpe": "RPE",
+    "setDone": "Set done",
+    "technique": {
+      "straight": "straight sets",
+      "top_set_backoff": "top set + back-offs",
+      "drop_set": "drop set on the last",
+      "rest_pause": "rest-pause on the last"
+    },
+    "readinessForm": {
+      "sleep": "Sleep",
+      "soreness": "Soreness",
+      "energy": "Energy",
+      "save": "Set my session"
+    },
+    "runMinutes": "min",
+    "pace": "pace",
+    "zone": "Heart-rate zone {zone}",
+    "guidedRun": "Start guided run",
+    "logRun": "Log",
+    "runSaved": "Run logged.",
+    "intervalLine": "{reps} × {meters} m at {pace}/km, {rest} easy between.",
+    "runWalkLine": "{repeats} × (run {run} min / walk {walk} min).",
+    "km": "km"
+  },
+  "plan": {
+    "title": "Plan",
+    "empty": "No plan yet. Finish the questionnaire to build one.",
+    "block": "Block {block} · {weeks} weeks",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "weekOf": "Week {week} of {total}",
+    "rest": "Rest",
+    "legend": {
+      "gym": "Gym",
+      "run": "Run",
+      "done": "Done",
+      "today": "Today"
+    },
+    "table": {
+      "day": "Day",
+      "session": "Session",
+      "time": "Time"
+    }
+  },
+  "library": {
+    "title": "Exercise library",
+    "all": "All",
+    "filterMuscle": "Filter by muscle",
+    "filterEquipment": "Filter by equipment",
+    "count": "{n} exercises",
+    "cues": "How to do it",
+    "mistakes": "Common mistakes",
+    "alsoWorks": "Also works"
+  },
+  "run": {
+    "noRun": "No run planned for this day.",
+    "segmentOf": "Segment {n} of {total}",
+    "left": "left",
+    "start": "Start",
+    "pause": "Pause",
+    "resume": "Resume",
+    "exit": "Exit",
+    "finished": "Run complete.",
+    "saveAndExit": "Save run",
+    "segments": {
+      "warmup": "Warm-up",
+      "work": "Go",
+      "rest": "Easy",
+      "run": "Run",
+      "walk": "Walk",
+      "steady": "Steady",
+      "cooldown": "Cool-down"
+    },
+    "cues": {
+      "warmup": "Warm up, nice and easy.",
+      "work": "Go hard.",
+      "workWithPace": "Go. Target {pace} per kilometre.",
+      "rest": "Easy jog.",
+      "run": "Run.",
+      "walk": "Walk.",
+      "steady": "Steady pace.",
+      "steadyWithPace": "Steady, around {pace} per kilometre.",
+      "cooldown": "Cool down. Nearly done.",
+      "done": "Done. Great run.",
+      "warmupWithPace": "Warm up, nice and easy.",
+      "restWithPace": "Easy jog.",
+      "runWithPace": "Run.",
+      "walkWithPace": "Walk.",
+      "cooldownWithPace": "Cool down. Nearly done."
+    },
+    "perKm": "/km"
+  },
+  "group": {
+    "title": "Group",
+    "leave": "Leave",
+    "inviteCode": "Invite code",
+    "copyLink": "Copy invite link",
+    "member": "Member",
+    "thisWeek": "This week",
+    "streak": "Streak",
+    "remove": "Remove",
+    "you": "you",
+    "privacy": "Members see only names, sessions this week and streaks. Never weights, body data or logs.",
+    "createTitle": "Create a group",
+    "create": "Create",
+    "joinTitle": "Join with a 6-character code",
+    "join": "Join",
+    "errors": {
+      "name": "Give the group a name.",
+      "create": "Could not create the group.",
+      "code": "That code is not valid or has expired."
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "hello": "Signed in as {name}",
+    "plan": "Your plan",
+    "planHelp": "Change your answers and the plan regenerates from today. Past sessions and logs are kept.",
+    "editAnswers": "Edit my answers",
+    "units": "Units",
+    "metric": "kg / cm",
+    "imperial": "lb / in",
+    "timezone": "Time zone",
+    "timezoneHelp": "\"Today\" is always worked out in this zone.",
+    "save": "Save",
+    "data": "Your data",
+    "export": "Export my data (JSON)",
+    "privacyLink": "Privacy",
+    "disclaimerTitle": "Not medical advice",
+    "signOut": "Sign out",
+    "deleteTitle": "Delete account",
+    "deleteHelp": "Deletes your account and every piece of data with it. This cannot be undone.",
+    "deleteConfirmLabel": "Type DELETE to confirm",
+    "deleteWord": "DELETE",
+    "deleteButton": "Delete my account"
+  },
+  "privacy": {
+    "title": "Privacy",
+    "intro": "Plates & Pace stores what it needs to build and adapt your plan, and nothing is shared with other people unless you choose to join a group.",
+    "stored": {
+      "title": "What we store",
+      "body": "Your questionnaire answers, body measurements, the plan we generate, and the sets and runs you log. All of it is tied to your account only."
+    },
+    "visible": {
+      "title": "Who can see it",
+      "body": "You. Every table is protected by row-level security in the database, so another user cannot read your rows even by asking the database directly."
+    },
+    "groups": {
+      "title": "Groups",
+      "body": "If you join a group, members see your display name, how many sessions you completed this week, and your streak. Never your weights, body data, health answers or logs. There is no setting that shares those."
+    },
+    "export": {
+      "title": "Export",
+      "body": "Settings → Export my data downloads everything we hold about you as one JSON file."
+    },
+    "delete": {
+      "title": "Delete",
+      "body": "Settings → Delete account removes your account and every row tied to it, immediately and permanently."
+    },
+    "health": {
+      "title": "Health answers",
+      "body": "Your health screening answers only decide whether your plan starts carefully. They are never shown to anyone and are never used for anything else."
+    }
+  },
+  "progress": {
+    "title": "Progress",
+    "streak": "Streak",
+    "thisWeek": "Sessions this week",
+    "sessionsPerWeek": "Sessions per week",
+    "sessions": "sessions",
+    "week": "Week",
+    "e1rm": "Estimated 1RM",
+    "weeklyVolume": "Hard sets this week, by muscle",
+    "sets": "sets",
+    "muscle": "Muscle",
+    "runDistance": "Run distance",
+    "runPace": "Run pace",
+    "distance": "Distance",
+    "pace": "Pace",
+    "date": "Date",
+    "bodyweight": "Body weight",
+    "waist": "Waist",
+    "table": "Show as table",
+    "empty": "Log a session and your progress will start showing here."
+  },
+  "offline": {
+    "body": "You are offline. Sets you log are saved on this device and will sync when you are back online."
   }
 }

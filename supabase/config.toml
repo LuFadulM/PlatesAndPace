@@ -10,7 +10,9 @@ max_rows = 1000
 [db]
 port = 54322
 shadow_port = 54320
-major_version = 16
+# The current Supabase CLI refuses 16 here; local Postgres 16 still runs the
+# same migrations, which use nothing version-specific.
+major_version = 17
 
 [studio]
 enabled = true
@@ -18,17 +20,17 @@ port = 54323
 
 # Catches the magic-link and confirmation emails locally so onboarding can be
 # walked through end to end without sending real mail.
-[inbucket]
+[local_smtp]
 enabled = true
 port = 54324
 
 [auth]
 enabled = true
 site_url = "http://localhost:3000"
-additional_redirect_urls = [
-  "http://localhost:3000/en/auth/callback",
-  "http://localhost:3000/es/auth/callback",
-]
+# The callback lives at /auth/callback, outside the locale prefix. A glob
+# keeps local development simple; production lists its exact URL in the
+# Supabase dashboard.
+additional_redirect_urls = ["http://localhost:3000/**"]
 jwt_expiry = 3600
 enable_signup = true
 
