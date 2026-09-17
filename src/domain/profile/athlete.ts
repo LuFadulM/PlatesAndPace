@@ -1,4 +1,5 @@
 import { fromISODate, type PlainDate } from '../dates'
+import { DEFAULT_PLATES, type PlateInventory } from '../strength/loads'
 import type { MuscleGroup } from '../strength/volume'
 import {
   ADULT_AGE,
@@ -90,6 +91,8 @@ export interface AthleteModel {
 
   equipment: EquipmentSetting
   unavailableMachines: string[]
+  /** What the barbell can actually be loaded to. */
+  plates: PlateInventory
 
   injuries: InjuryArea[]
   /** Patterns no exercise in this athlete's plan may use. */
@@ -193,6 +196,7 @@ export function buildAthleteModel(
 
     equipment: answers.equipment.setting,
     unavailableMachines: answers.equipment.unavailableMachines,
+    plates: answers.equipment.plates ?? DEFAULT_PLATES[answers.basics.units],
 
     injuries: answers.injuries.areas,
     bannedPatterns,

@@ -8,9 +8,10 @@ import { compareDates, fromISODate, isValidPlainDate, todayInZone, toISODate, we
 import { resolveLoads } from '@/domain/plan'
 import { alternativesFor, catalogueFor } from '@/domain/plan/edit'
 import { buildAthleteModel } from '@/domain/profile/athlete'
+import { DEFAULT_PLATES } from '@/domain/strength/loads'
 import type { Readiness } from '@/domain/strength/autoregulation'
 import { isLocale } from '@/i18n/routing'
-import { getSessionLogWithSets, lastPerformances, latestMaxes } from '@/lib/data/logs'
+import { getSessionLogWithSets, lastPerformances, latestMaxDetails, type MaxDetail } from '@/lib/data/logs'
 import { getCurrentPlan, getDoneDates, getPlannedDay, getPlannedDays } from '@/lib/data/plan'
 import { getActiveAnswers, getLatestWeightKg, requireProfile } from '@/lib/data/profile'
 
@@ -26,18 +27,26 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
   const iso = toISODate(selected)
   const strip = weekStrip(selected)
 
-  const [day, plan, days, doneDates, { log, sets }, maxes, answers, weightKg] = await Promise.all([
+  const [day, plan, days, doneDates, { log, sets }, maxDetails, answers, weightKg] = await Promise.all([
     getPlannedDay(iso),
     getCurrentPlan(),
     getPlannedDays(strip[0]!, strip[6]!),
     getDoneDates(strip[0]!, strip[6]!),
     getSessionLogWithSets(iso),
-    latestMaxes(today),
+    latestMaxDetails(today),
     getActiveAnswers(),
     getLatestWeightKg(),
   ])
+  const maxes = Object.fromEntries(Object.entries(maxDetails).map(([id, d]) => [id, d.e1rm]))
+  const units = profile.units as 'metric' | 'imperial'
+  const plates = answers?.equipment.plates ?? DEFAULT_PLATES[units]
 
-  const resolved = day?.gym && plan ? { ...day, gym: resolveLoads(day.gym, day.week, plan.weeks, maxes, profile.units as 'metric' | 'imperial') } : day
+  // What the athlete did the last time they met each exercise: shown next to
+  // today's prescription, and what double progression works from.
+  const lastTime = day?.gym ? await lastPerformances(day.gym.exercises.map((e) => e.exerciseId), iso) : {}
+  const lastSets = Object.fromEntries(Object.entries(lastTime).map(([id, p]) => [id, p.sets.map((s) => ({ ...s, done: true }))]))
+
+  const resolved = day?.gym && plan ? { ...day, gym: resolveLoads(day.gym, day.week, plan.weeks, maxes, units, { goal: answers?.goals.primary, lastSets, plates }) } : day
 
   const stripDays: StripDay[] = days.map((d) => ({ date: d.date, type: d.type, done: doneDates.has(d.date) }))
 
@@ -56,7 +65,6 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
       // An athlete the model refuses (e.g. a birth date that makes them under age) can still log; they just cannot edit.
     }
   }
-  const lastTime = resolved?.gym ? await lastPerformances(resolved.gym.exercises.map((e) => e.exerciseId), iso) : {}
 
   const initialSets: LoggedSet[] = sets.map((s) => ({
     exerciseId: s.exercise_id,
@@ -88,7 +96,9 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
       <SessionView
         date={iso}
         day={resolved}
-        units={profile.units as 'metric' | 'imperial'}
+        units={units}
+        plates={plates}
+        maxes={maxDetails as Record<string, MaxDetail>}
         initialSets={initialSets}
         initialReadiness={(log?.readiness as Readiness | null) ?? null}
         alreadyDone={log?.done ?? false}

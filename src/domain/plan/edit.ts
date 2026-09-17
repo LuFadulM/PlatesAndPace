@@ -2,7 +2,7 @@ import { EXERCISES, getExercise } from '../exercises/library'
 import type { ExerciseDefinition } from '../exercises/types'
 import type { AthleteModel } from '../profile/athlete'
 import type { Units } from '../profile/types'
-import { loadForTarget, roundToIncrement, startingLoadKg } from '../strength/loads'
+import { loadForTarget, roundLoad, startingLoadKg } from '../strength/loads'
 import { phaseParameters } from '../strength/periodization'
 import { createRng } from '../strength/rng'
 import { exclusionReason, roleFits, type SelectionContext } from '../strength/selection'
@@ -78,7 +78,7 @@ export function prescribeLoad(exercise: ExerciseDefinition, reps: number, rpe: n
         conservativeMode: model.conservativeMode,
       })
   const powerScale = exercise.category === 'power' ? 0.5 : 1
-  return roundToIncrement(base * powerScale * phase.loadMultiplier, exercise.implement, model.units)
+  return roundLoad(base * powerScale * phase.loadMultiplier, exercise.implement, model.units, model.plates)
 }
 
 /**

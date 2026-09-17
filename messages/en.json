@@ -1040,7 +1040,10 @@
         "full_gym": "Full gym with machines",
         "dumbbells_bench": "Dumbbells and a bench",
         "home_none": "At home, no equipment",
-        "unavailable": "Machines you do not have (optional)"
+        "unavailable": "Machines you do not have (optional)",
+        "platesHelp": "So the app only ever asks for a weight you can actually load.",
+        "bar": "Bar ({unit})",
+        "plates": "Plate pairs you have ({unit})"
       },
       "injuries": {
         "title": "Injuries and limits",
@@ -1176,6 +1179,21 @@
       "time": "to fit your session time",
       "interference": "because of the run around this session",
       "volume_cap": "past ten sets a muscle stops growing and starts hurting"
+    },
+    "maxLine": "Estimated max ~{amount} {unit} · {confidence}",
+    "confidence": {
+      "high": "solid estimate",
+      "medium": "rough estimate",
+      "low": "guess: log a heavier set of 10 or fewer"
+    },
+    "progression": {
+      "increase": "You cleared the rep range last time, so the load goes up",
+      "hold": "Same load as last time: chase the reps",
+      "decrease": "Last time missed the range, so the load comes down"
+    },
+    "plates": {
+      "perSide": "Per side: {plates} {unit} on a {bar} {unit} bar",
+      "barOnly": "Empty {bar} {unit} bar"
     }
   },
   "plan": {

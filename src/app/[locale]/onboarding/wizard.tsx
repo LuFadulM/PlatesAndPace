@@ -21,11 +21,16 @@ import {
   type QuestionnaireStep,
 } from '@/domain/profile/questionnaire'
 import { PRIMARY_GOALS, type PrimaryGoal, type SecondaryGoal } from '@/domain/profile/types'
+import { DEFAULT_PLATES } from '@/domain/strength/loads'
 import { saveAnswersAndGeneratePlan } from '@/lib/actions/plan'
 
 type Draft = { [K in QuestionnaireStep]: Partial<QuestionnaireAnswers[K]> }
 
 const DAYS = [1, 2, 3, 4, 5, 6, 7] as const
+const KG_PER_LB = 0.45359237
+/** Bars and plate pairs a rack usually offers, in the athlete's own unit. */
+const BAR_OPTIONS = { metric: [20, 15, 10], imperial: [45, 35, 15] } as const
+const PLATE_OPTIONS = { metric: [25, 20, 15, 10, 5, 2.5, 1.25], imperial: [45, 35, 25, 10, 5, 2.5] } as const
 
 function initialDraft(locale: Locale, initial: QuestionnaireAnswers | null): Draft {
   if (initial) return { ...initial }
@@ -294,6 +299,30 @@ export function OnboardingWizard({ locale, initial, editing }: { locale: Locale;
           <fieldset><legend className="mb-1.5 text-sm font-medium">{t('steps.equipment.setting')}</legend>
             <div className="flex flex-col gap-2">{(['full_gym', 'dumbbells_bench', 'home_none'] as const).map((s) => <button type="button" key={s} className={`${chip(draft.equipment.setting === s)} text-left`} onClick={() => update('equipment', { setting: s })}>{t(`steps.equipment.${s}`)}</button>)}</div>
           </fieldset>
+          {draft.equipment.setting === 'full_gym' && (() => {
+            const unit = imperial ? 'lb' : 'kg'
+            const toKgUnit = (v: number) => (imperial ? v * KG_PER_LB : v)
+            const fromKgUnit = (kg: number) => (imperial ? Math.round(kg / KG_PER_LB * 2) / 2 : kg)
+            const current = draft.equipment.plates ?? DEFAULT_PLATES[imperial ? 'imperial' : 'metric']
+            const selectedBar = fromKgUnit(current.barKg)
+            const selectedPlates = current.platePairsKg.map(fromKgUnit)
+            const setPlates = (barUnit: number, platesUnit: number[]) =>
+              update('equipment', { plates: { barKg: toKgUnit(barUnit), platePairsKg: platesUnit.map(toKgUnit) } })
+            return (
+              <div className="flex flex-col gap-3 rounded-xl border border-(--color-border) bg-(--color-surface) p-3">
+                <p className="text-xs text-(--color-ink-muted)">{t('steps.equipment.platesHelp')}</p>
+                <fieldset><legend className="mb-1.5 text-sm font-medium">{t('steps.equipment.bar', { unit })}</legend>
+                  <div className="flex flex-wrap gap-2">{BAR_OPTIONS[imperial ? 'imperial' : 'metric'].map((b) => <button type="button" key={b} aria-pressed={Math.abs(selectedBar - b) < 0.6} className={chip(Math.abs(selectedBar - b) < 0.6)} onClick={() => setPlates(b, selectedPlates)}>{b}</button>)}</div>
+                </fieldset>
+                <fieldset><legend className="mb-1.5 text-sm font-medium">{t('steps.equipment.plates', { unit })}</legend>
+                  <div className="flex flex-wrap gap-2">{PLATE_OPTIONS[imperial ? 'imperial' : 'metric'].map((pl) => {
+                    const on = selectedPlates.some((v) => Math.abs(v - pl) < 0.3)
+                    return <button type="button" key={pl} aria-pressed={on} className={chip(on)} onClick={() => setPlates(selectedBar, on ? selectedPlates.filter((v) => Math.abs(v - pl) >= 0.3) : [...selectedPlates, pl])}>{pl}</button>
+                  })}</div>
+                </fieldset>
+              </div>
+            )
+          })()}
           {draft.equipment.setting === 'full_gym' && (
             <fieldset><legend className="mb-1.5 text-sm font-medium">{t('steps.equipment.unavailable')}</legend>
               <div className="flex flex-wrap gap-2">{machineNames.map((m) => <button type="button" key={m} className={chip((draft.equipment.unavailableMachines ?? []).includes(m))} onClick={() => update('equipment', { unavailableMachines: toggle(draft.equipment.unavailableMachines, m as never) })}>{m.replace(/_/g, ' ')}</button>)}</div>

@@ -5,13 +5,14 @@ import { useLocale, useTranslations } from 'next-intl'
 import { Link, useRouter } from '@/i18n/navigation'
 import { formatDuration, formatPace } from '@/domain/dates'
 import type { PlannedExercise, PlannedDay } from '@/domain/plan'
+import type { ResolvedExercise } from '@/domain/plan/resolve'
 import { nextSetMultiplier, readinessAdjustment, type Readiness } from '@/domain/strength/autoregulation'
-import { roundToIncrement } from '@/domain/strength/loads'
+import { nearestLoadable, roundToIncrement, type PlateInventory } from '@/domain/strength/loads'
 import { getExercise } from '@/domain/exercises/library'
 import type { NutritionEstimate } from '@/domain/nutrition'
 import { createOutbox, setLogKey, type Outbox } from '@/lib/offline'
 import { finishSession, saveReadiness, saveRun, saveSets } from '@/lib/actions/logs'
-import type { LastPerformance } from '@/lib/data/logs'
+import type { LastPerformance, MaxDetail } from '@/lib/data/logs'
 import type { Units } from '@/domain/profile/types'
 import { ExerciseFigure } from '@/components/figure/exercise-figure'
 import { AddExercise, ExerciseTools } from './exercise-editor'
@@ -33,6 +34,10 @@ interface Props {
   date: string
   day: PlannedDay | null
   units: Units
+  /** The athlete's bar and plates, for the per-side view on barbell lifts. */
+  plates: PlateInventory
+  /** Best estimated max per exercise, with how much to trust it. */
+  maxes: Record<string, MaxDetail>
   initialSets: LoggedSet[]
   initialReadiness: Readiness | null
   alreadyDone: boolean
@@ -59,7 +64,7 @@ function Section({ title, children, defaultOpen = false }: { title: string; chil
 
 const input = 'min-h-11 w-full rounded-lg border border-(--color-border) px-2 text-center'
 
-export function SessionView({ date, day, units, initialSets, initialReadiness, alreadyDone, initialNotes, nutrition, alternatives, catalogue, lastTime, editable }: Props) {
+export function SessionView({ date, day, units, plates, maxes, initialSets, initialReadiness, alreadyDone, initialNotes, nutrition, alternatives, catalogue, lastTime, editable }: Props) {
   const t = useTranslations('today')
   const tEx = useTranslations('exercises')
   const tCoach = useTranslations()
@@ -235,6 +240,18 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
   const summaryOf = (e: PlannedExercise) => `${e.sets} × ${e.holdSeconds ? `${e.holdSeconds} s` : `${e.repMin}–${e.repMax}`}${e.loadKg ? `, ${displayLoad(e.loadKg * (adjustment?.loadMultiplier ?? 1), units)} ${unit}` : ''}`
   const effortOf = (e: PlannedExercise) => (e.role === 'mobility' ? '' : t('effort', { rpe: e.rpeTarget, rir: Math.max(0, Math.round((10 - e.rpeTarget) * 2) / 2) }))
   const shortDate = (iso: string) => new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(new Date(`${iso}T12:00:00`))
+  const maxLine = (e: PlannedExercise) => {
+    const m = maxes[e.exerciseId]
+    if (!m || e.loadKg === 0) return null
+    return t('maxLine', { amount: displayLoad(m.e1rm, units), unit, confidence: t(`confidence.${m.confidence}`) })
+  }
+  const progressionLine = (e: ResolvedExercise) => (e.progression && e.progression.reason !== 'max' && e.progression.reason !== 'first' ? t(`progression.${e.progression.reason}`) : null)
+  const plateLine = (e: PlannedExercise, kg: number) => {
+    if (getExercise(e.exerciseId).implement !== 'barbell' || kg <= 0) return null
+    const load = nearestLoadable(kg, plates)
+    if (load.perSideKg.length === 0) return t('plates.barOnly', { bar: displayLoad(plates.barKg, units), unit })
+    return t('plates.perSide', { plates: load.perSideKg.map((p) => displayLoad(p, units)).join(' + '), unit, bar: displayLoad(plates.barKg, units) })
+  }
   const lastLine = (e: PlannedExercise) => {
     const last = lastTime[e.exerciseId]
     if (!last || last.sets.length === 0) return t('firstTime')
@@ -330,6 +347,10 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
                         </div>
                       </div>
                       <p className="text-xs font-semibold text-(--color-plate-blue)">{lastLine(e)}</p>
+                      {(maxLine(e) || progressionLine(e as ResolvedExercise)) && (
+                        <p className="text-xs text-(--color-ink-muted)">{[maxLine(e), progressionLine(e as ResolvedExercise)].filter(Boolean).join(' · ')}</p>
+                      )}
+                      {plateLine(e, loadFor(e, 0)) && <p className="text-xs text-(--color-ink-muted)">{plateLine(e, loadFor(e, 0))}</p>}
                       {Array.from({ length: e.sets }, (_, i) => {
                         const logged = sets.get(setLogKey(date, e.exerciseId, i))
                         const suggested = loadFor(e, i)

@@ -151,6 +151,13 @@ export const scheduleSchema = z
 export const equipmentSchema = z.object({
   setting: z.enum(['full_gym', 'dumbbells_bench', 'home_none']),
   unavailableMachines: z.array(z.string()).default([]),
+  /** The bar and plate pairs on the rack, in kilograms; absent means a standard set. */
+  plates: z
+    .object({
+      barKg: z.number().min(5).max(30),
+      platePairsKg: z.array(z.number().positive().max(50)).min(1).max(12),
+    })
+    .optional(),
 })
 
 export const injuriesSchema = z.object({

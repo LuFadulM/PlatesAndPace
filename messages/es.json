@@ -1040,7 +1040,10 @@
         "full_gym": "Gimnasio completo con máquinas",
         "dumbbells_bench": "Mancuernas y un banco",
         "home_none": "En casa, sin equipo",
-        "unavailable": "Máquinas que no tienes (opcional)"
+        "unavailable": "Máquinas que no tienes (opcional)",
+        "platesHelp": "Para que la app solo te pida pesos que puedas montar de verdad.",
+        "bar": "Barra ({unit})",
+        "plates": "Pares de discos que tienes ({unit})"
       },
       "injuries": {
         "title": "Lesiones y límites",
@@ -1176,6 +1179,21 @@
       "time": "para que quepa en el tiempo de tu sesión",
       "interference": "por la carrera alrededor de esta sesión",
       "volume_cap": "pasadas diez series un músculo deja de crecer y empieza a doler"
+    },
+    "maxLine": "Máximo estimado ~{amount} {unit} · {confidence}",
+    "confidence": {
+      "high": "estimación sólida",
+      "medium": "estimación aproximada",
+      "low": "una suposición: registra una serie más pesada de 10 o menos"
+    },
+    "progression": {
+      "increase": "La última vez completaste el rango, así que sube el peso",
+      "hold": "Mismo peso que la última vez: ve por las repeticiones",
+      "decrease": "La última vez no llegaste al rango, así que baja el peso"
+    },
+    "plates": {
+      "perSide": "Por lado: {plates} {unit} en una barra de {bar} {unit}",
+      "barOnly": "Barra vacía de {bar} {unit}"
     }
   },
   "plan": {

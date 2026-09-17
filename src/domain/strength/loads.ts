@@ -128,3 +128,77 @@ export function sessionOneRepMax(
   if (completed.length === 0) return null
   return Math.max(...completed.map((set) => estimatedOneRepMax(set.kg, set.reps, set.rpe)))
 }
+
+/** Brzycki's estimate: kg × 36 / (37 − reps). Diverges from Epley past ten reps. */
+export function brzyckiOneRepMax(kg: number, reps: number): number {
+  if (kg < 0) throw new RangeError('load cannot be negative')
+  if (reps < 1 || reps >= 37) throw new RangeError('Brzycki holds for 1 to 36 reps')
+  return (kg * 36) / (37 - reps)
+}
+
+export type MaxConfidence = 'high' | 'medium' | 'low'
+
+/**
+ * How much to trust an estimated max from a set of this many reps. Epley is
+ * reliable to about ten; past twelve the estimate is more about endurance
+ * than strength, and the UI says so.
+ */
+export function oneRepMaxConfidence(reps: number): MaxConfidence {
+  if (reps <= 10) return 'high'
+  if (reps <= 12) return 'medium'
+  return 'low'
+}
+
+/** What is actually on the rack: a bar and the plate pairs available. Kilograms throughout. */
+export interface PlateInventory {
+  barKg: number
+  /** Each weight assumed available in unlimited pairs. */
+  platePairsKg: readonly number[]
+}
+
+const LB = KG_PER_LB
+export const DEFAULT_PLATES: Record<Units, PlateInventory> = {
+  metric: { barKg: 20, platePairsKg: [25, 20, 15, 10, 5, 2.5, 1.25] },
+  imperial: { barKg: 45 * LB, platePairsKg: [45 * LB, 35 * LB, 25 * LB, 10 * LB, 5 * LB, 2.5 * LB] },
+}
+
+export interface BarbellLoad {
+  kg: number
+  /** Plates on one side, heaviest first, in kilograms. */
+  perSideKg: number[]
+}
+
+/** The heaviest bar the inventory can make at or under the target. */
+export function heaviestLoadableUnder(targetKg: number, inventory: PlateInventory): BarbellLoad {
+  const plates = [...inventory.platePairsKg].sort((a, b) => b - a)
+  let side = Math.max(0, (targetKg - inventory.barKg) / 2)
+  const perSideKg: number[] = []
+  for (const plate of plates) {
+    while (side + 1e-9 >= plate) {
+      perSideKg.push(plate)
+      side -= plate
+    }
+  }
+  const kg = inventory.barKg + 2 * perSideKg.reduce((a, b) => a + b, 0)
+  return { kg: Math.round(kg * 100) / 100, perSideKg }
+}
+
+/**
+ * The loadable bar nearest the target: the heaviest under it, or one smallest
+ * plate pair up when that is closer. A target below the bar is the bar.
+ */
+export function nearestLoadable(targetKg: number, inventory: PlateInventory): BarbellLoad {
+  if (targetKg <= inventory.barKg) return { kg: inventory.barKg, perSideKg: [] }
+  const under = heaviestLoadableUnder(targetKg, inventory)
+  const smallest = Math.min(...inventory.platePairsKg)
+  if (!Number.isFinite(smallest)) return under
+  const over = heaviestLoadableUnder(under.kg + 2 * smallest + 1e-6, inventory)
+  return over.kg - targetKg < targetKg - under.kg ? over : under
+}
+
+/** Rounds to a real load: plates for a barbell when the rack is known, increments otherwise. */
+export function roundLoad(kg: number, implement: Implement, units: Units, plates?: PlateInventory): number {
+  if (kg <= 0) return 0
+  if (implement === 'barbell' && plates) return nearestLoadable(kg, plates).kg
+  return roundToIncrement(kg, implement, units)
+}

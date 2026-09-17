@@ -16,7 +16,7 @@ import {
   type TrainingPaces,
 } from '../running'
 import { getExercise } from '../exercises/library'
-import { loadForTarget, roundToIncrement, startingLoadKg } from '../strength/loads'
+import { loadForTarget, roundLoad, startingLoadKg } from '../strength/loads'
 import { phaseParameters, type Phase } from '../strength/periodization'
 import { createRng, planSeed } from '../strength/rng'
 import { selectExercise, type SelectionContext } from '../strength/selection'
@@ -396,7 +396,7 @@ function buildGymSession(
       // Power work moves 30–60% of what the lift could carry, as fast as possible.
       const powerScale = exercise.category === 'power' ? 0.5 : 1
       const scaled = base * powerScale * phase.loadMultiplier * (week === 1 ? (options.reviewLoadMultiplier ?? 1) : 1)
-      loadKg = roundToIncrement(scaled, exercise.implement, model.units)
+      loadKg = roundLoad(scaled, exercise.implement, model.units, model.plates)
     }
 
     let technique: Technique = 'straight'
