@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { isLocale } from '@/i18n/routing'
-import { getProfile } from '@/lib/data/profile'
+import { requireProfile } from '@/lib/data/profile'
 import { SettingsPanel } from './settings-panel'
 
 export default async function SettingsPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -9,7 +9,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ local
   if (!isLocale(locale)) notFound()
   setRequestLocale(locale)
   const t = await getTranslations('settings')
-  const profile = (await getProfile())!
+  const profile = await requireProfile(locale)
   return (
     <main className="flex flex-col gap-4 px-4 py-6">
       <h1 className="font-display text-3xl font-bold">{t('title')}</h1>

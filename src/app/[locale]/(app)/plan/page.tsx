@@ -4,7 +4,7 @@ import { MonthCalendar } from '@/components/plan/month-calendar'
 import { addDays, fromISODate, todayInZone, toISODate } from '@/domain/dates'
 import { isLocale } from '@/i18n/routing'
 import { getCurrentPlan, getDoneDates, getPlannedDays } from '@/lib/data/plan'
-import { getProfile } from '@/lib/data/profile'
+import { requireProfile } from '@/lib/data/profile'
 
 export default async function PlanPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
@@ -12,7 +12,7 @@ export default async function PlanPage({ params }: { params: Promise<{ locale: s
   setRequestLocale(locale)
   const t = await getTranslations('plan')
 
-  const profile = (await getProfile())!
+  const profile = await requireProfile(locale)
   const today = todayInZone(profile.timezone)
   const plan = await getCurrentPlan()
   if (!plan) return <main className="px-4 py-6"><h1 className="font-display text-3xl font-bold">{t('title')}</h1><p className="mt-2 text-(--color-ink-muted)">{t('empty')}</p></main>

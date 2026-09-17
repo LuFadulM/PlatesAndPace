@@ -14,13 +14,13 @@ test('logs a workout and the result raises the next session\'s load', async ({ p
   await signIn(page, email, 'en')
   await completeOnboarding(page, 'en', { name: 'Beto' })
 
-  // Monday is the first gym day for the profile the helper builds. Strip links
-  // always carry the date, so the same day next week is plain arithmetic.
-  const strip = page.getByRole('list', { name: 'This week' })
-  const monday = (await strip.getByRole('link').first().getAttribute('href')) ?? ''
-  const mondayIso = /date=(\d{4}-\d{2}-\d{2})/.exec(monday)?.[1]
-  expect(mondayIso).toBeTruthy()
-  await page.goto(monday)
+  // The helper's schedule is Mon/Wed/Fri. A plan created midweek only holds
+  // days from today forward, so open the first gym day on or after today.
+  const todayIso = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
+  const cursor = new Date(`${todayIso}T00:00:00Z`)
+  while (![1, 3, 5].includes(cursor.getUTCDay())) cursor.setUTCDate(cursor.getUTCDate() + 1)
+  const gymIso = cursor.toISOString().slice(0, 10)
+  await page.goto(`/en/today?date=${gymIso}`)
   await page.getByRole('button', { name: /Set my session/ }).click()
 
   // Open the primary lift (row A) and read what it suggests.
@@ -49,7 +49,7 @@ test('logs a workout and the result raises the next session\'s load', async ({ p
   expect(data?.every((s) => s.done)).toBe(true)
 
   // The same lift, next week: it recurs by design, and opens heavier.
-  const next = new Date(`${mondayIso}T00:00:00Z`)
+  const next = new Date(`${gymIso}T00:00:00Z`)
   next.setUTCDate(next.getUTCDate() + 7)
   await page.goto(`/en/today?date=${next.toISOString().slice(0, 10)}`)
   const nextRowA = page.getByRole('button', { name: /^A\s/ }).first()

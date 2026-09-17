@@ -1,3 +1,4 @@
+import { redirect } from '@/i18n/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { questionnaireSchema, type QuestionnaireAnswers } from '@/domain/profile/questionnaire'
 import type { Tables } from '@/types/database'
@@ -39,4 +40,15 @@ export async function getLatestWeightKg(): Promise<number | null> {
     .limit(1)
     .maybeSingle()
   return data?.weight_kg ?? null
+}
+
+/**
+ * The profile, or a redirect to onboarding. Next renders a layout and its page
+ * in parallel, so a page must not assume the layout's gate has already run —
+ * a fresh account would dereference null for a moment before the redirect.
+ */
+export async function requireProfile(locale: 'en' | 'es'): Promise<Profile> {
+  const profile = await getProfile()
+  if (!profile?.onboarded_at) redirect({ href: '/onboarding', locale })
+  return profile as Profile
 }

@@ -10,14 +10,14 @@ import type { Readiness } from '@/domain/strength/autoregulation'
 import { isLocale } from '@/i18n/routing'
 import { getSessionLogWithSets, latestMaxes } from '@/lib/data/logs'
 import { getCurrentPlan, getDoneDates, getPlannedDay, getPlannedDays } from '@/lib/data/plan'
-import { getActiveAnswers, getLatestWeightKg, getProfile } from '@/lib/data/profile'
+import { getActiveAnswers, getLatestWeightKg, requireProfile } from '@/lib/data/profile'
 
 export default async function TodayPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ date?: string }> }) {
   const { locale } = await params
   if (!isLocale(locale)) notFound()
   setRequestLocale(locale)
 
-  const profile = (await getProfile())!
+  const profile = await requireProfile(locale)
   const today = todayInZone(profile.timezone)
   const { date: requested } = await searchParams
   const selected = requested && /^\d{4}-\d{2}-\d{2}$/.test(requested) && isValidPlainDate(fromISODate(requested)) ? fromISODate(requested) : today
