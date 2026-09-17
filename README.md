@@ -71,8 +71,12 @@ function, which returns display name, sessions done this week and streak — not
 ## Deployment (Vercel + Supabase)
 
 1. Create a Supabase project and run `supabase db push` against it.
-2. In Supabase → Authentication → URL Configuration, set the site URL to your Vercel domain
-   and add `https://<domain>/auth/callback` to the redirect list.
+2. In Supabase → Authentication → URL Configuration, set **Site URL** to
+   `https://<domain>` and add `https://<domain>/**` under **Redirect URLs** (add
+   `https://*-<team>.vercel.app/**` too if you want magic links from preview deployments).
+   The callback carries query parameters, so an exact `/auth/callback` entry does not match;
+   and a link whose redirect is not on this list is silently sent to the Site URL instead,
+   which looks like "I clicked the link and nothing happened".
 3. Import the repository into Vercel. `vercel.json` pins the Next.js preset.
 4. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in the Vercel project's
    environment variables (Production and Preview).
