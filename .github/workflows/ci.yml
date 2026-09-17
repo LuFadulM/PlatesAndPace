@@ -43,3 +43,35 @@ jobs:
       - run: npm test
         env:
           TZ: ${{ matrix.tz }}
+
+  database:
+    name: Migrations and RLS
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      # Applies every migration to a real Postgres and then proves the policies
+      # hold: one user cannot read, or write into, another user's rows
+      # (PLAN.md §11.4 spec 5).
+      - name: Apply migrations and run the RLS suite
+        env:
+          PGPASSWORD: postgres
+          PSQL_ARGS: -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -q
+        run: |
+          set -euo pipefail
+          psql $PSQL_ARGS -f supabase/tests/_shim.sql
+          for migration in supabase/migrations/*.sql; do
+            echo "applying $migration"
+            psql $PSQL_ARGS -f "$migration"
+          done
+          psql $PSQL_ARGS -f supabase/tests/rls.test.sql

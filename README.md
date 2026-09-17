@@ -40,3 +40,30 @@ A training day is a calendar date in the athlete's own time zone, never a UTC in
 date logic lives in `src/domain/dates` and nothing outside it may construct or compare
 `Date` objects for calendar purposes. `npm run test:tz` proves the engine is independent of
 the host clock.
+
+## Database
+
+Schema, policies and RPCs live in `supabase/migrations`, applied in filename order.
+
+```bash
+supabase start        # local Postgres, Auth, Studio and a mail catcher
+supabase db reset     # re-apply every migration, then supabase/seed.sql
+```
+
+The seed creates one demo athlete matching the worked example in `PLAN.md` §1 — a hybrid
+lifter in Bogotá, five gym days and three runs a week, currently running 3 km in 20:00.
+
+### Privacy is enforced by the schema, not by the UI
+
+Every table carries a `user_id` and four RLS policies keyed on `auth.uid()`. Body data,
+health flags, measurements and training logs have no policy and no view that exposes them
+to anyone but their owner.
+
+What a group can see comes from a single `SECURITY DEFINER` function,
+`group_weekly_summary`, which returns exactly four columns: member id, display name,
+sessions completed this week, and streak. There is no query another member can write that
+reaches further.
+
+`supabase/tests/rls.test.sql` proves it against a real Postgres: one user cannot read
+another's logs, measurements, plans or profile, cannot reach them by primary key, and
+cannot insert rows owned by someone else. It runs on every PR.
