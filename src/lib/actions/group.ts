@@ -4,25 +4,14 @@ import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 
-const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789' // no 0/O/1/I
-
-function inviteCode(): string {
-  const bytes = new Uint8Array(6)
-  crypto.getRandomValues(bytes)
-  return [...bytes].map((b) => CODE_ALPHABET[b % CODE_ALPHABET.length]).join('')
-}
-
 export async function createGroup(name: string) {
   const parsed = z.string().trim().min(1).max(60).safeParse(name)
   if (!parsed.success) return { ok: false as const, errorKey: 'group.errors.name' }
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { ok: false as const, errorKey: 'auth.errors.signedOut' }
-
-  const { data: group, error } = await supabase.from('groups').insert({ name: parsed.data, owner_id: user.id }).select('id').single()
-  if (error || !group) return { ok: false as const, errorKey: 'group.errors.create' }
-  await supabase.from('group_members').insert({ group_id: group.id, user_id: user.id, role: 'owner' })
-  await supabase.from('group_invites').insert({ group_id: group.id, code: inviteCode(), created_by: user.id })
+  // One RPC creates the group, the owner's membership and the first invite
+  // atomically; see the migration for why plain inserts cannot.
+  const { error } = await supabase.rpc('create_group', { p_name: parsed.data })
+  if (error) return { ok: false as const, errorKey: 'group.errors.create' }
   revalidatePath('/', 'layout')
   return { ok: true as const }
 }

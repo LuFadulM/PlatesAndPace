@@ -396,6 +396,7 @@ export type Database = {
         Returns: { member_id: string; display_name: string; sessions_done_this_week: number; streak_days: number }[]
       }
       join_group_with_code: { Args: { p_code: string }; Returns: string }
+      create_group: { Args: { p_name: string }; Returns: string }
       export_my_data: { Args: Record<string, never>; Returns: Json }
       delete_my_account: { Args: Record<string, never>; Returns: undefined }
       training_streak: { Args: { p_user_id: string }; Returns: number }

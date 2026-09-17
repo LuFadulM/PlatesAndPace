@@ -13,7 +13,8 @@ test('the calendar shows the correct "today" for Bogotá late in the evening', a
   await signIn(page, email, 'es')
   await completeOnboarding(page, 'es', { name: 'Zona' })
   await page.goto('/es/today')
-  await expect(page.getByText('Hoy')).toBeVisible()
+  // The relative-day label is its own paragraph; other copy also contains "hoy".
+  await expect(page.locator('p', { hasText: /^Hoy$/ })).toBeVisible()
   await expect(page.getByRole('heading', { level: 1 })).toContainText('martes, 15 de septiembre')
   await page.goto('/es/plan')
   await expect(page.getByRole('button', { name: '2026-09-15' })).toHaveAttribute('aria-current', 'date')

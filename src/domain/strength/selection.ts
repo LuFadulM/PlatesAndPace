@@ -23,6 +23,12 @@ export interface SelectionContext {
   swaps: ReadonlyMap<string, string>
   /** Extra patterns banned today, e.g. heavy hinges before a long run. */
   extraBannedPatterns?: ReadonlySet<MovementPattern>
+  /**
+   * The exercise this slot used last week. Primary and secondary lifts keep it
+   * when they can: the next session's load comes from the last one, and a
+   * lift that rotates every week has no last one to come from.
+   */
+  preferred?: string
 }
 
 const TIER_RANK: Record<ExperienceTier, number> = { beginner: 0, intermediate: 1, advanced: 2 }
@@ -99,6 +105,12 @@ function score(exercise: ExerciseDefinition, slot: Slot, ctx: SelectionContext):
   }
 
   if (ctx.recentlyUsed.has(exercise.id)) points -= 2
+
+  // Continuity outweighs every tiebreak for the lifts that carry progression;
+  // accessories and isolation work are free to rotate.
+  if (ctx.preferred === exercise.id && (slot.role === 'primary' || slot.role === 'secondary')) {
+    points += 10
+  }
 
   return points
 }

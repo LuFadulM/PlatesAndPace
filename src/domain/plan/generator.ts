@@ -167,6 +167,7 @@ function buildGymSession(
   options: GenerateOptions,
   todaysRun: RunKind,
   tomorrowsRun: RunKind,
+  continuity: Map<string, string>,
 ): GymSession {
   const phase = phaseParameters(week, model.blockWeeks)
   const limits = interferenceLimits(model.goal, todaysRun, tomorrowsRun)
@@ -185,16 +186,18 @@ function buildGymSession(
   let lowerSets = 0
   const volumeScale = phase.volumeMultiplier * (week === 1 ? (options.reviewVolumeMultiplier ?? 1) : 1)
 
-  for (const slot of template) {
-    const exercise = selectExercise(slot, dayCtx, chosen)
-    if (!exercise) continue
+  template.forEach((slot, slotIndex) => {
+    const continuityKey = `${kind}:${slotIndex}`
+    const exercise = selectExercise(slot, { ...dayCtx, preferred: continuity.get(continuityKey) }, chosen)
+    if (!exercise) return
     chosen.add(exercise.id)
+    continuity.set(continuityKey, exercise.id)
 
     let sets = Math.max(1, Math.round(slot.sets * volumeScale))
     const isLower = exercise.region === 'lower'
     if (isLower && isLowerBodySession(kind)) {
       const room = limits.maxLowerBodySets - lowerSets
-      if (room <= 0) continue
+      if (room <= 0) return
       sets = Math.min(sets, room)
       lowerSets += sets
     }
@@ -246,7 +249,7 @@ function buildGymSession(
     } else {
       exercises.push(planned)
     }
-  }
+  })
 
   // Labels: A, B, C1/C2 for a superset pair, D …
   let index = 0
@@ -358,6 +361,9 @@ export function generatePlan(model: AthleteModel, options: GenerateOptions): Gen
   const start = startOfPlanWeek(model.startDate)
   const days: PlannedDay[] = []
   const usedThisWeek = new Set<string>()
+  // Slot → exercise chosen last time this session kind ran, so the lifts that
+  // carry progression recur week to week (see SelectionContext.preferred).
+  const continuity = new Map<string, string>()
 
   for (let offset = 0; offset < model.blockWeeks * 7; offset += 1) {
     const date: PlainDate = addDays(start, offset)
@@ -374,7 +380,7 @@ export function generatePlan(model: AthleteModel, options: GenerateOptions): Gen
     let gym: GymSession | undefined
     if (gymIndex >= 0) {
       const dayCtx: SelectionContext = { ...ctx, recentlyUsed: new Set([...ctx.recentlyUsed, ...usedThisWeek]) }
-      gym = buildGymSession(split[gymIndex]!, week, model, dayCtx, options, todaysRun, tomorrowsRun)
+      gym = buildGymSession(split[gymIndex]!, week, model, dayCtx, options, todaysRun, tomorrowsRun, continuity)
       for (const e of gym.exercises) usedThisWeek.add(e.exerciseId)
     }
 

@@ -12,7 +12,7 @@ test('joins a group with an invite code and sees only names, sessions and streak
   await owner.goto('/en/group')
   await owner.getByLabel('Create a group').fill('Bogotá crew')
   await owner.getByRole('button', { name: 'Create' }).click()
-  const code = (await owner.locator('.tracking-\\[0\\.3em\\]').first().textContent())?.trim() ?? ''
+  const code = (await owner.getByText(/^[A-HJ-NP-Z2-9]{6}$/).first().textContent())?.trim() ?? ''
   expect(code).toHaveLength(6)
 
   const member = await browser.newPage()

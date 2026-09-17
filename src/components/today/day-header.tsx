@@ -48,7 +48,7 @@ export function DayHeader({ date, today, strip }: { date: string; today: string;
           return (
             <li key={iso}>
               <Link
-                href={{ pathname: '/today', query: iso === today ? undefined : { date: iso } }}
+                href={{ pathname: '/today', query: { date: iso } }}
                 aria-current={isSelected ? 'date' : undefined}
                 className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg text-xs font-semibold ${
                   isSelected ? 'bg-(--color-ink) text-(--color-bg)' : 'bg-(--color-surface)'

@@ -172,6 +172,24 @@ describe('generatePlan — three profiles, three plans (PLAN.md §11.3)', () => 
   })
 })
 
+describe('generatePlan — continuity', () => {
+  it('keeps the primary and secondary lifts of each session kind the same every week', () => {
+    // Progressive overload needs a lift to repeat: the next session's load is
+    // derived from the last one, and a rotating lift has no last one.
+    for (const answers of [BEGINNER_WOMAN, INTERMEDIATE_MAN, HYBRID_RUNNER]) {
+      const result = plan(answers)
+      const byKind = new Map<string, Set<string>>()
+      for (const day of result.days) {
+        if (!day.gym) continue
+        const key = day.gym.kind
+        const leads = day.gym.exercises.filter((e) => e.role === 'primary' || e.role === 'secondary').map((e) => e.exerciseId).join(',')
+        byKind.set(key, (byKind.get(key) ?? new Set()).add(leads))
+      }
+      for (const [kind, variants] of byKind) expect(variants.size, `${kind} for ${answers.basics.displayName}`).toBe(1)
+    }
+  })
+})
+
 describe('generatePlan — guards', () => {
   it('respects an injury across every session of the block', () => {
     const kneeInjury = build({ injuries: { areas: ['knees'], note: '' } })

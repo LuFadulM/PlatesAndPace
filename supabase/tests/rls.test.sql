@@ -91,14 +91,32 @@ reset role;
 set role authenticated;
 do $become$ begin perform set_config('request.jwt.claim.sub', '11111111-1111-1111-1111-111111111111', false); end $become$;
 
-insert into public.groups (id, name, owner_id)
-values ('cccccccc-0000-0000-0000-000000000001', 'Bogotá crew', '11111111-1111-1111-1111-111111111111');
-
-insert into public.group_members (group_id, user_id, role)
-values ('cccccccc-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', 'owner');
-
-insert into public.group_invites (group_id, code, created_by)
-values ('cccccccc-0000-0000-0000-000000000001', 'AB12CD', '11111111-1111-1111-1111-111111111111');
+-- Creating a group goes through the RPC: three rows, atomically, as the
+-- signed-in user. The plain-insert route cannot read the new id back
+-- (RETURNING is filtered by the SELECT policy before membership exists).
+do $$
+declare v_id uuid;
+begin
+  v_id := public.create_group('Bogotá crew');
+  perform public.assert(v_id is not null, 'create_group should return the new id');
+  perform public.assert(
+    (select count(*) from public.groups where id = v_id and owner_id = '11111111-1111-1111-1111-111111111111') = 1,
+    'the creator should own the new group');
+  perform public.assert(
+    (select role from public.group_members where group_id = v_id and user_id = '11111111-1111-1111-1111-111111111111') = 'owner',
+    'the creator should be a member with the owner role');
+  perform public.assert(
+    (select count(*) from public.group_invites where group_id = v_id and code ~ '^[A-HJ-NP-Z2-9]{6}$') = 1,
+    'a six-character invite from the unambiguous alphabet should exist');
+  -- Carry the generated code to the statements below. (An UPDATE here would
+  -- silently touch zero rows: group_invites has no update policy, by design.)
+  perform set_config('test.invite_code',
+    (select code from public.group_invites where group_id = v_id), false);
+  -- And the id: a subquery on groups would run under Beto's RLS below, inside
+  -- the same statement that first makes him a member, and see nothing.
+  perform set_config('test.group_id', v_id::text, false);
+end;
+$$;
 
 -- Beto joins with the code, which he could not have read directly.
 do $become$ begin perform set_config('request.jwt.claim.sub', '22222222-2222-2222-2222-222222222222', false); end $become$;
@@ -108,20 +126,20 @@ select public.assert(
   'a non-member must not be able to read invites');
 
 select public.assert(
-  public.join_group_with_code('ab12cd') = 'cccccccc-0000-0000-0000-000000000001',
+  public.join_group_with_code(lower(current_setting('test.invite_code'))) = current_setting('test.group_id')::uuid,
   'joining by code should be case-insensitive and return the group');
 
 select public.assert(
-  (select count(*) from public.group_members where group_id = 'cccccccc-0000-0000-0000-000000000001') = 2,
+  (select count(*) from public.group_members where group_id = current_setting('test.group_id')::uuid) = 2,
   'the group should now have two members');
 
 -- The summary shows names, weekly counts and streaks — and nothing more.
 select public.assert(
-  (select count(*) from public.group_weekly_summary('cccccccc-0000-0000-0000-000000000001')) = 2,
+  (select count(*) from public.group_weekly_summary(current_setting('test.group_id')::uuid)) = 2,
   'both members should appear in the summary');
 
 select public.assert(
-  (select sessions_done_this_week from public.group_weekly_summary('cccccccc-0000-0000-0000-000000000001')
+  (select sessions_done_this_week from public.group_weekly_summary(current_setting('test.group_id')::uuid)
    where display_name = 'Ana') = 1,
   'Ana''s completed session should be counted for the week');
 
@@ -147,7 +165,7 @@ do $become$ begin perform set_config('request.jwt.claim.sub', '33333333-3333-333
 do $$
 begin
   begin
-    perform public.group_weekly_summary('cccccccc-0000-0000-0000-000000000001');
+    perform public.group_weekly_summary(current_setting('test.group_id')::uuid);
     raise exception 'ASSERTION FAILED: a non-member must not read the group summary';
   exception
     when insufficient_privilege then null;
