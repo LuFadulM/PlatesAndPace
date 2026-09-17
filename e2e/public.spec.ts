@@ -20,7 +20,9 @@ test('serves both languages and the install manifest', async ({ page }) => {
 })
 
 test('has no horizontal overflow at 390px', async ({ page }) => {
-  for (const path of ['/en', '/es/sign-in', '/en/privacy']) {
+  // Both landings: Spanish has the longest words, and any overflow widens the
+  // mobile layout viewport, which also throws off taps near the bottom.
+  for (const path of ['/en', '/es', '/es/sign-in', '/en/privacy']) {
     await page.goto(path)
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)
     expect(overflow, path).toBe(false)

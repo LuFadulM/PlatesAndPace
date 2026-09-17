@@ -38,7 +38,7 @@ export function SessionDemo() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
-      <div className="flex flex-col gap-5">
+      <div className="flex min-w-0 flex-col gap-5">
         <div className="flex flex-wrap gap-1.5">
           {FOCUS_PRESET_IDS.map((preset) => (
             <button type="button" key={preset} className="min-h-9 rounded-full border border-dashed border-(--color-border) px-3 text-xs font-semibold hover:border-(--color-plate-blue)" onClick={() => setFocus([...FOCUS_PRESETS[preset]])}>
@@ -84,9 +84,10 @@ export function SessionDemo() {
         </div>
       </div>
 
-      <div className="rounded-3xl border border-(--color-border) bg-(--color-surface) p-5 shadow-xl">
-        <div className="flex items-baseline justify-between gap-3">
-          <h3 className="font-display text-2xl font-bold uppercase">{focus.length > 0 ? focus.map((m) => tMuscles(m)).join(' · ') : t('result')}</h3>
+      {/* min-w-0 on both columns: a long muscle name (“Isquiotibiales”) must wrap, never widen the page past the viewport. */}
+      <div className="min-w-0 rounded-3xl border border-(--color-border) bg-(--color-surface) p-5 shadow-xl">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+          <h3 className="min-w-0 font-display text-2xl font-bold uppercase break-words">{focus.length > 0 ? focus.map((m) => tMuscles(m)).join(' · ') : t('result')}</h3>
           {session && <span className="shrink-0 text-sm font-semibold text-(--color-ink-muted)">{t('estimate', { minutes: session.estimatedMinutes })}</span>}
         </div>
         <ol className="mt-4 flex flex-col gap-2" aria-live="polite">
