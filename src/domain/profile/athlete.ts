@@ -1,4 +1,5 @@
 import { fromISODate, type PlainDate } from '../dates'
+import type { MuscleGroup } from '../strength/volume'
 import {
   ADULT_AGE,
   MINIMUM_AGE,
@@ -73,6 +74,11 @@ export interface AthleteModel {
   gymDays: number[]
   runDays: number[]
   longRunDay?: number
+  /**
+   * Muscle groups per gym day (ISO weekday), when the athlete chose them
+   * rather than taking the engine's split. Absent means auto.
+   */
+  customSplit?: ReadonlyMap<number, readonly MuscleGroup[]>
   sessionMinutes: number
   startDate: PlainDate
   blockWeeks: number
@@ -129,6 +135,13 @@ export function buildAthleteModel(
     for (const pattern of INJURY_PATTERNS[area]) bannedPatterns.add(pattern)
   }
 
+  const customSplit =
+    answers.schedule.splitMode === 'custom'
+      ? new Map(
+          answers.schedule.gymDays.map((day) => [day, answers.schedule.customSplit[String(day)] ?? []] as const),
+        )
+      : undefined
+
   const recentRun = answers.experience.recentRun
     ? { km: answers.experience.recentRun.km, seconds: answers.experience.recentRun.minutes * 60 }
     : undefined
@@ -158,6 +171,7 @@ export function buildAthleteModel(
     gymDays: [...answers.schedule.gymDays].sort((a, b) => a - b),
     runDays: [...answers.schedule.runDays].sort((a, b) => a - b),
     longRunDay: answers.schedule.longRunDay,
+    customSplit,
     sessionMinutes: answers.schedule.sessionMinutes,
     startDate: fromISODate(answers.schedule.startDate),
     blockWeeks: answers.schedule.blockWeeks,

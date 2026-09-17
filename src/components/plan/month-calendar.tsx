@@ -96,7 +96,7 @@ export function MonthCalendar({ today, startDate, weeks, days, doneDates }: Prop
                 <tr key={iso} className="border-t border-(--color-border)">
                   <td className="py-2 font-semibold">{d.day}</td>
                   <td className="py-2">
-                    {day?.gym && <Link href={{ pathname: '/today', query: { date: iso } }} className="block text-(--color-plate-blue) underline-offset-2 hover:underline">{tAll(day.gym.titleKey)}</Link>}
+                    {day?.gym && <Link href={{ pathname: '/today', query: { date: iso } }} className="block text-(--color-plate-blue) underline-offset-2 hover:underline">{day.gym.kind === 'custom' && day.gym.focus?.length ? day.gym.focus.map((m) => tAll(`muscles.${m}`)).join(' · ') : tAll(day.gym.titleKey)}</Link>}
                     {day?.run && <Link href={{ pathname: '/today', query: { date: iso } }} className="block text-(--color-ink)">{tAll(day.run.titleKey)}</Link>}
                     {!day?.gym && !day?.run && <span className="text-(--color-ink-muted)">{t('rest')}</span>}
                   </td>

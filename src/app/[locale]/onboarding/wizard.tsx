@@ -6,6 +6,8 @@ import { useRouter } from '@/i18n/navigation'
 import type { Locale } from '@/i18n/routing'
 import { detectTimeZone, todayInZone, toISODate } from '@/domain/dates'
 import { MACHINE_IDS, EXERCISE_IDS } from '@/domain/exercises/library'
+import { FOCUS_PRESETS, FOCUS_PRESET_IDS } from '@/domain/strength/splits'
+import { MUSCLE_GROUPS, type MuscleGroup } from '@/domain/strength/volume'
 import {
   QUESTIONNAIRE_STEPS,
   STEP_SCHEMAS,
@@ -30,7 +32,7 @@ function initialDraft(locale: Locale, initial: QuestionnaireAnswers | null): Dra
     health: { heartCondition: false, chestPain: false, dizziness: false, jointProblem: false, bloodPressureMedication: false, pregnancy: false, other: false },
     goals: {},
     experience: { knowsBigLifts: false },
-    schedule: { gymDays: [], runDays: [], sessionMinutes: 60, startDate: toISODate(todayInZone(timezone)), blockWeeks: 8 },
+    schedule: { gymDays: [], runDays: [], splitMode: 'auto', customSplit: {}, sessionMinutes: 60, startDate: toISODate(todayInZone(timezone)), blockWeeks: 8 },
     equipment: { setting: 'full_gym', unavailableMachines: [] },
     injuries: { areas: [], note: '' },
     preferences: { focusAreas: [], intensity: 'hard', avoidExerciseIds: [] },
@@ -46,6 +48,7 @@ export function OnboardingWizard({ locale, initial, editing }: { locale: Locale;
   const t = useTranslations('onboarding')
   const tEx = useTranslations('exercises')
   const tLocale = useTranslations('locale')
+  const tMuscles = useTranslations('muscles')
   const router = useRouter()
   const [step, setStep] = useState(0)
   const [draft, setDraft] = useState<Draft>(() => initialDraft(locale, initial))
@@ -200,6 +203,39 @@ export function OnboardingWizard({ locale, initial, editing }: { locale: Locale;
           <fieldset><legend className="mb-1.5 text-sm font-medium">{t('steps.schedule.gymDays')}</legend>
             <div className="flex flex-wrap gap-2">{DAYS.map((d) => <button type="button" key={d} className={chip((draft.schedule.gymDays ?? []).includes(d))} onClick={() => update('schedule', { gymDays: toggle(draft.schedule.gymDays, d as never) })}>{t(`days.${d}`)}</button>)}</div>
           </fieldset>
+          <fieldset><legend className="mb-1.5 text-sm font-medium">{t('steps.schedule.splitMode')}</legend>
+            <div className="flex gap-2">
+              <button type="button" className={chip((draft.schedule.splitMode ?? 'auto') === 'auto')} onClick={() => update('schedule', { splitMode: 'auto' })}>{t('steps.schedule.splitAuto')}</button>
+              <button type="button" className={chip(draft.schedule.splitMode === 'custom')} onClick={() => update('schedule', { splitMode: 'custom' })}>{t('steps.schedule.splitCustom')}</button>
+            </div>
+          </fieldset>
+          {draft.schedule.splitMode === 'custom' && (
+            <div className="flex flex-col gap-4 rounded-xl border border-(--color-border) bg-(--color-surface) p-3">
+              <p className="text-xs text-(--color-ink-muted)">{t('steps.schedule.splitHelp')}</p>
+              {[...(draft.schedule.gymDays ?? [])].sort((a, b) => a - b).map((d) => {
+                const chosen: MuscleGroup[] = draft.schedule.customSplit?.[String(d)] ?? []
+                const setDay = (muscles: MuscleGroup[]) => update('schedule', { customSplit: { ...(draft.schedule.customSplit ?? {}), [String(d)]: muscles } })
+                return (
+                  <fieldset key={d}>
+                    <legend className="mb-1.5 text-sm font-medium">{t('steps.schedule.dayFocus', { day: t(`days.${d}`) })}</legend>
+                    <div className="mb-2 flex flex-wrap gap-1.5">
+                      {FOCUS_PRESET_IDS.map((preset) => <button type="button" key={preset} className="min-h-9 rounded-full border border-dashed border-(--color-border) px-3 text-xs font-semibold" onClick={() => setDay([...FOCUS_PRESETS[preset]])}>{t(`steps.schedule.presets.${preset}`)}</button>)}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {MUSCLE_GROUPS.map((m) => {
+                        const index = chosen.indexOf(m)
+                        return (
+                          <button type="button" key={m} aria-pressed={index >= 0} className={chip(index >= 0)} onClick={() => setDay(index >= 0 ? chosen.filter((x) => x !== m) : [...chosen, m])}>
+                            {index >= 0 ? `${index + 1}. ` : ''}{tMuscles(m)}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </fieldset>
+                )
+              })}
+            </div>
+          )}
           <fieldset><legend className="mb-1.5 text-sm font-medium">{t('steps.schedule.runDays')}</legend>
             <div className="flex flex-wrap gap-2">{DAYS.map((d) => <button type="button" key={d} className={chip((draft.schedule.runDays ?? []).includes(d))} onClick={() => update('schedule', { runDays: toggle(draft.schedule.runDays, d as never) })}>{t(`days.${d}`)}</button>)}</div>
           </fieldset>

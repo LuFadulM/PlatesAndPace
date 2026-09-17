@@ -633,6 +633,9 @@
     },
     "upper_b": {
       "title": "Upper B"
+    },
+    "custom": {
+      "title": "Your session"
     }
   },
   "runs": {
@@ -751,7 +754,20 @@
         "startDate": "Start date",
         "blockWeeks": "Block length",
         "weeks": "{n} weeks",
-        "startHelp": "Plans start on the Monday of that week."
+        "startHelp": "Plans start on the Monday of that week.",
+        "splitMode": "Who decides what you train each day?",
+        "splitAuto": "Let the app choose",
+        "splitCustom": "I choose the muscles",
+        "splitHelp": "Pick the muscle groups for each gym day, in the order you want to prioritise them. The first one gets the main lift.",
+        "dayFocus": "{day}: what do you train?",
+        "presets": {
+          "legs": "Full legs",
+          "glutes_hamstrings": "Glutes & hamstrings",
+          "push": "Chest, shoulders & triceps",
+          "pull": "Back & biceps",
+          "upper": "Upper body",
+          "full_body": "Full body"
+        }
       },
       "equipment": {
         "title": "Equipment",
@@ -838,7 +854,16 @@
     "runSaved": "Run logged.",
     "intervalLine": "{reps} × {meters} m at {pace}/km, {rest} easy between.",
     "runWalkLine": "{repeats} × (run {run} min / walk {walk} min).",
-    "km": "km"
+    "km": "km",
+    "refocus": {
+      "title": "Change today's focus",
+      "help": "Pick the muscles you want today and the session is rebuilt around your weights, your equipment and your injuries.",
+      "restHint": "Nothing planned today? Pick muscles and train anyway.",
+      "apply": "Build today's session",
+      "rebuilt": "Today's session is rebuilt.",
+      "error": "Could not rebuild the session. Try again.",
+      "selected": "{n} selected"
+    }
   },
   "plan": {
     "title": "Plan",

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { MUSCLE_GROUPS, type MuscleGroup } from '../strength/volume'
 import { RACE_DISTANCES_KM } from './types'
 
 /**
@@ -75,11 +76,20 @@ export const experienceSchema = z
 /** ISO weekdays, 1 = Monday. */
 const weekday = z.number().int().min(1).max(7)
 
+const muscleGroup = z.enum(MUSCLE_GROUPS as unknown as [MuscleGroup, ...MuscleGroup[]])
+
 export const scheduleSchema = z
   .object({
     gymDays: z.array(weekday).min(2).max(6),
     runDays: z.array(weekday).max(7),
     longRunDay: weekday.optional(),
+    /**
+     * `auto` lets the engine pick the split for the day count. `custom` means
+     * the athlete named the muscle groups for each gym day themselves, keyed
+     * by ISO weekday as a string because the answers are stored as JSON.
+     */
+    splitMode: z.enum(['auto', 'custom']).default('auto'),
+    customSplit: z.record(z.string(), z.array(muscleGroup).min(1).max(6)).default({}),
     sessionMinutes: z.union([
       z.literal(30),
       z.literal(45),
@@ -97,6 +107,12 @@ export const scheduleSchema = z
   .refine(
     (schedule) => schedule.longRunDay === undefined || schedule.runDays.includes(schedule.longRunDay),
     { message: 'the long run has to fall on a run day', path: ['longRunDay'] },
+  )
+  .refine(
+    (schedule) =>
+      schedule.splitMode !== 'custom' ||
+      schedule.gymDays.every((day) => (schedule.customSplit[String(day)]?.length ?? 0) > 0),
+    { message: 'every gym day needs at least one muscle group', path: ['customSplit'] },
   )
 
 export const equipmentSchema = z.object({

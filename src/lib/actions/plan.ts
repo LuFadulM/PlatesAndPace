@@ -1,12 +1,16 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { z } from 'zod'
 import { addDays, compareDates, fromISODate, todayInZone, toISODate, type PlainDate } from '@/domain/dates'
-import { generatePlan, type GeneratedPlan } from '@/domain/plan'
+import { generatePlan, regenerateGymSession, type GeneratedPlan, type PlannedDay } from '@/domain/plan'
 import { buildAthleteModel } from '@/domain/profile/athlete'
 import { anyHealthFlag, questionnaireSchema } from '@/domain/profile/questionnaire'
 import { planSeed } from '@/domain/strength/rng'
+import { MUSCLE_GROUPS, type MuscleGroup } from '@/domain/strength/volume'
 import { exerciseIdsUsedSince, getSwaps, latestMaxes } from '@/lib/data/logs'
+import { getCurrentPlan, getPlannedDay } from '@/lib/data/plan'
+import { getActiveAnswers } from '@/lib/data/profile'
 import { createClient } from '@/lib/supabase/server'
 import type { Json } from '@/types/database'
 
@@ -112,5 +116,70 @@ async function materialise(
   const { error: sessionsError } = await supabase.from('planned_sessions').insert(rows)
   if (sessionsError) return { ok: false, errorKey: 'onboarding.errors.save' }
 
+  return { ok: true }
+}
+
+const refocusSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  muscles: z.array(z.enum(MUSCLE_GROUPS as unknown as [MuscleGroup, ...MuscleGroup[]])).min(1).max(6),
+})
+
+/**
+ * Rebuilds one day's gym session from muscle groups the athlete chose on the
+ * spot. Only today or later can change — the past is history — and the run
+ * scheduled for that day and the next still shapes the session.
+ */
+export async function refocusDay(raw: unknown): Promise<{ ok: true } | { ok: false; errorKey: string }> {
+  const parsed = refocusSchema.safeParse(raw)
+  if (!parsed.success) return { ok: false, errorKey: 'today.refocus.error' }
+  const { date, muscles } = parsed.data
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { ok: false, errorKey: 'auth.errors.signedOut' }
+
+  const answers = await getActiveAnswers()
+  if (!answers) return { ok: false, errorKey: 'today.refocus.error' }
+
+  const today = todayInZone(answers.basics.timezone)
+  if (compareDates(fromISODate(date), today) < 0) return { ok: false, errorKey: 'today.refocus.error' }
+
+  let model
+  try {
+    model = buildAthleteModel(answers, today)
+  } catch {
+    return { ok: false, errorKey: 'today.refocus.error' }
+  }
+
+  const [plan, day, next, maxes, swaps, recent] = await Promise.all([
+    getCurrentPlan(),
+    getPlannedDay(date),
+    getPlannedDay(toISODate(addDays(fromISODate(date), 1))),
+    latestMaxes(today),
+    getSwaps(),
+    exerciseIdsUsedSince(addDays(fromISODate(date), -7)),
+  ])
+  if (!plan || !day) return { ok: false, errorKey: 'today.refocus.error' }
+
+  const gym = regenerateGymSession(model, {
+    focus: muscles,
+    week: day.week,
+    todaysRun: day.run?.kind ?? 'none',
+    tomorrowsRun: next?.run?.kind ?? 'none',
+    seed: `${user.id}:${date}:${muscles.join('+')}`,
+    previousMaxes: maxes,
+    swaps,
+    recentlyUsed: recent,
+  })
+
+  const rebuilt: PlannedDay = { ...day, type: day.run ? 'gym_run' : 'gym', gym }
+  const { error } = await supabase
+    .from('planned_sessions')
+    .update({ type: rebuilt.type, content: rebuilt as unknown as Json })
+    .eq('user_id', user.id)
+    .eq('date', date)
+  if (error) return { ok: false, errorKey: 'today.refocus.error' }
+
+  revalidatePath('/', 'layout')
   return { ok: true }
 }

@@ -12,6 +12,8 @@ import type { NutritionEstimate } from '@/domain/nutrition'
 import { createOutbox, setLogKey, type Outbox } from '@/lib/offline'
 import { finishSession, saveReadiness, saveRun, saveSets } from '@/lib/actions/logs'
 import type { Units } from '@/domain/profile/types'
+import { ExerciseFigure } from '@/components/figure/exercise-figure'
+import { FocusPicker } from './focus-picker'
 import { RestTimer } from './rest-timer'
 
 export interface LoggedSet {
@@ -52,6 +54,7 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
   const t = useTranslations('today')
   const tEx = useTranslations('exercises')
   const tCoach = useTranslations()
+  const tMuscles = useTranslations('muscles')
   const locale = useLocale()
   const router = useRouter()
   const [pending, startTransition] = useTransition()
@@ -165,6 +168,11 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
   if (!day) return <p className="text-(--color-ink-muted)">{t('noPlan')}</p>
 
   const run = day.run
+  const gymTitle = gym
+    ? gym.kind === 'custom' && gym.focus && gym.focus.length > 0
+      ? gym.focus.map((m) => tMuscles(m)).join(' · ')
+      : tCoach(gym.titleKey)
+    : ''
   const summaryOf = (e: PlannedExercise) => `${e.sets} × ${e.repMin}–${e.repMax}${e.loadKg ? `, ${displayLoad(e.loadKg * (adjustment?.loadMultiplier ?? 1), units)} ${unitLabel(units)}` : ''}`
 
   return (
@@ -175,7 +183,7 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
       {gym && (
         <>
           <div>
-            <h2 className="font-display text-3xl font-bold">{tCoach(gym.titleKey)}</h2>
+            <h2 className="font-display text-3xl font-bold">{gymTitle}</h2>
             <p className="text-sm text-(--color-ink-muted)">{tCoach(gym.intentKey)} · {t('estimate', { minutes: gym.estimatedMinutes })}</p>
           </div>
 
@@ -205,6 +213,7 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
                 <li key={e.exerciseId} className="rounded-xl border border-(--color-border) bg-(--color-surface)">
                   <button type="button" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? null : e.exerciseId)} className="flex min-h-14 w-full items-center gap-3 px-3 text-left">
                     <span className={`w-7 font-display text-lg font-bold ${complete ? 'text-(--color-plate-green)' : 'text-(--color-plate-blue)'}`}>{e.label}</span>
+                    <ExerciseFigure animation={getExercise(e.exerciseId).animation} title={tEx(`${e.exerciseId}.name`)} className="h-12 w-12 shrink-0 text-(--color-ink)" />
                     <span className="flex-1">
                       <span className="block font-semibold">{tEx(`${e.exerciseId}.name`)}</span>
                       <span className="block text-xs text-(--color-ink-muted)">{summaryOf(e)}{e.technique !== 'straight' ? ` · ${t(`technique.${e.technique}`)}` : ''}</span>
@@ -213,7 +222,14 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
                   </button>
                   {isOpen && (
                     <div className="flex flex-col gap-2 border-t border-(--color-border) px-3 py-3">
-                      <p className="text-xs text-(--color-ink-muted)">{tEx(`${e.exerciseId}.cue1`)} · {tEx(`${e.exerciseId}.cue2`)}</p>
+                      <div className="flex items-center gap-3">
+                        <ExerciseFigure animation={getExercise(e.exerciseId).animation} title={tEx(`${e.exerciseId}.name`)} className="h-28 w-28 shrink-0 text-(--color-ink)" />
+                        <div className="text-xs text-(--color-ink-muted)">
+                          <p>{tEx(`${e.exerciseId}.cue1`)}</p>
+                          <p>{tEx(`${e.exerciseId}.cue2`)}</p>
+                          <p className="mt-1 text-(--color-plate-red)">{tEx(`${e.exerciseId}.mistake1`)}</p>
+                        </div>
+                      </div>
                       {Array.from({ length: e.sets }, (_, i) => {
                         const logged = sets.get(setLogKey(date, e.exerciseId, i))
                         const suggested = loadFor(e, i)
@@ -249,6 +265,12 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
       )}
 
       {run && <RunCard run={run} date={date} locale={locale} />}
+
+      {!done && (
+        <Section title={t('refocus.title')} defaultOpen={!gym}>
+          <FocusPicker date={date} current={gym?.focus} isRestDay={!gym} />
+        </Section>
+      )}
 
       {!done && (gym || run) && (
         <button type="button" disabled={pending} onClick={finish} className="min-h-12 rounded-xl bg-(--color-plate-green) font-display text-lg font-bold text-white disabled:opacity-60">
