@@ -27,6 +27,7 @@ import {
   type SessionKind,
 } from '../strength/splits'
 import { sessionTemplate, type SlotRole } from '../strength/templates'
+import type { MuscleGroup } from '../strength/volume'
 
 /**
  * Turns an athlete model into a concrete session for every calendar day of a
@@ -54,6 +55,8 @@ export interface PlannedExercise {
 
 export interface GymSession {
   kind: SessionKind
+  /** The muscle groups a custom session was built from, in priority order. */
+  focus?: MuscleGroup[]
   titleKey: string
   intentKey: string
   warmupKey: string
@@ -101,6 +104,8 @@ export interface GeneratedPlan {
   /** Snapshot for `plans.settings`. */
   settings: {
     split: SessionKind[]
+    /** Muscle groups per ISO weekday when the athlete chose the split. */
+    customSplit?: Record<string, MuscleGroup[]>
     goal: AthleteModel['goal']
     tier: AthleteModel['tier']
     conservativeMode: boolean
@@ -168,10 +173,15 @@ function buildGymSession(
   todaysRun: RunKind,
   tomorrowsRun: RunKind,
   continuity: Map<string, string>,
+  focus?: readonly MuscleGroup[],
 ): GymSession {
   const phase = phaseParameters(week, model.blockWeeks)
   const limits = interferenceLimits(model.goal, todaysRun, tomorrowsRun)
-  const template = sessionTemplate(kind, model.goal, model.tier, model.sessionMinutes)
+  const template = sessionTemplate(kind, model.goal, model.tier, model.sessionMinutes, focus)
+  const lowerBody = isLowerBodySession(kind, focus)
+  // Custom sessions keep continuity per muscle combination, so the same
+  // "glutes + hamstrings" day sees the same primary lift week after week.
+  const continuityPrefix = kind === 'custom' ? `custom:${(focus ?? []).join('+')}` : kind
 
   const extraBanned = new Set<MovementPattern>(ctx.extraBannedPatterns ?? [])
   if (!limits.allowHeavyHinge) {
@@ -187,7 +197,7 @@ function buildGymSession(
   const volumeScale = phase.volumeMultiplier * (week === 1 ? (options.reviewVolumeMultiplier ?? 1) : 1)
 
   template.forEach((slot, slotIndex) => {
-    const continuityKey = `${kind}:${slotIndex}`
+    const continuityKey = `${continuityPrefix}:${slotIndex}`
     const exercise = selectExercise(slot, { ...dayCtx, preferred: continuity.get(continuityKey) }, chosen)
     if (!exercise) return
     chosen.add(exercise.id)
@@ -195,7 +205,7 @@ function buildGymSession(
 
     let sets = Math.max(1, Math.round(slot.sets * volumeScale))
     const isLower = exercise.region === 'lower'
-    if (isLower && isLowerBodySession(kind)) {
+    if (isLower && lowerBody) {
       const room = limits.maxLowerBodySets - lowerSets
       if (room <= 0) return
       sets = Math.min(sets, room)
@@ -276,9 +286,10 @@ function buildGymSession(
 
   return {
     kind,
+    focus: kind === 'custom' ? [...(focus ?? [])] : undefined,
     titleKey: `sessions.${kind}.title`,
     intentKey: phase.messageKey,
-    warmupKey: isLowerBodySession(kind) ? 'warmup.lower' : 'warmup.upper',
+    warmupKey: lowerBody ? 'warmup.lower' : 'warmup.upper',
     exercises,
     finisher,
     estimatedMinutes,
@@ -342,7 +353,9 @@ function buildRunSession(
 export function generatePlan(model: AthleteModel, options: GenerateOptions): GeneratedPlan {
   const seed = options.seed ?? planSeed(model.displayName, options.block)
   const rng = createRng(seed)
-  const split = selectSplit(model.gymDays.length, model.tier, model.goal)
+  const split: SessionKind[] = model.customSplit
+    ? model.gymDays.map(() => 'custom' as const)
+    : selectSplit(model.gymDays.length, model.tier, model.goal)
   const runKinds = assignRunKinds(model)
 
   const paces = model.recentRun ? trainingPaces(model.recentRun, model.targetRace) : null
@@ -380,7 +393,7 @@ export function generatePlan(model: AthleteModel, options: GenerateOptions): Gen
     let gym: GymSession | undefined
     if (gymIndex >= 0) {
       const dayCtx: SelectionContext = { ...ctx, recentlyUsed: new Set([...ctx.recentlyUsed, ...usedThisWeek]) }
-      gym = buildGymSession(split[gymIndex]!, week, model, dayCtx, options, todaysRun, tomorrowsRun, continuity)
+      gym = buildGymSession(split[gymIndex]!, week, model, dayCtx, options, todaysRun, tomorrowsRun, continuity, model.customSplit?.get(dow))
       for (const e of gym.exercises) usedThisWeek.add(e.exerciseId)
     }
 
@@ -396,6 +409,55 @@ export function generatePlan(model: AthleteModel, options: GenerateOptions): Gen
     weeks: model.blockWeeks,
     days,
     paces,
-    settings: { split, goal: model.goal, tier: model.tier, conservativeMode: model.conservativeMode, seed },
+    settings: {
+      split,
+      customSplit: model.customSplit
+        ? Object.fromEntries([...model.customSplit].map(([day, muscles]) => [String(day), [...muscles]]))
+        : undefined,
+      goal: model.goal,
+      tier: model.tier,
+      conservativeMode: model.conservativeMode,
+      seed,
+    },
   }
+}
+
+export interface RegenerateOptions {
+  /** The muscle groups the athlete wants today, in priority order. */
+  focus: readonly MuscleGroup[]
+  week: number
+  todaysRun: RunKind
+  tomorrowsRun: RunKind
+  /** Seeded per day so two taps on the same choice give the same session. */
+  seed: string
+  previousMaxes?: Readonly<Record<string, number>>
+  recentlyUsed?: ReadonlySet<string>
+  swaps?: ReadonlyMap<string, string>
+}
+
+/**
+ * One gym session built from muscle groups chosen on the day, outside the
+ * block's split. Everything else — loads, RPE, phase, interference with the
+ * runs around it, injuries, equipment — comes from the same rules as the
+ * planned sessions, so a day the athlete rearranges is as safe as one the
+ * engine planned.
+ */
+export function regenerateGymSession(model: AthleteModel, options: RegenerateOptions): GymSession {
+  const ctx: SelectionContext = {
+    model,
+    rng: createRng(options.seed),
+    recentlyUsed: options.recentlyUsed ?? new Set(),
+    swaps: options.swaps ?? new Map(),
+  }
+  return buildGymSession(
+    'custom',
+    options.week,
+    model,
+    ctx,
+    { block: 0, previousMaxes: options.previousMaxes },
+    options.todaysRun,
+    options.tomorrowsRun,
+    new Map(),
+    options.focus,
+  )
 }

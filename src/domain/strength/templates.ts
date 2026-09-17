@@ -1,3 +1,4 @@
+import { EXERCISES } from '../exercises/library'
 import type { ExperienceTier, PrimaryGoal } from '../profile/types'
 import type { SessionKind } from './splits'
 import type { MuscleGroup } from './volume'
@@ -85,7 +86,7 @@ const SETS_BY_ROLE: Record<Exclude<SlotRole, 'finisher'>, number> = {
 type Blueprint = ReadonlyArray<[Exclude<SlotRole, 'finisher'>, MuscleGroup]>
 
 /** Muscle order per session kind, highest priority first. */
-const BLUEPRINTS: Record<SessionKind, Blueprint> = {
+const BLUEPRINTS: Record<Exclude<SessionKind, 'custom'>, Blueprint> = {
   full_body_a: [['primary', 'quads'], ['secondary', 'chest'], ['secondary', 'back'], ['accessory', 'hamstrings'], ['isolation', 'shoulders'], ['core', 'abs'], ['isolation', 'calves']],
   full_body_b: [['primary', 'hamstrings'], ['secondary', 'back'], ['secondary', 'chest'], ['accessory', 'glutes'], ['isolation', 'biceps'], ['isolation', 'triceps'], ['core', 'abs']],
   full_body_c: [['primary', 'glutes'], ['secondary', 'shoulders'], ['secondary', 'back'], ['accessory', 'quads'], ['isolation', 'calves'], ['core', 'abs'], ['isolation', 'chest']],
@@ -98,6 +99,53 @@ const BLUEPRINTS: Record<SessionKind, Blueprint> = {
   upper_a: [['primary', 'chest'], ['secondary', 'back'], ['secondary', 'shoulders'], ['isolation', 'triceps'], ['isolation', 'biceps'], ['isolation', 'chest'], ['core', 'abs']],
   glutes_lower_b: [['primary', 'glutes'], ['secondary', 'hamstrings'], ['accessory', 'glutes'], ['accessory', 'quads'], ['isolation', 'glutes'], ['core', 'abs'], ['isolation', 'calves']],
   upper_b: [['primary', 'back'], ['secondary', 'chest'], ['secondary', 'shoulders'], ['isolation', 'biceps'], ['isolation', 'triceps'], ['isolation', 'shoulders'], ['core', 'abs']],
+}
+
+/** Muscles the library can serve with a compound movement — candidates for the main lift. */
+const PRIMARY_CAPABLE: ReadonlySet<MuscleGroup> = new Set(
+  EXERCISES.filter((e) => e.category === 'compound').map((e) => e.primary),
+)
+
+/** Muscles with at least an accessory movement, so they can carry a mid-session slot. */
+const ACCESSORY_CAPABLE: ReadonlySet<MuscleGroup> = new Set(
+  EXERCISES.filter((e) => e.category === 'accessory').map((e) => e.primary),
+)
+
+/**
+ * A blueprint from the muscle groups the athlete named for the day.
+ *
+ * The first muscle gets the primary lift, the second the secondary, and the
+ * rest accessories; then every muscle gets isolation work in the order given,
+ * so "glutes, hamstrings" reads as a glute day with hamstring support and
+ * "hamstrings, glutes" the other way round. Muscles the library only serves
+ * with isolation movements (biceps, triceps, calves) never get a compound
+ * slot they could not fill, and abs go in as core work.
+ */
+export function customBlueprint(focus: readonly MuscleGroup[]): Blueprint {
+  const muscles = [...new Set(focus)]
+  if (muscles.length === 0) throw new RangeError('a custom session needs at least one muscle group')
+
+  const big = muscles.filter((m) => m !== 'abs' && PRIMARY_CAPABLE.has(m))
+  const mid = muscles.filter((m) => m !== 'abs' && !PRIMARY_CAPABLE.has(m) && ACCESSORY_CAPABLE.has(m))
+  const small = muscles.filter((m) => m !== 'abs' && !PRIMARY_CAPABLE.has(m) && !ACCESSORY_CAPABLE.has(m))
+  const wantsAbs = muscles.includes('abs')
+  const pairs: Array<[Exclude<SlotRole, 'finisher'>, MuscleGroup]> = []
+
+  if (big.length > 0) {
+    pairs.push(['primary', big[0]!])
+    pairs.push(['secondary', big[1] ?? big[0]!])
+    for (const m of big.slice(2)) pairs.push(['accessory', m])
+    if (big.length < 3) pairs.push(['accessory', big[0]!])
+  }
+  for (const m of mid) pairs.push(['accessory', m])
+  for (const m of small) pairs.push(['isolation', m])
+  for (const m of mid) pairs.push(['isolation', m])
+  for (const m of big) pairs.push(['isolation', m])
+  if (wantsAbs || pairs.length < 7) pairs.push(['core', 'abs'])
+  for (const m of small) pairs.push(['isolation', m])
+  for (const m of big) pairs.push(['isolation', m])
+
+  return pairs.slice(0, 8)
 }
 
 /** How many slots fit in a session of a given length, warm-up included. */
@@ -124,11 +172,13 @@ export function sessionTemplate(
   goal: PrimaryGoal,
   tier: ExperienceTier,
   sessionMinutes: number,
+  focus?: readonly MuscleGroup[],
 ): Slot[] {
   const shapes = GOAL_SHAPES[goal]
   const budget = slotBudget(sessionMinutes) - (wantsFinisher(goal) ? 1 : 0)
+  const blueprint = kind === 'custom' ? customBlueprint(focus ?? []) : BLUEPRINTS[kind]
 
-  const slots: Slot[] = BLUEPRINTS[kind].slice(0, Math.max(2, budget)).map(([role, muscle]) => {
+  const slots: Slot[] = blueprint.slice(0, Math.max(2, budget)).map(([role, muscle]) => {
     const shape = shapes[role]
     // Beginners do fewer sets per slot: the same total is spread over more
     // sessions and their recovery cannot yet absorb the extra.

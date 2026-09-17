@@ -633,6 +633,9 @@
     },
     "upper_b": {
       "title": "Superior B"
+    },
+    "custom": {
+      "title": "Tu sesión"
     }
   },
   "runs": {
@@ -751,7 +754,20 @@
         "startDate": "Fecha de inicio",
         "blockWeeks": "Duración del bloque",
         "weeks": "{n} semanas",
-        "startHelp": "Los planes empiezan el lunes de esa semana."
+        "startHelp": "Los planes empiezan el lunes de esa semana.",
+        "splitMode": "¿Quién decide qué entrenas cada día?",
+        "splitAuto": "Que lo elija la app",
+        "splitCustom": "Yo elijo los músculos",
+        "splitHelp": "Elige los grupos musculares de cada día de gimnasio, en el orden en que quieras priorizarlos. El primero se lleva el ejercicio principal.",
+        "dayFocus": "{day}: ¿qué entrenas?",
+        "presets": {
+          "legs": "Pierna completa",
+          "glutes_hamstrings": "Glúteos e isquios",
+          "push": "Pecho, hombros y tríceps",
+          "pull": "Espalda y bíceps",
+          "upper": "Tren superior",
+          "full_body": "Cuerpo completo"
+        }
       },
       "equipment": {
         "title": "Equipo",
@@ -838,7 +854,16 @@
     "runSaved": "Carrera registrada.",
     "intervalLine": "{reps} × {meters} m a {pace}/km, {rest} suave entre cada una.",
     "runWalkLine": "{repeats} × (correr {run} min / caminar {walk} min).",
-    "km": "km"
+    "km": "km",
+    "refocus": {
+      "title": "Cambiar el enfoque de hoy",
+      "help": "Elige los músculos que quieres hoy y la sesión se arma de nuevo con tus pesos, tu equipo y tus lesiones en cuenta.",
+      "restHint": "¿Nada planeado hoy? Elige músculos y entrena igual.",
+      "apply": "Armar la sesión de hoy",
+      "rebuilt": "La sesión de hoy quedó armada.",
+      "error": "No se pudo armar la sesión. Intenta de nuevo.",
+      "selected": "{n} elegidos"
+    }
   },
   "plan": {
     "title": "Plan",

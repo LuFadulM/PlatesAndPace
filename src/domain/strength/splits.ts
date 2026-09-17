@@ -1,4 +1,5 @@
 import type { ExperienceTier, PrimaryGoal } from '../profile/types'
+import type { MuscleGroup } from './volume'
 
 /** The shape of one gym day (PLAN.md §6.2). */
 export type SessionKind =
@@ -14,6 +15,8 @@ export type SessionKind =
   | 'upper_a'
   | 'glutes_lower_b'
   | 'upper_b'
+  /** Built from muscle groups the athlete named, not from a fixed blueprint. */
+  | 'custom'
 
 export const MIN_GYM_DAYS = 2
 export const MAX_GYM_DAYS = 6
@@ -62,9 +65,31 @@ const LOWER_BODY_SESSIONS: ReadonlySet<SessionKind> = new Set([
   'full_body_c',
 ])
 
-export function isLowerBodySession(kind: SessionKind): boolean {
+const LOWER_BODY_MUSCLES: ReadonlySet<MuscleGroup> = new Set(['quads', 'hamstrings', 'glutes', 'calves'])
+
+export function isLowerBodyFocus(focus: readonly MuscleGroup[]): boolean {
+  return focus.some((muscle) => LOWER_BODY_MUSCLES.has(muscle))
+}
+
+/** A custom session is lower-body when any of its chosen muscles is. */
+export function isLowerBodySession(kind: SessionKind, focus?: readonly MuscleGroup[]): boolean {
+  if (kind === 'custom') return focus ? isLowerBodyFocus(focus) : false
   return LOWER_BODY_SESSIONS.has(kind)
 }
+
+/** Quick picks for the custom split, in the order they are offered. */
+export type FocusPreset = 'legs' | 'glutes_hamstrings' | 'push' | 'pull' | 'upper' | 'full_body'
+
+export const FOCUS_PRESETS: Record<FocusPreset, readonly MuscleGroup[]> = {
+  legs: ['quads', 'hamstrings', 'glutes', 'calves'],
+  glutes_hamstrings: ['glutes', 'hamstrings'],
+  push: ['chest', 'shoulders', 'triceps'],
+  pull: ['back', 'biceps'],
+  upper: ['chest', 'back', 'shoulders', 'biceps', 'triceps'],
+  full_body: ['quads', 'chest', 'back', 'hamstrings', 'shoulders', 'abs'],
+}
+
+export const FOCUS_PRESET_IDS: readonly FocusPreset[] = ['legs', 'glutes_hamstrings', 'push', 'pull', 'upper', 'full_body']
 
 export type RunKind = 'easy' | 'long' | 'threshold' | 'interval' | 'run_walk' | 'none'
 

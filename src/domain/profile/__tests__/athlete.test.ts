@@ -94,7 +94,7 @@ describe('questionnaire validation', () => {
           sessionMinutes: 60,
           startDate: '2026-09-14',
           blockWeeks: 8,
-        } as QuestionnaireAnswers['schedule'],
+        } as unknown as QuestionnaireAnswers['schedule'],
       }),
     ).toThrow()
   })
@@ -108,7 +108,7 @@ describe('questionnaire validation', () => {
           sessionMinutes: 60,
           startDate: '2026-09-14',
           blockWeeks: 8,
-        } as QuestionnaireAnswers['schedule'],
+        } as unknown as QuestionnaireAnswers['schedule'],
       }),
     ).toThrow()
   })
@@ -123,7 +123,7 @@ describe('questionnaire validation', () => {
             sessionMinutes: 60,
             startDate: '2026-09-14',
             blockWeeks: 8,
-          } as QuestionnaireAnswers['schedule'],
+          } as unknown as QuestionnaireAnswers['schedule'],
         }),
       ).toThrow()
     }
@@ -217,7 +217,7 @@ describe('buildAthleteModel', () => {
           sessionMinutes: 60,
           startDate: '2026-09-14',
           blockWeeks: 8,
-        } as QuestionnaireAnswers['schedule'],
+        } as unknown as QuestionnaireAnswers['schedule'],
       }),
       TODAY,
     )
