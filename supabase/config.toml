@@ -10,7 +10,9 @@ max_rows = 1000
 [db]
 port = 54322
 shadow_port = 54320
-major_version = 16
+# The current Supabase CLI refuses 16 here; local Postgres 16 still runs the
+# same migrations, which use nothing version-specific.
+major_version = 17
 
 [studio]
 enabled = true
