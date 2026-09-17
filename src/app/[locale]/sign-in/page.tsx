@@ -24,7 +24,7 @@ export default async function SignInPage({
 
       {error ? (
         <p role="alert" className="text-sm text-(--color-plate-red)">
-          {error === 'exchange_failed' ? t('errors.linkExpired') : t('errors.linkInvalid')}
+          {error === 'exchange_failed' ? t('errors.linkExpired') : error === 'other_device' ? t('errors.otherDevice') : t('errors.linkInvalid')}
         </p>
       ) : null}
 

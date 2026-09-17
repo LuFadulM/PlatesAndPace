@@ -77,13 +77,30 @@ function, which returns display name, sessions done this week and streak — not
    The callback carries query parameters, so an exact `/auth/callback` entry does not match;
    and a link whose redirect is not on this list is silently sent to the Site URL instead,
    which looks like "I clicked the link and nothing happened".
-3. Import the repository into Vercel. `vercel.json` pins the Next.js preset.
-4. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in the Vercel project's
+3. Still in Supabase → Authentication → Email Templates, point both **Confirm signup** and
+   **Magic Link** at the app's callback instead of Supabase's redirect page. Replace the
+   link's `href` in each template with:
+
+   ```
+   {{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email
+   ```
+
+   The app's callback verifies the token itself, so the link works in whichever browser
+   opens it — a mail app's built-in browser included. The default template relies on a
+   cookie set by the browser that requested the link, and fails with "code verifier
+   should be non-empty" anywhere else.
+4. Supabase's built-in mailer allows two emails per hour per project, which is fine for
+   one person testing and nothing more. Before inviting people, add your own SMTP under
+   Authentication → SMTP Settings (Resend, Postmark and Gmail all work) and raise the
+   email rate limit under Authentication → Rate Limits. The sign-in screen tells the
+   athlete when the limit is hit rather than reporting a broken mail server.
+5. Import the repository into Vercel. `vercel.json` pins the Next.js preset.
+6. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in the Vercel project's
    environment variables (Production and Preview).
-5. In Vercel → Settings → Deployment Protection, set **Vercel Authentication** to *Disabled*
+7. In Vercel → Settings → Deployment Protection, set **Vercel Authentication** to *Disabled*
    or *Only Preview Deployments*. Left on for production it shows every visitor
    "This request was blocked · 403".
-6. Push to `main`. CI runs lint, types, build, the unit suite in two time zones, the RLS
+8. Push to `main`. CI runs lint, types, build, the unit suite in two time zones, the RLS
    suite and the e2e suite; Vercel deploys the merge.
 
 For Google sign-in, create an OAuth client in Google Cloud, add the Supabase callback URL
