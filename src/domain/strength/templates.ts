@@ -145,6 +145,16 @@ export function customBlueprint(focus: readonly MuscleGroup[]): Blueprint {
   for (const m of small) pairs.push(['isolation', m])
   for (const m of big) pairs.push(['isolation', m])
 
+  // A day built from one or two small muscles (calves, or abs alone) would
+  // otherwise be a couple of slots long. Pad it round-robin so a short list
+  // still fills a session; selection skips any exercise already used.
+  let cursor = 0
+  while (pairs.length < 5) {
+    const m = muscles[cursor % muscles.length]!
+    pairs.push([m === 'abs' ? 'core' : 'isolation', m])
+    cursor += 1
+  }
+
   return pairs.slice(0, 8)
 }
 

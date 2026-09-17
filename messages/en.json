@@ -21,7 +21,8 @@
       "how": "How it works",
       "programs": "Your focus",
       "why": "Why it works",
-      "menu": "Menu"
+      "menu": "Menu",
+      "demo": "Try it"
     },
     "stats": {
       "exercises": "70 exercises, each one animated",
@@ -87,6 +88,58 @@
     },
     "footer": {
       "madeFor": "Made for phones. Add it to your home screen and it works offline in the gym."
+    },
+    "eyebrow": "Today:",
+    "rotating": {
+      "w1": "glutes",
+      "w2": "legs",
+      "w3": "chest",
+      "w4": "back",
+      "w5": "shoulders",
+      "w6": "a long run"
+    },
+    "phone": {
+      "week": "This week",
+      "today": "Today",
+      "title": "Glutes · Hamstrings",
+      "meta": "5 lifts · 58 min",
+      "done": "Session done. Nice work."
+    },
+    "numbers": {
+      "title": "The numbers behind every session",
+      "exercises": "exercises in the library",
+      "animations": "movements, each one animated",
+      "days": "days planned per year",
+      "languages": "languages, one plan"
+    },
+    "demo": {
+      "title": "Try it right now",
+      "body": "Pick the muscles and your level. The session below is built by the same engine as the app, here in your browser, with no sign-up.",
+      "level": "Level",
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "length": "Session length",
+      "sex": "Loads for",
+      "female": "Her",
+      "male": "Him",
+      "result": "Your session",
+      "estimate": "~{minutes} min",
+      "sets": "{sets} × {min}–{max}",
+      "rpe": "RPE {rpe}",
+      "bodyweight": "bodyweight",
+      "note": "Example loads for a {kg} kg athlete. Yours come from your own weight, then from every set you log.",
+      "cta": "Build my real plan"
+    },
+    "coach": {
+      "title": "A coach in your pocket",
+      "body": "Every day starts with three taps: sleep, soreness, energy. The session bends to the answer.",
+      "good": "Slept well, fresh legs",
+      "moderate": "A bit flat",
+      "low": "Rough night"
+    },
+    "sticky": {
+      "cta": "Start free"
     }
   },
   "locale": {

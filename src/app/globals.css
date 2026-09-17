@@ -98,6 +98,67 @@
     outline-offset: 2px;
   }
 
+  /* ---------------------------------------------------- landing motion -- */
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-14px) rotate(6deg); }
+  }
+  @keyframes pulse-ring {
+    0% { transform: scale(0.9); opacity: 0.7; }
+    100% { transform: scale(1.6); opacity: 0; }
+  }
+  @keyframes tick-through {
+    0%, 15% { background-color: transparent; }
+    25%, 100% { background-color: color-mix(in srgb, var(--color-plate-green) 18%, transparent); }
+  }
+  @keyframes word-in {
+    from { opacity: 0; transform: translateY(0.4em); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes bar-fill {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+  .marquee-track { animation: marquee 32s linear infinite; }
+  .float-slow { animation: float 7s ease-in-out infinite; }
+  .float-fast { animation: float 5s ease-in-out infinite reverse; }
+  .pulse-ring { animation: pulse-ring 2.4s ease-out infinite; }
+  .word-in { animation: word-in 0.45s ease-out both; }
+  .bar-fill { transform-origin: left; animation: bar-fill 1.2s ease-out both; }
+
+  /* Scroll reveal: hidden until the observer flips data-shown. Without JS,
+     or with reduced motion, everything is simply visible. */
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+  .reveal[data-shown='true'] { opacity: 1; transform: none; }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .card-lift { transition: transform 0.25s ease-out, box-shadow 0.25s ease-out; }
+
+  /* Phone mock timeline: each row's checkbox fills, then the done line appears. */
+  @keyframes tick-fill {
+    0%, 99% { background-color: transparent; border-color: var(--color-border); }
+    100% { background-color: var(--color-plate-green); border-color: var(--color-plate-green); }
+  }
+  @keyframes done-in {
+    0%, 99% { opacity: 0; transform: translateY(6px); }
+    100% { opacity: 1; transform: none; }
+  }
+  .tick { animation: tick-fill 0.01s linear both; }
+  .done-line { animation: done-in 0.4s ease-out both; }
+  .card-lift:hover { transform: translateY(-4px); box-shadow: 0 16px 40px -20px rgb(0 0 0 / 0.45); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; }
+    .marquee-track, .float-slow, .float-fast, .pulse-ring, .word-in, .bar-fill { animation: none; }
+    .tick { animation: none; background-color: var(--color-plate-green); border-color: var(--color-plate-green); }
+    .done-line { animation: none; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;

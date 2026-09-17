@@ -21,7 +21,8 @@
       "how": "Cómo funciona",
       "programs": "Tu enfoque",
       "why": "Por qué funciona",
-      "menu": "Menú"
+      "menu": "Menú",
+      "demo": "Pruébalo"
     },
     "stats": {
       "exercises": "70 ejercicios, cada uno animado",
@@ -87,6 +88,58 @@
     },
     "footer": {
       "madeFor": "Hecho para el celular. Agrégalo a tu pantalla de inicio y funciona sin señal en el gimnasio."
+    },
+    "eyebrow": "Hoy toca:",
+    "rotating": {
+      "w1": "glúteos",
+      "w2": "piernas",
+      "w3": "pecho",
+      "w4": "espalda",
+      "w5": "hombros",
+      "w6": "rodaje largo"
+    },
+    "phone": {
+      "week": "Esta semana",
+      "today": "Hoy",
+      "title": "Glúteos · Isquios",
+      "meta": "5 ejercicios · 58 min",
+      "done": "Sesión hecha. Buen trabajo."
+    },
+    "numbers": {
+      "title": "Los números detrás de cada sesión",
+      "exercises": "ejercicios en la biblioteca",
+      "animations": "movimientos, cada uno animado",
+      "days": "días planeados al año",
+      "languages": "idiomas, un solo plan"
+    },
+    "demo": {
+      "title": "Pruébalo ahora mismo",
+      "body": "Elige los músculos y tu nivel. La sesión de abajo la arma el mismo motor de la app, aquí en tu navegador, sin registrarte.",
+      "level": "Nivel",
+      "beginner": "Principiante",
+      "intermediate": "Intermedio",
+      "advanced": "Avanzado",
+      "length": "Duración",
+      "sex": "Cargas para",
+      "female": "Ella",
+      "male": "Él",
+      "result": "Tu sesión",
+      "estimate": "~{minutes} min",
+      "sets": "{sets} × {min}–{max}",
+      "rpe": "RPE {rpe}",
+      "bodyweight": "peso corporal",
+      "note": "Cargas de ejemplo para alguien de {kg} kg. Las tuyas salen de tu peso, y después de cada serie que registres.",
+      "cta": "Armar mi plan de verdad"
+    },
+    "coach": {
+      "title": "Un coach en el bolsillo",
+      "body": "Cada día empieza con tres toques: sueño, dolor muscular, energía. La sesión se acomoda a la respuesta.",
+      "good": "Dormiste bien, piernas frescas",
+      "moderate": "Un poco plana",
+      "low": "Mala noche"
+    },
+    "sticky": {
+      "cta": "Empieza gratis"
     }
   },
   "locale": {
