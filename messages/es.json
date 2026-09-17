@@ -38,5 +38,23 @@
       "conservativeMode": "Tus respuestas de salud indican un inicio prudente, así que este plan no usa déficit de calorías.",
       "calorieFloorApplied": "Esto se subió a un mínimo seguro en vez de bajar más."
     }
+  },
+  "auth": {
+    "signInTitle": "Iniciar sesión",
+    "signInBody": "Escribe tu correo y te enviamos un enlace para entrar. Sin contraseñas que recordar.",
+    "emailLabel": "Correo",
+    "sendLink": "Enviarme el enlace",
+    "sending": "Enviando…",
+    "magicLinkHint": "El enlace sirve una sola vez y vence en una hora.",
+    "checkEmailTitle": "Revisa tu correo",
+    "checkEmailBody": "Te enviamos un enlace para entrar. Ábrelo en este dispositivo para continuar.",
+    "checkEmailSpam": "Si no llega en un minuto, revisa la carpeta de spam.",
+    "signOut": "Cerrar sesión",
+    "errors": {
+      "invalidEmail": "Eso no parece un correo electrónico.",
+      "sendFailed": "No pudimos enviar el enlace. Inténtalo de nuevo en un momento.",
+      "linkExpired": "Ese enlace ya venció. Pide uno nuevo.",
+      "linkInvalid": "Ese enlace no funcionó. Pide uno nuevo."
+    }
   }
 }
