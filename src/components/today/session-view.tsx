@@ -5,13 +5,14 @@ import { useLocale, useTranslations } from 'next-intl'
 import { Link, useRouter } from '@/i18n/navigation'
 import { formatDuration, formatPace } from '@/domain/dates'
 import type { PlannedExercise, PlannedDay } from '@/domain/plan'
+import type { ResolvedExercise } from '@/domain/plan/resolve'
 import { nextSetMultiplier, readinessAdjustment, type Readiness } from '@/domain/strength/autoregulation'
-import { roundToIncrement } from '@/domain/strength/loads'
+import { nearestLoadable, roundToIncrement, type PlateInventory } from '@/domain/strength/loads'
 import { getExercise } from '@/domain/exercises/library'
 import type { NutritionEstimate } from '@/domain/nutrition'
 import { createOutbox, setLogKey, type Outbox } from '@/lib/offline'
-import { finishSession, saveReadiness, saveRun, saveSets } from '@/lib/actions/logs'
-import type { LastPerformance } from '@/lib/data/logs'
+import { finishSession, logWeight, saveReadiness, saveRun, saveSets } from '@/lib/actions/logs'
+import type { LastPerformance, MaxDetail } from '@/lib/data/logs'
 import type { Units } from '@/domain/profile/types'
 import { ExerciseFigure } from '@/components/figure/exercise-figure'
 import { AddExercise, ExerciseTools } from './exercise-editor'
@@ -33,11 +34,16 @@ interface Props {
   date: string
   day: PlannedDay | null
   units: Units
+  /** The athlete's bar and plates, for the per-side view on barbell lifts. */
+  plates: PlateInventory
+  /** Best estimated max per exercise, with how much to trust it. */
+  maxes: Record<string, MaxDetail>
   initialSets: LoggedSet[]
   initialReadiness: Readiness | null
   alreadyDone: boolean
   initialNotes: string | null
   nutrition: NutritionEstimate | null
+  latestWeightKg: number | null
   /** Per exercise id, what it may be swapped for; empty when the day cannot be edited. */
   alternatives: Record<string, string[]>
   /** Everything that may be added to the day. */
@@ -59,7 +65,7 @@ function Section({ title, children, defaultOpen = false }: { title: string; chil
 
 const input = 'min-h-11 w-full rounded-lg border border-(--color-border) px-2 text-center'
 
-export function SessionView({ date, day, units, initialSets, initialReadiness, alreadyDone, initialNotes, nutrition, alternatives, catalogue, lastTime, editable }: Props) {
+export function SessionView({ date, day, units, plates, maxes, initialSets, initialReadiness, alreadyDone, initialNotes, nutrition, latestWeightKg, alternatives, catalogue, lastTime, editable }: Props) {
   const t = useTranslations('today')
   const tEx = useTranslations('exercises')
   const tCoach = useTranslations()
@@ -232,8 +238,21 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
       ? gym.focus.map((m) => tMuscles(m)).join(' · ')
       : tCoach(gym.titleKey)
     : ''
-  const summaryOf = (e: PlannedExercise) => `${e.sets} × ${e.repMin}–${e.repMax}${e.loadKg ? `, ${displayLoad(e.loadKg * (adjustment?.loadMultiplier ?? 1), units)} ${unit}` : ''}`
+  const summaryOf = (e: PlannedExercise) => `${e.sets} × ${e.holdSeconds ? `${e.holdSeconds} s` : `${e.repMin}–${e.repMax}`}${e.loadKg ? `, ${displayLoad(e.loadKg * (adjustment?.loadMultiplier ?? 1), units)} ${unit}` : ''}`
+  const effortOf = (e: PlannedExercise) => (e.role === 'mobility' ? '' : t('effort', { rpe: e.rpeTarget, rir: Math.max(0, Math.round((10 - e.rpeTarget) * 2) / 2) }))
   const shortDate = (iso: string) => new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(new Date(`${iso}T12:00:00`))
+  const maxLine = (e: PlannedExercise) => {
+    const m = maxes[e.exerciseId]
+    if (!m || e.loadKg === 0) return null
+    return t('maxLine', { amount: displayLoad(m.e1rm, units), unit, confidence: t(`confidence.${m.confidence}`) })
+  }
+  const progressionLine = (e: ResolvedExercise) => (e.progression && e.progression.reason !== 'max' && e.progression.reason !== 'first' ? t(`progression.${e.progression.reason}`) : null)
+  const plateLine = (e: PlannedExercise, kg: number) => {
+    if (getExercise(e.exerciseId).implement !== 'barbell' || kg <= 0) return null
+    const load = nearestLoadable(kg, plates)
+    if (load.perSideKg.length === 0) return t('plates.barOnly', { bar: displayLoad(plates.barKg, units), unit })
+    return t('plates.perSide', { plates: load.perSideKg.map((p) => displayLoad(p, units)).join(' + '), unit, bar: displayLoad(plates.barKg, units) })
+  }
   const lastLine = (e: PlannedExercise) => {
     const last = lastTime[e.exerciseId]
     if (!last || last.sets.length === 0) return t('firstTime')
@@ -272,6 +291,19 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
             </div>
           )}
 
+          {gym.adjustments && gym.adjustments.length > 0 && (
+            <details className="rounded-xl border border-dashed border-(--color-border) bg-(--color-surface) text-sm">
+              <summary className="flex min-h-11 cursor-pointer items-center px-4 font-semibold">{t('adjustments.title', { n: gym.adjustments.length })}</summary>
+              <ul className="flex flex-col gap-1 px-4 pb-3 text-(--color-ink-muted)">
+                {gym.adjustments.map((a) => (
+                  <li key={`${a.reason}-${a.exerciseId}`}>
+                    {t(a.removed ? 'adjustments.removed' : 'adjustments.trimmed', { name: tEx(`${a.exerciseId}.name`), sets: a.setsRemoved })} · {t(`adjustments.${a.reason}`, { minutes: gym.estimatedMinutes })}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
+
           <Section title={t('readiness')} defaultOpen={!readiness && !done}>
             {readiness ? (
               <p className="text-sm">{tCoach(readinessAdjustment(readiness).messageKey)}</p>
@@ -282,12 +314,7 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
 
           <Section title={t('warmup')}><p className="text-sm">{tCoach(gym.warmupKey)}</p></Section>
 
-          {nutrition && (
-            <Section title={t('fuel')}>
-              <p className="text-sm">{t('fuelLine', { kcal: nutrition.targetKcal, protein: nutrition.proteinG, water: (nutrition.waterMlPerTrainingDay / 1000).toFixed(1) })}</p>
-              <p className="mt-1 text-xs text-(--color-ink-muted)">{tCoach('nutrition.notes.estimateOnly')}</p>
-            </Section>
-          )}
+          {nutrition && <FuelCard nutrition={nutrition} trainingDay date={date} units={units} latestWeightKg={latestWeightKg} />}
 
           <ol className="flex flex-col gap-2" aria-label={t('exercises')}>
             {exercises.map((e, index) => {
@@ -301,7 +328,7 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
                     <ExerciseFigure animation={getExercise(e.exerciseId).animation} title={tEx(`${e.exerciseId}.name`)} className="h-12 w-12 shrink-0 text-(--color-ink)" />
                     <span className="min-w-0 flex-1">
                       <span className="block font-semibold">{tEx(`${e.exerciseId}.name`)}</span>
-                      <span className="block text-xs text-(--color-ink-muted)">{summaryOf(e)}{e.technique !== 'straight' ? ` · ${t(`technique.${e.technique}`)}` : ''}</span>
+                      <span className="block text-xs text-(--color-ink-muted)">{summaryOf(e)}{effortOf(e) ? ` · ${effortOf(e)}` : ''}{e.technique !== 'straight' ? ` · ${t(`technique.${e.technique}`)}` : ''}</span>
                     </span>
                     <span className={`text-sm font-semibold tabular-nums ${complete ? 'text-(--color-plate-green)' : ''}`}>{count}/{e.sets}</span>
                   </button>
@@ -316,6 +343,10 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
                         </div>
                       </div>
                       <p className="text-xs font-semibold text-(--color-plate-blue)">{lastLine(e)}</p>
+                      {(maxLine(e) || progressionLine(e as ResolvedExercise)) && (
+                        <p className="text-xs text-(--color-ink-muted)">{[maxLine(e), progressionLine(e as ResolvedExercise)].filter(Boolean).join(' · ')}</p>
+                      )}
+                      {plateLine(e, loadFor(e, 0)) && <p className="text-xs text-(--color-ink-muted)">{plateLine(e, loadFor(e, 0))}</p>}
                       {Array.from({ length: e.sets }, (_, i) => {
                         const logged = sets.get(setLogKey(date, e.exerciseId, i))
                         const suggested = loadFor(e, i)
@@ -370,6 +401,9 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
         </>
       )}
 
+      {!gym && nutrition && <FuelCard nutrition={nutrition} trainingDay={run !== undefined} date={date} units={units} latestWeightKg={latestWeightKg} />}
+
+      {run && day.order === 'lift_first' && gym && <p role="note" className="rounded-full bg-(--color-plate-yellow) px-3 py-1 text-center text-xs font-semibold">{t('liftFirst')}</p>}
       {run && <RunCard run={run} date={date} locale={locale} />}
 
       {!done && (
@@ -391,6 +425,44 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
       )}
       {done && notes.trim() && <p className="rounded-xl border border-(--color-border) bg-(--color-surface) px-4 py-3 text-sm whitespace-pre-wrap">{notes}</p>}
     </div>
+  )
+}
+
+/**
+ * The day's food targets: calories and macros for a training or a rest day,
+ * every caveat the estimator raised, and the scale reading that keeps the
+ * adaptive loop honest.
+ */
+function FuelCard({ nutrition, trainingDay, date, units, latestWeightKg }: { nutrition: NutritionEstimate; trainingDay: boolean; date: string; units: Units; latestWeightKg: number | null }) {
+  const t = useTranslations('today')
+  const tN = useTranslations()
+  const [weight, setWeight] = useState('')
+  const [pending, startTransition] = useTransition()
+  const [saved, setSaved] = useState(false)
+  const day = trainingDay ? nutrition.trainingDay : nutrition.restDay
+  const kcal = trainingDay ? nutrition.trainingDayKcal : nutrition.restDayKcal
+  const unit = unitLabel(units)
+  return (
+    <Section title={t('fuel')}>
+      <p className="text-sm font-semibold">{t(trainingDay ? 'fuelTraining' : 'fuelRest', { kcal })}</p>
+      <dl className="mt-2 grid grid-cols-4 gap-2 text-center">
+        {([['protein', day.proteinG], ['carbs', day.carbsG], ['fat', day.fatG], ['fibre', day.fibreG]] as const).map(([k, g]) => (
+          <div key={k} className="rounded-lg bg-(--color-surface-2) py-2"><dt className="text-[10px] uppercase text-(--color-ink-muted)">{t(`macro.${k}`)}</dt><dd className="font-display text-lg font-bold tabular-nums">{t('grams', { g })}</dd></div>
+        ))}
+      </dl>
+      <p className="mt-2 text-xs text-(--color-ink-muted)">{t('fuelWater', { water: (nutrition.waterMlPerTrainingDay / 1000).toFixed(1) })} · {t('fuelPredicted', { kg: Math.abs(nutrition.predictedWeeklyChangeKg).toFixed(2), direction: nutrition.predictedWeeklyChangeKg < 0 ? t('fuelDown') : nutrition.predictedWeeklyChangeKg > 0 ? t('fuelUp') : t('fuelHold') })}</p>
+      <ul className="mt-2 flex flex-col gap-1 text-xs text-(--color-ink-muted)">
+        {nutrition.noteKeys.map((key) => <li key={key}>{tN(key)}</li>)}
+      </ul>
+      <form className="mt-3 flex items-end gap-2" onSubmit={(e) => { e.preventDefault(); const v = Number(weight); if (!v) return; startTransition(async () => { const r = await logWeight({ date, weightKg: toKg(v, units) }); if (r.ok) setSaved(true) }) }}>
+        <label className="flex flex-1 flex-col gap-1 text-xs font-medium">
+          {t('weighIn', { unit, last: latestWeightKg ? displayLoad(latestWeightKg, units) : '–' })}
+          <input type="number" inputMode="decimal" step="0.1" value={weight} onChange={(e) => { setWeight(e.target.value); setSaved(false) }} className="min-h-11 w-full rounded-lg border border-(--color-border) bg-(--color-surface) px-3 text-base font-normal" />
+        </label>
+        <button type="submit" disabled={pending || !weight} className="min-h-11 rounded-lg bg-(--color-ink) px-4 text-sm font-semibold text-(--color-bg) disabled:opacity-60">{t('weighInSave')}</button>
+      </form>
+      {saved && <p role="status" className="mt-1 text-xs font-semibold text-(--color-plate-green)">{t('weighInSaved')}</p>}
+    </Section>
   )
 }
 
@@ -435,7 +507,10 @@ function RunCard({ run, date, locale }: { run: NonNullable<PlannedDay['run']>; d
       </dl>
       {run.intervals && <p className="mt-2 text-sm">{t('intervalLine', { reps: run.intervals.reps, meters: run.intervals.workMeters, rest: formatDuration(run.intervals.restSec, locale), pace: formatPace(run.intervals.paceSecPerKm, locale) })}</p>}
       {run.runWalk && <p className="mt-2 text-sm">{t('runWalkLine', { repeats: run.runWalk.repeats, run: run.runWalk.runMinutes, walk: run.runWalk.walkMinutes })}</p>}
-      <p className="mt-1 text-xs text-(--color-ink-muted)">{t('zone', { zone: run.hrZone })}</p>
+      <p className="mt-1 text-xs text-(--color-ink-muted)">
+        {run.hrRange ? t('zoneRange', { zone: run.hrZone, min: run.hrRange.minBpm, max: run.hrRange.maxBpm }) : t('zone', { zone: run.hrZone })}
+        {run.hrRange ? ` · ${t(`zoneMethod.${run.hrRange.method}`)}${run.hrRange.maxEstimated ? ` · ${t('zoneMaxEstimated')}` : ''}` : ''}
+      </p>
       <Link href={{ pathname: '/run', query: { date } }} className="mt-3 flex min-h-11 items-center justify-center rounded-lg bg-(--color-plate-yellow) font-semibold">{t('guidedRun')}</Link>
       {!saved ? (
         <form className="mt-3 grid grid-cols-[1fr_1fr_auto] gap-2" onSubmit={(e) => { e.preventDefault(); startTransition(async () => { const r = await saveRun({ date, plannedType: run.kind === 'none' ? null : run.kind, minutes: Number(minutes), km: Number(km) }); if (r.ok) setSaved(true) }) }}>

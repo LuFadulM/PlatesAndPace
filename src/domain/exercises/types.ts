@@ -17,6 +17,10 @@ export type ExerciseCategory =
   | 'isolation'
   | 'core'
   | 'conditioning'
+  /** Explosive work: jumps, swings, push presses. Fast, never to failure. */
+  | 'power'
+  /** Stretches, holds and pattern drills measured in seconds, not reps. */
+  | 'mobility'
 
 export interface ExerciseDefinition {
   id: string
@@ -40,6 +44,8 @@ export interface ExerciseDefinition {
   animation: AnimationId
   /** Whether both sides are worked one at a time, doubling the set's duration. */
   unilateral?: boolean
+  /** Prescribed as a timed hold rather than reps. */
+  timed?: boolean
 }
 
 export type AnimationId =

@@ -56,8 +56,12 @@ export async function completeOnboarding(page: Page, locale: 'en' | 'es', opts: 
   // health (all defaults no)
   await page.getByRole('button', { name: t.next }).click()
   // goals
-  await page.getByRole('button', { name: opts.runner ? (locale === 'es' ? 'Ambas: pesas y correr' : 'Both: lift and run') : (locale === 'es' ? 'Ganar músculo' : 'Build muscle') }).click()
-  if (opts.runner) await page.getByRole('button', { name: '10K' }).click()
+  // Goal: build muscle; a runner adds running beside it and names a race.
+  await page.getByRole('button', { name: locale === 'es' ? /^Ganar músculo/ : /^Build muscle/ }).click()
+  if (opts.runner) {
+    await page.getByRole('button', { name: locale === 'es' ? 'También corro' : 'I also run' }).click()
+    await page.getByRole('button', { name: '10K' }).click()
+  }
   await page.getByRole('button', { name: t.next }).click()
   // experience
   await page.getByRole('button', { name: locale === 'es' ? 'De 1 a 3 años' : '1 to 3 years' }).click()
@@ -75,6 +79,10 @@ export async function completeOnboarding(page: Page, locale: 'en' | 'es', opts: 
   await page.getByRole('button', { name: t.next }).click()
   await page.getByRole('button', { name: t.next }).click()
   await page.getByRole('button', { name: t.finish }).click()
+  // The plan explains itself first; the button leads to today's session.
+  await page.waitForURL(new RegExp(`/${locale}/plan`), { timeout: 30_000 })
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  await page.getByRole('link', { name: locale === 'es' ? 'Ir a la sesión de hoy' : "Go to today's session" }).click()
   await page.waitForURL(new RegExp(`/${locale}/today`), { timeout: 30_000 })
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
 }

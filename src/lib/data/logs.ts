@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { estimatedOneRepMax } from '@/domain/strength/loads'
+import { estimatedOneRepMax, oneRepMaxConfidence, type MaxConfidence } from '@/domain/strength/loads'
 import { addDays, fromISODate, toISODate, type PlainDate } from '@/domain/dates'
 import type { Tables } from '@/types/database'
 
@@ -7,8 +7,15 @@ export type SessionLog = Tables<'session_logs'>
 export type SetLog = Tables<'set_logs'>
 export type RunLog = Tables<'run_logs'>
 
-/** The athlete's best estimated 1RM per exercise over the last `weeks`. */
-export async function latestMaxes(today: PlainDate, weeks = 8): Promise<Record<string, number>> {
+export interface MaxDetail {
+  e1rm: number
+  /** Reps of the set the estimate came from; past twelve it is a guess. */
+  reps: number
+  confidence: MaxConfidence
+}
+
+/** The athlete's best estimated 1RM per exercise over the last `weeks`, with how much to trust it. */
+export async function latestMaxDetails(today: PlainDate, weeks = 8): Promise<Record<string, MaxDetail>> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return {}
@@ -19,13 +26,20 @@ export async function latestMaxes(today: PlainDate, weeks = 8): Promise<Record<s
     .eq('user_id', user.id)
     .eq('done', true)
     .gte('session_logs.date', since)
-  const maxes: Record<string, number> = {}
+  const maxes: Record<string, MaxDetail> = {}
   for (const row of data ?? []) {
     if (row.kg === null || row.reps === null || row.rpe === null || row.kg <= 0 || row.reps <= 0) continue
     const e1rm = estimatedOneRepMax(Number(row.kg), row.reps, Number(row.rpe))
-    if (!maxes[row.exercise_id] || e1rm > maxes[row.exercise_id]!) maxes[row.exercise_id] = e1rm
+    const current = maxes[row.exercise_id]
+    if (!current || e1rm > current.e1rm) maxes[row.exercise_id] = { e1rm, reps: row.reps, confidence: oneRepMaxConfidence(row.reps) }
   }
   return maxes
+}
+
+/** The estimates alone, for the engine. */
+export async function latestMaxes(today: PlainDate, weeks = 8): Promise<Record<string, number>> {
+  const details = await latestMaxDetails(today, weeks)
+  return Object.fromEntries(Object.entries(details).map(([id, d]) => [id, d.e1rm]))
 }
 
 export async function exerciseIdsUsedSince(date: PlainDate): Promise<Set<string>> {

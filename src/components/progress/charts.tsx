@@ -88,16 +88,20 @@ export function ProgressCharts({ data }: { data: ProgressData }) {
 
       {data.weeklyVolume.length > 0 && (
         <Card title={t('weeklyVolume')}>
-          <ResponsiveContainer width="100%" height={Math.max(160, data.weeklyVolume.length * 28)}>
+          <ResponsiveContainer width="100%" height={Math.max(180, data.weeklyVolume.length * 40)}>
             <BarChart data={data.weeklyVolume} layout="vertical" margin={{ left: 8, right: 16 }}>
               <CartesianGrid horizontal={false} stroke={grid} />
               <XAxis type="number" allowDecimals={false} tick={{ fill: ink, fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis type="category" dataKey="muscle" tickFormatter={(m) => tM(m)} width={90} tick={{ fill: ink, fontSize: 11 }} axisLine={false} tickLine={false} />
-              <Tooltip {...tooltipStyle} labelFormatter={(m) => tM(String(m))} formatter={(v) => [v, t('sets')]} cursor={{ fill: 'var(--color-surface-2)' }} />
+              <Tooltip {...tooltipStyle} labelFormatter={(m) => tM(String(m))} formatter={(v, name) => [v, name === 'sets' ? t('sets') : name === 'mev' ? t('mev') : t('mrv')]} cursor={{ fill: 'var(--color-surface-2)' }} />
+              <Legend wrapperStyle={{ fontSize: 12, color: 'var(--color-ink)' }} formatter={(v) => (v === 'sets' ? t('sets') : v === 'mev' ? t('mev') : t('mrv'))} />
               <Bar dataKey="sets" fill={SERIES[0]} radius={[0, 4, 4, 0]} maxBarSize={14} />
+              <Bar dataKey="mev" fill={SERIES[2]} radius={[0, 4, 4, 0]} maxBarSize={6} />
+              <Bar dataKey="mrv" fill={SERIES[3]} radius={[0, 4, 4, 0]} maxBarSize={6} />
             </BarChart>
           </ResponsiveContainer>
-          <DataTable caption={t('table')} head={[t('muscle'), t('sets')]} rows={data.weeklyVolume.map((v) => [tM(v.muscle), v.sets])} />
+          <p className="mt-1 text-xs text-(--color-ink-muted)">{t('landmarksHelp')}</p>
+          <DataTable caption={t('table')} head={[t('muscle'), t('sets'), t('mev'), t('mrv')]} rows={data.weeklyVolume.map((v) => [tM(v.muscle), v.sets, v.mev, v.mrv])} />
         </Card>
       )}
 

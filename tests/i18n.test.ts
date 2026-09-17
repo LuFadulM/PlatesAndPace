@@ -29,7 +29,7 @@ function placeholders(message: string): Set<string> {
  * and other proper nouns. Anything not listed here that matches is a
  * translation someone forgot to write.
  */
-const IDENTICAL_BY_DESIGN = new Set(['app.name', 'locale.en', 'locale.es', 'today.km', 'run.perKm', 'onboarding.steps.basics.metric', 'onboarding.steps.basics.imperial', 'settings.metric', 'settings.imperial', 'landing.demo.estimate', 'landing.demo.sets', 'landing.demo.rpe'])
+const IDENTICAL_BY_DESIGN = new Set(['app.name', 'locale.en', 'locale.es', 'today.km', 'run.perKm', 'onboarding.steps.basics.metric', 'onboarding.steps.basics.imperial', 'settings.metric', 'settings.imperial', 'landing.demo.estimate', 'landing.demo.sets', 'landing.demo.rpe', 'today.grams', 'today.estimate'])
 
 const flat = Object.fromEntries(
   Object.entries(catalogs).map(([locale, tree]) => [locale, flatten(tree)]),

@@ -1,5 +1,6 @@
 import { EXERCISES } from '../exercises/library'
 import type { ExperienceTier, PrimaryGoal } from '../profile/types'
+import { goalPolicy } from './goals'
 import type { SessionKind } from './splits'
 import type { MuscleGroup } from './volume'
 
@@ -10,7 +11,7 @@ import type { MuscleGroup } from './volume'
  * has to be short, slots are dropped from the end, never the front, so the
  * primary lift always survives and the isolation work is what gives way.
  */
-export type SlotRole = 'primary' | 'secondary' | 'accessory' | 'isolation' | 'core' | 'finisher'
+export type SlotRole = 'power' | 'primary' | 'secondary' | 'accessory' | 'isolation' | 'core' | 'mobility' | 'finisher'
 
 export interface Slot {
   role: SlotRole
@@ -29,58 +30,92 @@ interface RoleShape {
   restSec: number
 }
 
-/** Rep bands and rest per role, shaped by the goal. */
-const GOAL_SHAPES: Record<PrimaryGoal, Record<Exclude<SlotRole, 'finisher'>, RoleShape>> = {
-  get_strong: {
-    primary: { repMin: 3, repMax: 6, restSec: 180 },
-    secondary: { repMin: 5, repMax: 8, restSec: 150 },
+/**
+ * Rep bands and rest per role, shaped by the goal (CLAUDE.md, rule 3).
+ * Mobility bands are seconds of a hold, not reps.
+ */
+type Shapes = Record<Exclude<SlotRole, 'finisher'>, RoleShape>
+
+const POWER: RoleShape = { repMin: 3, repMax: 5, restSec: 150 }
+const MOBILITY: RoleShape = { repMin: 30, repMax: 45, restSec: 15 }
+
+const HYPERTROPHY: Shapes = {
+  power: POWER,
+  primary: { repMin: 6, repMax: 10, restSec: 120 },
+  secondary: { repMin: 8, repMax: 12, restSec: 90 },
+  accessory: { repMin: 10, repMax: 15, restSec: 75 },
+  isolation: { repMin: 12, repMax: 15, restSec: 60 },
+  core: { repMin: 12, repMax: 20, restSec: 45 },
+  mobility: MOBILITY,
+}
+
+const GOAL_SHAPES: Record<PrimaryGoal, Shapes> = {
+  hypertrophy: HYPERTROPHY,
+  strength: {
+    power: POWER,
+    primary: { repMin: 3, repMax: 5, restSec: 240 },
+    secondary: { repMin: 5, repMax: 8, restSec: 180 },
     accessory: { repMin: 8, repMax: 12, restSec: 90 },
     isolation: { repMin: 10, repMax: 15, restSec: 60 },
     core: { repMin: 10, repMax: 15, restSec: 45 },
+    mobility: MOBILITY,
   },
-  build_muscle: {
-    primary: { repMin: 6, repMax: 10, restSec: 120 },
-    secondary: { repMin: 8, repMax: 12, restSec: 90 },
-    accessory: { repMin: 10, repMax: 15, restSec: 75 },
-    isolation: { repMin: 12, repMax: 15, restSec: 60 },
-    core: { repMin: 12, repMax: 20, restSec: 45 },
-  },
-  lose_fat: {
+  fat_loss: {
+    power: POWER,
     primary: { repMin: 8, repMax: 12, restSec: 75 },
     secondary: { repMin: 10, repMax: 15, restSec: 60 },
     accessory: { repMin: 12, repMax: 15, restSec: 45 },
     isolation: { repMin: 12, repMax: 20, restSec: 45 },
     core: { repMin: 15, repMax: 20, restSec: 30 },
+    mobility: MOBILITY,
   },
-  fit_and_firm: {
+  recomposition: HYPERTROPHY,
+  endurance: {
+    power: POWER,
     primary: { repMin: 6, repMax: 10, restSec: 90 },
     secondary: { repMin: 8, repMax: 12, restSec: 90 },
     accessory: { repMin: 10, repMax: 15, restSec: 60 },
     isolation: { repMin: 12, repMax: 15, restSec: 60 },
     core: { repMin: 12, repMax: 20, restSec: 45 },
+    mobility: MOBILITY,
   },
-  run_faster: {
-    primary: { repMin: 6, repMax: 10, restSec: 90 },
-    secondary: { repMin: 8, repMax: 12, restSec: 90 },
+  athletic_performance: {
+    power: POWER,
+    primary: { repMin: 3, repMax: 5, restSec: 180 },
+    secondary: { repMin: 5, repMax: 8, restSec: 120 },
+    accessory: { repMin: 6, repMax: 10, restSec: 90 },
+    isolation: { repMin: 8, repMax: 12, restSec: 60 },
+    core: { repMin: 8, repMax: 12, restSec: 60 },
+    mobility: MOBILITY,
+  },
+  general_health: {
+    power: POWER,
+    primary: { repMin: 8, repMax: 12, restSec: 90 },
+    secondary: { repMin: 8, repMax: 12, restSec: 75 },
     accessory: { repMin: 10, repMax: 15, restSec: 60 },
     isolation: { repMin: 12, repMax: 15, restSec: 60 },
     core: { repMin: 12, repMax: 20, restSec: 45 },
+    mobility: MOBILITY,
   },
-  hybrid: {
-    primary: { repMin: 5, repMax: 8, restSec: 150 },
-    secondary: { repMin: 8, repMax: 12, restSec: 90 },
-    accessory: { repMin: 10, repMax: 15, restSec: 60 },
-    isolation: { repMin: 12, repMax: 15, restSec: 60 },
-    core: { repMin: 12, repMax: 20, restSec: 45 },
+  mobility_rehab: {
+    power: POWER,
+    primary: { repMin: 8, repMax: 12, restSec: 90 },
+    secondary: { repMin: 10, repMax: 15, restSec: 75 },
+    accessory: { repMin: 12, repMax: 15, restSec: 60 },
+    isolation: { repMin: 12, repMax: 20, restSec: 60 },
+    core: { repMin: 15, repMax: 20, restSec: 45 },
+    mobility: { repMin: 45, repMax: 60, restSec: 15 },
   },
 }
 
 const SETS_BY_ROLE: Record<Exclude<SlotRole, 'finisher'>, number> = {
+  power: 3,
   primary: 4,
   secondary: 3,
   accessory: 3,
   isolation: 3,
   core: 3,
+  mobility: 2,
 }
 
 /** Rep band, rest and default set count for a role under a goal — what an exercise added by hand inherits. */
@@ -174,12 +209,12 @@ export function slotBudget(sessionMinutes: number): number {
 
 /** Whether the goal ends sessions with a conditioning piece. */
 export function wantsFinisher(goal: PrimaryGoal): boolean {
-  return goal === 'lose_fat' || goal === 'fit_and_firm'
+  return goalPolicy(goal).finisher
 }
 
 /** Whether accessory and isolation work is paired into supersets. */
 export function wantsSupersets(goal: PrimaryGoal): boolean {
-  return goal === 'lose_fat'
+  return goalPolicy(goal).supersets
 }
 
 export function sessionTemplate(
@@ -190,15 +225,27 @@ export function sessionTemplate(
   focus?: readonly MuscleGroup[],
 ): Slot[] {
   const shapes = GOAL_SHAPES[goal]
-  const budget = slotBudget(sessionMinutes) - (wantsFinisher(goal) ? 1 : 0)
-  const blueprint = kind === 'custom' ? customBlueprint(focus ?? []) : BLUEPRINTS[kind]
+  const policy = goalPolicy(goal)
+  const budget = slotBudget(sessionMinutes) - (policy.finisher ? 1 : 0)
+  const base = kind === 'custom' ? customBlueprint(focus ?? []) : BLUEPRINTS[kind]
+  const lead = base[0]?.[1] ?? 'quads'
 
-  const slots: Slot[] = blueprint.slice(0, Math.max(2, budget)).map(([role, muscle]) => {
+  // Goal-specific slots wrap the blueprint: explosive work before the primary
+  // lift for the athlete, mobility first for someone coming back, mobility
+  // last for general health. They ride outside the slot budget: a mobility
+  // hold is a minute, and power work is what the athletic session is for.
+  const blueprint: Blueprint = [
+    ...(policy.mobilitySlot === 'start' ? ([['mobility', lead]] as Blueprint) : []),
+    ...(policy.powerSlot ? ([['power', lead]] as Blueprint) : []),
+    ...base.slice(0, Math.max(2, budget)),
+    ...(policy.mobilitySlot === 'end' ? ([['mobility', lead]] as Blueprint) : []),
+  ]
+
+  const slots: Slot[] = blueprint.map(([role, muscle]) => {
     const shape = shapes[role]
-    // Beginners do fewer sets per slot: the same total is spread over more
-    // sessions and their recovery cannot yet absorb the extra.
-    const sets = tier === 'beginner' && role !== 'primary' ? Math.max(2, SETS_BY_ROLE[role] - 1) : SETS_BY_ROLE[role]
-    return { role, muscle, sets, ...shape }
+    // Default set counts; the generator replaces them from the weekly volume
+    // ledger, and a beginner's lighter start comes from the landmarks.
+    return { role, muscle, sets: SETS_BY_ROLE[role], ...shape }
   })
 
   if (wantsSupersets(goal)) {

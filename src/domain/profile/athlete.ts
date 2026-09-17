@@ -1,9 +1,12 @@
 import { fromISODate, type PlainDate } from '../dates'
+import { DEFAULT_PLATES, type PlateInventory } from '../strength/loads'
+import type { HeartRateProfile } from '../running/zones'
 import type { MuscleGroup } from '../strength/volume'
 import {
   ADULT_AGE,
   MINIMUM_AGE,
   anyHealthFlag,
+  involvesRunning,
   type QuestionnaireAnswers,
 } from './questionnaire'
 import {
@@ -16,6 +19,7 @@ import {
   type IntensityPreference,
   type LiftingExperience,
   type PrimaryGoal,
+  type SecondaryGoal,
   type Sex,
   type Units,
 } from './types'
@@ -62,6 +66,9 @@ export interface AthleteModel {
   weightKg: number
 
   goal: PrimaryGoal
+  goalSecondary?: SecondaryGoal
+  /** Running is part of the goal, so run days shape the lifting around them. */
+  runsMatter: boolean
   targetRace?: '5k' | '10k' | 'half'
   raceDate?: PlainDate
 
@@ -70,6 +77,7 @@ export interface AthleteModel {
   knowsBigLifts: boolean
   recentRun?: { km: number; seconds: number }
   continuousRunMinutes?: number
+  heartRate: HeartRateProfile
 
   gymDays: number[]
   runDays: number[]
@@ -85,6 +93,8 @@ export interface AthleteModel {
 
   equipment: EquipmentSetting
   unavailableMachines: string[]
+  /** What the barbell can actually be loaded to. */
+  plates: PlateInventory
 
   injuries: InjuryArea[]
   /** Patterns no exercise in this athlete's plan may use. */
@@ -102,6 +112,8 @@ export interface AthleteModel {
   /** Under-18s and careful starts never train to a true maximum. */
   maxRpe: number
   allowCalorieDeficit: boolean
+  /** Why a deficit is off, when it is, so the UI can say so. */
+  deficitBlockedBy?: 'minor' | 'medical' | 'disordered_eating'
 }
 
 export class UnderageError extends RangeError {
@@ -146,6 +158,12 @@ export function buildAthleteModel(
     ? { km: answers.experience.recentRun.km, seconds: answers.experience.recentRun.minutes * 60 }
     : undefined
 
+  // A history of disordered eating turns a fat-loss goal into recomposition:
+  // the same training, food at maintenance, and no number to chase down.
+  const disorderedEating = answers.health.disorderedEating
+  const goal: PrimaryGoal = disorderedEating && answers.goals.primary === 'fat_loss' ? 'recomposition' : answers.goals.primary
+  const deficitBlockedBy = isMinor ? 'minor' : needsMedicalClearance ? 'medical' : disorderedEating ? 'disordered_eating' : undefined
+
   return {
     displayName: answers.basics.displayName,
     locale: answers.basics.locale,
@@ -158,7 +176,9 @@ export function buildAthleteModel(
     heightCm: answers.body.heightCm,
     weightKg: answers.body.weightKg,
 
-    goal: answers.goals.primary,
+    goal,
+    goalSecondary: answers.goals.secondary,
+    runsMatter: involvesRunning(answers.goals),
     targetRace: answers.goals.targetRace,
     raceDate: answers.goals.raceDate ? fromISODate(answers.goals.raceDate) : undefined,
 
@@ -167,6 +187,7 @@ export function buildAthleteModel(
     knowsBigLifts: answers.experience.knowsBigLifts,
     recentRun,
     continuousRunMinutes: answers.experience.continuousRunMinutes,
+    heartRate: { restingHr: answers.experience.restingHr, maxHr: answers.experience.maxHr, lthr: answers.experience.lthr },
 
     gymDays: [...answers.schedule.gymDays].sort((a, b) => a - b),
     runDays: [...answers.schedule.runDays].sort((a, b) => a - b),
@@ -178,6 +199,7 @@ export function buildAthleteModel(
 
     equipment: answers.equipment.setting,
     unavailableMachines: answers.equipment.unavailableMachines,
+    plates: answers.equipment.plates ?? DEFAULT_PLATES[answers.basics.units],
 
     injuries: answers.injuries.areas,
     bannedPatterns,
@@ -193,7 +215,8 @@ export function buildAthleteModel(
     // A minor or a flagged athlete never goes to a true maximum, whatever
     // intensity they asked for.
     maxRpe: isMinor || needsMedicalClearance ? 8 : 10,
-    allowCalorieDeficit: !isMinor && !needsMedicalClearance,
+    allowCalorieDeficit: deficitBlockedBy === undefined,
+    deficitBlockedBy,
   }
 }
 

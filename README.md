@@ -129,6 +129,39 @@ switchable in Settings, and saved to the profile.
 All date logic lives in `src/domain/dates`, and `npm run test:tz` proves the engine is
 independent of the host clock.
 
+## The engine, in one page
+
+Everything the app prescribes comes from `src/domain`, which is pure and tested; the
+screens only render it. The rules are written out in `CLAUDE.md`; in short:
+
+- **Eight goals**, each with its own programming signature (`src/domain/strength/goals.ts`):
+  muscle, strength, fat loss, recomposition, endurance, athletic performance, general
+  health, mobility or a return to training. A secondary goal ("I also run") fits beside it.
+- **Volume from landmarks** (`volume.ts`): each muscle has MV, MEV, MAV and MRV; a beginner
+  starts at MEV, an advanced lifter inside the adaptive range, each week adds a set, the
+  deload halves. The generator keeps a weekly ledger per muscle, credits secondaries by half,
+  caps a session at ten direct sets per muscle, and never exceeds the athlete's time: every
+  cut is recorded and shown.
+- **Effort**: the phase sets an RPE target; the goal, the athlete and the movement cap it.
+  Compounds never reach failure; big barbell lifts stay two reps shy for anyone not yet
+  advanced; minors and flagged athletes never pass RPE 8. Reps in reserve are shown.
+- **Loads** (`loads.ts`, `progression.ts`, `plan/resolve.ts`): bodyweight ratios to start,
+  then the estimated max from logged sets with a confidence flag; plate math rounds every
+  barbell load to what the rack can hold; the main lifts progress by RPE and max, the
+  accessories by double progression.
+- **Running** (`src/domain/running`): VDOT paces from a recent effort, zones by lactate
+  threshold, heart-rate reserve or percent of max, 80/20 polarised weeks, long runs growing at
+  most a tenth a week with every fourth week reduced, and lift-first days.
+- **Food** (`src/domain/nutrition`): Mifflin-St Jeor, macros, carbohydrate leaning toward
+  training days, deficits and surpluses capped at a safe weekly rate, and a target that
+  adapts to the two-week weight trend. Never a deficit for minors, flagged athletes or a
+  history of disordered eating.
+- **The plan explains itself** (`plan/explain.ts`): every decision above is a numbered line
+  on the Plan page, in both languages.
+
+`src/domain/plan/__tests__/athletes.test.ts` is the fixture suite: named athletes, each of
+whom must get a valid plan.
+
 ## What was built without the prototype
 
 The brief referenced a single-user prototype, `plates-and-pace.html`, that never reached the

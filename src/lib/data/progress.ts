@@ -2,11 +2,11 @@ import { createClient } from '@/lib/supabase/server'
 import { addDays, fromISODate, startOfPlanWeek, toISODate, type PlainDate } from '@/domain/dates'
 import { getExercise, findExercise } from '@/domain/exercises/library'
 import { estimatedOneRepMax } from '@/domain/strength/loads'
-import type { MuscleGroup } from '@/domain/strength/volume'
+import { VOLUME_LANDMARKS, type MuscleGroup } from '@/domain/strength/volume'
 
 export interface WeekPoint { week: string; value: number }
 export interface LiftSeries { exerciseId: string; points: { week: string; e1rm: number }[] }
-export interface MuscleSets { muscle: MuscleGroup; sets: number }
+export interface MuscleSets { muscle: MuscleGroup; sets: number; mev: number; mrv: number }
 export interface RunPoint { date: string; km: number; paceSecPerKm: number }
 export interface BodyPoint { date: string; weightKg: number | null; waistCm: number | null }
 
@@ -68,7 +68,7 @@ export async function getProgress(today: PlainDate, weeks = 12): Promise<Progres
     if (!ex) continue
     volume.set(ex.primary, (volume.get(ex.primary) ?? 0) + 1)
   }
-  const weeklyVolume = [...volume.entries()].map(([muscle, sets]) => ({ muscle, sets })).sort((a, b) => b.sets - a.sets)
+  const weeklyVolume = [...volume.entries()].map(([muscle, sets]) => ({ muscle, sets, mev: VOLUME_LANDMARKS[muscle].mev, mrv: VOLUME_LANDMARKS[muscle].mrv })).sort((a, b) => b.sets - a.sets)
 
   return {
     sessionsPerWeek,

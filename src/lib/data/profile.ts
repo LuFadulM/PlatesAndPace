@@ -1,6 +1,7 @@
 import { redirect } from '@/i18n/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { questionnaireSchema, type QuestionnaireAnswers } from '@/domain/profile/questionnaire'
+import type { WeightPoint } from '@/domain/nutrition'
 import type { Tables } from '@/types/database'
 
 export type Profile = Tables<'profiles'>
@@ -51,4 +52,22 @@ export async function requireProfile(locale: 'en' | 'es'): Promise<Profile> {
   const profile = await getProfile()
   if (!profile?.onboarded_at) redirect({ href: '/onboarding', locale })
   return profile as Profile
+}
+
+/** Daily weights over the last `days`, oldest first, for the adaptive nutrition loop. */
+export async function getRecentWeights(todayIso: string, days = 14): Promise<WeightPoint[]> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+  const since = new Date(`${todayIso}T00:00:00Z`)
+  since.setUTCDate(since.getUTCDate() - days)
+  const { data } = await supabase
+    .from('body_measurements')
+    .select('date, weight_kg')
+    .eq('user_id', user.id)
+    .gte('date', since.toISOString().slice(0, 10))
+    .lte('date', todayIso)
+    .not('weight_kg', 'is', null)
+    .order('date')
+  return (data ?? []).map((r) => ({ date: r.date, kg: Number(r.weight_kg) }))
 }

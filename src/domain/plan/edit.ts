@@ -2,7 +2,7 @@ import { EXERCISES, getExercise } from '../exercises/library'
 import type { ExerciseDefinition } from '../exercises/types'
 import type { AthleteModel } from '../profile/athlete'
 import type { Units } from '../profile/types'
-import { loadForTarget, roundToIncrement, startingLoadKg } from '../strength/loads'
+import { loadForTarget, roundLoad, startingLoadKg } from '../strength/loads'
 import { phaseParameters } from '../strength/periodization'
 import { createRng } from '../strength/rng'
 import { exclusionReason, roleFits, type SelectionContext } from '../strength/selection'
@@ -61,7 +61,7 @@ function repTarget(e: Pick<PlannedExercise, 'repMin' | 'repMax'>): number {
 
 /** The working load the engine would prescribe for this exercise today. */
 export function prescribeLoad(exercise: ExerciseDefinition, reps: number, rpe: number, ctx: EditContext): number {
-  if (exercise.implement === 'bodyweight' || exercise.category === 'conditioning') return 0
+  if (exercise.implement === 'bodyweight' || exercise.category === 'conditioning' || exercise.timed) return 0
   const { model } = ctx
   const phase = phaseParameters(ctx.week, ctx.totalWeeks)
   const max = ctx.maxes?.[exercise.id]
@@ -77,7 +77,8 @@ export function prescribeLoad(exercise: ExerciseDefinition, reps: number, rpe: n
         units: model.units,
         conservativeMode: model.conservativeMode,
       })
-  return roundToIncrement(base * phase.loadMultiplier, exercise.implement, model.units)
+  const powerScale = exercise.category === 'power' ? 0.5 : 1
+  return roundLoad(base * powerScale * phase.loadMultiplier, exercise.implement, model.units, model.plates)
 }
 
 /**
@@ -153,6 +154,10 @@ export function roleForAdded(exercise: ExerciseDefinition, gym: GymSession): Exc
       return 'isolation'
     case 'core':
       return 'core'
+    case 'power':
+      return 'power'
+    case 'mobility':
+      return 'mobility'
     case 'conditioning':
       throw new RangeError('conditioning work is a finisher, not an exercise slot')
   }
@@ -180,6 +185,7 @@ export function addExercise(gym: GymSession, exerciseId: string, ctx: EditContex
     loadKg: prescribeLoad(exercise, repTarget(shape), rpeTarget, ctx),
     restSec: shape.restSec,
     technique: 'straight',
+    ...(exercise.timed ? { holdSeconds: repTarget(shape) } : {}),
   }
   return finish(gym, [...gym.exercises, added])
 }

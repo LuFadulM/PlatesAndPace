@@ -162,7 +162,12 @@
       "estimateOnly": "These are estimates to start from, not medical advice. Adjust them to how you feel and how your training goes.",
       "noDeficitUnder18": "You are under 18, so this plan does not use a calorie deficit.",
       "conservativeMode": "Your health answers put you in a careful start, so this plan does not use a calorie deficit.",
-      "calorieFloorApplied": "This has been raised to a safe minimum rather than going lower."
+      "calorieFloorApplied": "This has been raised to a safe minimum rather than going lower.",
+      "disorderedEating": "You told us about a history of disordered eating, so this plan never uses a deficit. Train for strength; eat to fuel it.",
+      "rateCapped": "The change has been capped at a safe weekly rate.",
+      "adaptedUp": "Your two-week trend moved faster than planned, so the target has come up a little.",
+      "adaptedDown": "Your two-week trend is slower than planned, so the target has come down a little.",
+      "recompPatience": "Recomposition is slow by design: eat at maintenance, lift hard, judge by the mirror and the bar over months, not the scale over days."
     }
   },
   "auth": {
@@ -695,6 +700,118 @@
       "cue2": "Long, smooth strokes",
       "mistake1": "Pulling with the arms first",
       "mistake2": "Rounding the back"
+    },
+    "box_jump": {
+      "name": "Box jump",
+      "cue1": "Swing the arms, land softly on the whole foot",
+      "cue2": "Step down, never jump down",
+      "mistake1": "Landing in a deep squat with the knees caving",
+      "mistake2": "Choosing a box so high you land stiff"
+    },
+    "broad_jump": {
+      "name": "Broad jump",
+      "cue1": "Load the hips, throw the arms forward",
+      "cue2": "Stick the landing before the next rep",
+      "mistake1": "Landing on the heels with straight legs",
+      "mistake2": "Rushing reps without resetting"
+    },
+    "push_press": {
+      "name": "Push press",
+      "cue1": "Dip a few inches, drive with the legs, punch the bar up",
+      "cue2": "Finish with the bar over the mid-foot",
+      "mistake1": "Dipping too deep and turning it into a squat",
+      "mistake2": "Pressing before the legs have finished driving"
+    },
+    "dumbbell_push_press": {
+      "name": "Dumbbell push press",
+      "cue1": "Short dip, fast drive, lock out overhead",
+      "cue2": "Keep the ribs down as you finish",
+      "mistake1": "Arching the lower back at the top",
+      "mistake2": "Letting the dumbbells drift forward"
+    },
+    "kettlebell_swing": {
+      "name": "Kettlebell swing",
+      "cue1": "Hinge, then snap the hips forward",
+      "cue2": "The arms are ropes; the hips do the work",
+      "mistake1": "Squatting the swing instead of hinging",
+      "mistake2": "Lifting with the shoulders to chest height"
+    },
+    "medicine_ball_slam": {
+      "name": "Medicine ball slam",
+      "cue1": "Reach tall, then slam through the floor",
+      "cue2": "Catch the bounce and go again",
+      "mistake1": "Rounding the back to pick the ball up",
+      "mistake2": "Slamming with the arms only"
+    },
+    "hip_flexor_stretch": {
+      "name": "Kneeling hip flexor stretch",
+      "cue1": "Tuck the pelvis, squeeze the back glute",
+      "cue2": "Breathe out and let the hip sink forward",
+      "mistake1": "Arching the lower back instead of stretching the hip",
+      "mistake2": "Leaning the torso forward"
+    },
+    "worlds_greatest_stretch": {
+      "name": "World's greatest stretch",
+      "cue1": "Long lunge, elbow to instep, then rotate up",
+      "cue2": "Slow, three breaths at each position",
+      "mistake1": "Front knee drifting inward",
+      "mistake2": "Rushing through the rotation"
+    },
+    "ninety_ninety_hip": {
+      "name": "90/90 hip stretch",
+      "cue1": "Both knees at ninety, sit tall",
+      "cue2": "Hinge over the front shin, then switch sides",
+      "mistake1": "Rounding the back to get lower",
+      "mistake2": "Holding the breath"
+    },
+    "thoracic_rotation": {
+      "name": "Thoracic rotation",
+      "cue1": "On all fours, hand behind head, rotate the elbow to the ceiling",
+      "cue2": "Follow the elbow with your eyes",
+      "mistake1": "Rotating from the lower back",
+      "mistake2": "Letting the hips shift"
+    },
+    "cat_cow": {
+      "name": "Cat-cow",
+      "cue1": "Round the whole spine, then arch it, one vertebra at a time",
+      "cue2": "Breathe out as you round",
+      "mistake1": "Moving only the neck",
+      "mistake2": "Going too fast to feel each segment"
+    },
+    "shoulder_dislocate": {
+      "name": "Shoulder pass-through",
+      "cue1": "Wide grip on a band or stick, arms straight, over and back",
+      "cue2": "Narrow the grip only when it stays smooth",
+      "mistake1": "Bending the elbows to get through",
+      "mistake2": "Arching the back at the top"
+    },
+    "wall_slide": {
+      "name": "Wall slide",
+      "cue1": "Back, elbows and wrists on the wall, slide up",
+      "cue2": "Ribs down, keep the contact",
+      "mistake1": "Losing wrist contact to get higher",
+      "mistake2": "Shrugging the shoulders"
+    },
+    "calf_stretch": {
+      "name": "Calf stretch on a step",
+      "cue1": "Heel over the edge, let it drop, knee straight",
+      "cue2": "Bend the knee slightly for the deeper calf",
+      "mistake1": "Bouncing",
+      "mistake2": "Rolling the foot outward"
+    },
+    "deep_squat_hold": {
+      "name": "Deep squat hold",
+      "cue1": "Sit into the bottom, elbows push the knees out",
+      "cue2": "Keep the chest tall and the heels down",
+      "mistake1": "Heels lifting",
+      "mistake2": "Rounding hard through the lower back"
+    },
+    "glute_bridge_hold": {
+      "name": "Glute bridge hold",
+      "cue1": "Squeeze the glutes, hold the hips level",
+      "cue2": "Ribs down, no arching",
+      "mistake1": "Pushing through the hamstrings instead of the glutes",
+      "mistake2": "Neck strain from looking forward"
     }
   },
   "muscles": {
@@ -721,7 +838,9 @@
     "accessory": "Accessory",
     "isolation": "Isolation",
     "core": "Core",
-    "conditioning": "Conditioning"
+    "conditioning": "Conditioning",
+    "power": "Power",
+    "mobility": "Mobility"
   },
   "sessions": {
     "full_body_a": {
@@ -794,7 +913,8 @@
     "errors": {
       "invalid": "Some answers are missing or invalid.",
       "underage": "Plates & Pace is for people aged 16 and over.",
-      "save": "We could not save your answers. Try again."
+      "save": "We could not save your answers. Try again.",
+      "medical": "Please confirm the medical notice before continuing."
     },
     "title": "Set up your plan",
     "stepOf": "Step {step} of {total}",
@@ -838,17 +958,41 @@
         "otherNote": "Tell us more (optional)",
         "yes": "Yes",
         "no": "No",
-        "clearance": "You answered yes to at least one question. We recommend getting medical clearance before hard training. Your plan will start in a careful mode: lighter weights and less volume."
+        "clearance": "You answered yes to at least one question. We recommend getting medical clearance before hard training. Your plan will start in a careful mode: lighter weights and less volume.",
+        "recentSurgery": "Have you had surgery in the last six months?",
+        "disorderedEating": "Have you struggled with disordered eating? If so, the app will never ask you to eat less.",
+        "medicalTitle": "Talk to a doctor first",
+        "medicalBody": "One of your answers is a red flag for hard exercise. Plates & Pace can still build you a careful plan, but it is training guidance, not medical advice. Please check with a doctor before you start.",
+        "medicalAck": "I understand, and I take responsibility for getting medical advice before training hard."
       },
       "goals": {
         "title": "Your goal",
         "primary": "What matters most right now?",
-        "build_muscle": "Build muscle",
-        "get_strong": "Get strong",
-        "lose_fat": "Lose fat",
-        "fit_and_firm": "Get fit and firm",
-        "run_faster": "Run faster or further",
-        "hybrid": "Both: lift and run",
+        "hypertrophy": "Build muscle",
+        "strength": "Get as strong as possible",
+        "fat_loss": "Lose fat",
+        "recomposition": "Recomposition: lose fat, keep muscle",
+        "endurance": "Run further or faster",
+        "athletic_performance": "Athletic performance",
+        "general_health": "General health",
+        "mobility_rehab": "Mobility, or a return to training",
+        "desc": {
+          "hypertrophy": "More sets each week, 6 to 12 reps close to failure, a lighter week when you need one.",
+          "strength": "Heavy sets of 1 to 5, long rests, the main lifts practised often.",
+          "fat_loss": "Keep the strength, trim the volume, add steps and easy cardio. Food does most of the work.",
+          "recomposition": "Train like you are building muscle, eat at maintenance with plenty of protein. Slow, and it works.",
+          "endurance": "80/20 running with paces from your own recent run, and lifting that supports it.",
+          "athletic_performance": "Power first, heavy lifts second, nothing to failure. Speed work on run days.",
+          "general_health": "Two full-body sessions, 150 minutes of easy cardio, mobility. The least friction possible.",
+          "mobility_rehab": "Slow, controlled movement, mobility first, loads that climb carefully. Pain gets a say."
+        },
+        "secondary": "Anything else? (optional)",
+        "also": {
+          "endurance": "I also run",
+          "hypertrophy": "I also want muscle",
+          "strength": "I also want to get strong",
+          "general_health": "I also want to stay healthy"
+        },
         "targetRace": "Target distance",
         "5k": "5K",
         "10k": "10K",
@@ -868,7 +1012,12 @@
         "cannotRun": "I can't run continuously yet",
         "recentKm": "A recent run: distance (km)",
         "recentMinutes": "and time (minutes)",
-        "continuousMinutes": "How many minutes can you run without stopping?"
+        "continuousMinutes": "How many minutes can you run without stopping?",
+        "heartRate": "Heart rate (optional)",
+        "heartRateHelp": "Each one you know makes your zones more accurate: resting HR unlocks heart-rate reserve zones, a threshold HR from a 30-minute time trial unlocks Friel zones.",
+        "restingHr": "Resting (bpm)",
+        "maxHr": "Max (bpm)",
+        "lthr": "Threshold (bpm)"
       },
       "schedule": {
         "title": "Your week",
@@ -901,7 +1050,10 @@
         "full_gym": "Full gym with machines",
         "dumbbells_bench": "Dumbbells and a bench",
         "home_none": "At home, no equipment",
-        "unavailable": "Machines you do not have (optional)"
+        "unavailable": "Machines you do not have (optional)",
+        "platesHelp": "So the app only ever asks for a weight you can actually load.",
+        "bar": "Bar ({unit})",
+        "plates": "Plate pairs you have ({unit})"
       },
       "injuries": {
         "title": "Injuries and limits",
@@ -964,7 +1116,8 @@
       "straight": "straight sets",
       "top_set_backoff": "top set + back-offs",
       "drop_set": "drop set on the last",
-      "rest_pause": "rest-pause on the last"
+      "rest_pause": "rest-pause on the last",
+      "tempo": "slow tempo: 3 s down, 1 s pause, 3 s up"
     },
     "readinessForm": {
       "sleep": "Sleep",
@@ -1027,7 +1180,56 @@
       "error": "Could not save the change. Try again.",
       "errorPast": "Past sessions are the record of what happened and can't be edited."
     },
-    "exercises": "Exercises"
+    "exercises": "Exercises",
+    "effort": "RPE {rpe} · {rir} in reserve",
+    "adjustments": {
+      "title": "{n} changes to fit your day",
+      "trimmed": "{name}: {sets} fewer sets",
+      "removed": "{name}: left out",
+      "time": "to fit your session time",
+      "interference": "because of the run around this session",
+      "volume_cap": "past ten sets a muscle stops growing and starts hurting"
+    },
+    "maxLine": "Estimated max ~{amount} {unit} · {confidence}",
+    "confidence": {
+      "high": "solid estimate",
+      "medium": "rough estimate",
+      "low": "guess: log a heavier set of 10 or fewer"
+    },
+    "progression": {
+      "increase": "You cleared the rep range last time, so the load goes up",
+      "hold": "Same load as last time: chase the reps",
+      "decrease": "Last time missed the range, so the load comes down"
+    },
+    "plates": {
+      "perSide": "Per side: {plates} {unit} on a {bar} {unit} bar",
+      "barOnly": "Empty {bar} {unit} bar"
+    },
+    "zoneRange": "Heart-rate zone {zone} · {min}–{max} bpm",
+    "zoneMethod": {
+      "max": "from your estimated max",
+      "hrr": "from your resting heart rate (Karvonen)",
+      "lthr": "from your lactate threshold (Friel)"
+    },
+    "zoneMaxEstimated": "max is an estimate from your age",
+    "liftFirst": "Lift first, run after: hard intervals never go before heavy legs.",
+    "fuelTraining": "Training day: about {kcal} kcal",
+    "fuelRest": "Rest day: about {kcal} kcal",
+    "macro": {
+      "protein": "Protein",
+      "carbs": "Carbs",
+      "fat": "Fat",
+      "fibre": "Fibre"
+    },
+    "fuelWater": "{water} L of water",
+    "fuelPredicted": "at this rate about {kg} kg a week {direction}",
+    "fuelDown": "down",
+    "fuelUp": "up",
+    "fuelHold": "steady",
+    "weighIn": "Morning weight ({unit}) · last {last}",
+    "weighInSave": "Log",
+    "weighInSaved": "Weight logged. The plan reads the two-week trend, not one morning.",
+    "grams": "{g} g"
   },
   "plan": {
     "title": "Plan",
@@ -1188,9 +1390,106 @@
     "bodyweight": "Body weight",
     "waist": "Waist",
     "table": "Show as table",
-    "empty": "Log a session and your progress will start showing here."
+    "empty": "Log a session and your progress will start showing here.",
+    "mev": "Minimum to grow",
+    "mrv": "Maximum you can recover from",
+    "landmarksHelp": "Aim between the two marks. Below the first, little changes; above the second, fatigue wins."
   },
   "offline": {
     "body": "You are offline. Sets you log are saved on this device and will sync when you are back online."
+  },
+  "explain": {
+    "title": "Your plan, and why",
+    "welcome": "Here is your plan. Read why it looks the way it does, then start.",
+    "goToday": "Go to today's session",
+    "goal": {
+      "hypertrophy": "You want muscle, so volume drives the plan: enough hard sets per muscle each week, most of them in the 6 to 12 rep range, close to failure but rarely at it.",
+      "strength": "You want to be strong, so intensity drives the plan: heavy sets of 1 to 5 on the main lifts, long rests, less total volume, and a heavier top set as each block matures.",
+      "fat_loss": "You want to lose fat, so the plan keeps the strength stimulus, trims the volume by about a fifth, pairs accessories into supersets, and leans on daily movement and easy cardio. Food does most of the work.",
+      "recomposition": "You want to change shape without a diet, so you train like someone building muscle and eat at maintenance with plenty of protein. It is slower than a cut and it works.",
+      "endurance": "You want to run better, so the running is the priority and the lifting supports it: fewer leg sets, and the runs decide how hard the legs may work on any given day.",
+      "athletic_performance": "You want to move well, so every session opens with explosive work when the nervous system is fresh, then heavy lifts, and nothing goes to failure.",
+      "general_health": "You want to be healthy, so the plan meets the WHO minimums with the least friction: full-body sessions, easy cardio through the week, and a mobility hold at the end of each session.",
+      "mobility_rehab": "You are coming back or building movement, so every session opens with mobility, the first two weeks use slow tempo to re-learn the patterns, effort stays moderate, and loads climb carefully."
+    },
+    "secondary": {
+      "endurance": "You also run, so the run days are built into the week and the lifting is arranged around them.",
+      "hypertrophy": "You also want muscle, so the lifting keeps enough volume to build it alongside the running.",
+      "strength": "You also want to be strong, so the main lifts stay heavy while the running carries the conditioning.",
+      "general_health": "You also want to stay healthy, so mobility and easy movement stay in the week."
+    },
+    "split": {
+      "custom": "You chose the muscles for each of your {days} gym days, so each session is built from your list and the engine fills in sets, loads and order.",
+      "fullBody": "{days} days a week, every session full body: each muscle gets worked several times a week, which is where most of the progress comes from at this stage.",
+      "parts": "{days} days a week across {sessions} different sessions, so each muscle is trained more than once a week without any one session becoming a marathon.",
+      "whyFullBodyBeginner": "Full body rather than a split because frequency beats specialisation until the basics are solid.",
+      "whyFullBodyStrength": "Full body rather than a split because strength is a skill: the main lifts are practised as often as possible."
+    },
+    "volume": {
+      "start": {
+        "beginner": "Week one starts at the minimum that grows anything, {low} to {high} hard sets per muscle, so recovery keeps up.",
+        "intermediate": "Week one starts just above the minimum that grows anything, {low} to {high} hard sets per muscle.",
+        "advanced": "Week one starts inside the adaptive range, {low} to {high} hard sets per muscle, because your recovery can already carry it."
+      },
+      "ramp": "Each week adds about one set per muscle toward the most you can recover from. Lighter on purpose: week {deload}.",
+      "focus": "Your focus areas ({n}) get two extra sets a week."
+    },
+    "intensity": {
+      "hypertrophy": "Effort: the main lifts stay one to three reps in reserve; isolation work may reach failure in the hardest week.",
+      "strength": "Effort: sets of 1 to 5 at one to three reps in reserve. Never to failure on a barbell.",
+      "fat_loss": "Effort: the same intensity as building muscle, less of it, and short rests between paired exercises.",
+      "recomposition": "Effort: the main lifts stay one to three reps in reserve; isolation work may reach failure in the hardest week.",
+      "endurance": "Effort: moderate. The legs are saved for the runs that matter.",
+      "athletic_performance": "Effort: power work at three or more reps in reserve, moved as fast as possible; heavy lifts at two.",
+      "general_health": "Effort: moderate throughout, two reps in reserve on everything.",
+      "mobility_rehab": "Effort: never past RPE 7. Pain gets a say: report it and the movement changes.",
+      "minor": "Because you are under 18, nothing in this plan goes past RPE 8 and there is no max testing.",
+      "careful": "Because of your health answers, nothing in this plan goes past RPE 8, loads start lighter and volume starts lower.",
+      "bigLifts": "Barbell squats, deadlifts and bench stay two reps in reserve until you are an advanced lifter."
+    },
+    "time": "Every session fits {minutes} minutes. When it would not, the engine cuts isolation work first, then accessories, and says what it cut.",
+    "loads": {
+      "calibrate": "Loads start from bodyweight ratios and your first week finds the real numbers: leave two reps in the tank and log honestly.",
+      "fromMax": "Loads come from your logged sets: every completed set updates an estimated max, and the next session opens from it.",
+      "progression": "The main lifts progress by RPE and estimated max; accessories by double progression: clear the top of the rep range on every set and the load goes up."
+    },
+    "equipment": {
+      "dumbbells_bench": "Dumbbells and a bench only: every exercise was chosen from what you have, and the plates you own decide the loads.",
+      "home_none": "No equipment: every exercise is bodyweight, progressed by reps, tempo and harder variations."
+    },
+    "injuries": "Areas you flagged ({n}): any movement that loads them is excluded at selection, not merely warned about.",
+    "cardio": {
+      "paces": "{runs} runs a week with paces from your own recent run: easy {easy}/km, threshold {threshold}/km, intervals {interval}/km.",
+      "goal": "Race prediction for the {race}: {fast} to {slow}/km. A range, not a promise.",
+      "runWalk": "{runs} run/walk sessions a week that lengthen the running a minute at a time until you run half an hour straight.",
+      "polarised": "About four fifths of the running minutes stay easy; the hard fifth is the intervals and the threshold block.",
+      "zones": {
+        "max": "Heart-rate zones from an estimated max (211 minus 0.64 times your age). Add your resting heart rate for better ones.",
+        "hrr": "Heart-rate zones from your resting heart rate (Karvonen).",
+        "lthr": "Heart-rate zones from your lactate threshold (Friel)."
+      },
+      "interference": "Hard intervals never go before heavy legs: when they share a day you lift first, and leg volume is capped on hard run days and the day before the long run.",
+      "easyMinutes": "Outside the sessions: about {minutes} minutes a week of easy cardio, walks count.",
+      "steps": "A step target of about {steps} a day: the cheapest calories you will ever spend."
+    },
+    "food": {
+      "hypertrophy": "Food: a small surplus, protein at 1.8 g/kg, carbohydrate leaning toward training days.",
+      "strength": "Food: maintenance, protein at 1.8 g/kg, carbohydrate leaning toward training days.",
+      "fat_loss": "Food: a deficit capped at a safe weekly rate, protein at 2.2 g/kg, and the target adjusts to your two-week weight trend.",
+      "recomposition": "Food: maintenance, protein at 2 g/kg. Judge progress over months.",
+      "endurance": "Food: maintenance with carbohydrate leaning toward run days.",
+      "athletic_performance": "Food: maintenance, protein at 1.8 g/kg, carbohydrate on training days.",
+      "general_health": "Food: maintenance, protein at 1.6 g/kg, fibre by the calories.",
+      "mobility_rehab": "Food: maintenance, protein at 1.6 g/kg to support the tissue you are rebuilding.",
+      "noDeficit": {
+        "minor": "Food: maintenance. Under 18 there is no deficit, whatever the goal.",
+        "medical": "Food: maintenance. With your health answers there is no deficit until a doctor has cleared you.",
+        "disordered_eating": "Food: maintenance, always. This plan will never ask you to eat less."
+      }
+    },
+    "safety": {
+      "clearance": "One of your answers is a red flag for hard exercise. This is training guidance, not medical advice: please check with a doctor.",
+      "adapts": "Nothing here is fixed. Log your sessions, your readiness and your weight, and the plan adapts every week."
+    }
   }
 }
