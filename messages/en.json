@@ -1183,8 +1183,8 @@
     "exercises": "Exercises",
     "effort": "RPE {rpe} · {rir} in reserve",
     "adjustments": {
-      "title": "{n, plural, one {1 change to fit your day} other {# changes to fit your day}}",
-      "trimmed": "{name}: {sets, plural, one {1 set fewer} other {# sets fewer}}",
+      "title": "{n} changes to fit your day",
+      "trimmed": "{name}: {sets} fewer sets",
       "removed": "{name}: left out",
       "time": "to fit your session time",
       "interference": "because of the run around this session",
@@ -1397,5 +1397,99 @@
   },
   "offline": {
     "body": "You are offline. Sets you log are saved on this device and will sync when you are back online."
+  },
+  "explain": {
+    "title": "Your plan, and why",
+    "welcome": "Here is your plan. Read why it looks the way it does, then start.",
+    "goToday": "Go to today's session",
+    "goal": {
+      "hypertrophy": "You want muscle, so volume drives the plan: enough hard sets per muscle each week, most of them in the 6 to 12 rep range, close to failure but rarely at it.",
+      "strength": "You want to be strong, so intensity drives the plan: heavy sets of 1 to 5 on the main lifts, long rests, less total volume, and a heavier top set as each block matures.",
+      "fat_loss": "You want to lose fat, so the plan keeps the strength stimulus, trims the volume by about a fifth, pairs accessories into supersets, and leans on daily movement and easy cardio. Food does most of the work.",
+      "recomposition": "You want to change shape without a diet, so you train like someone building muscle and eat at maintenance with plenty of protein. It is slower than a cut and it works.",
+      "endurance": "You want to run better, so the running is the priority and the lifting supports it: fewer leg sets, and the runs decide how hard the legs may work on any given day.",
+      "athletic_performance": "You want to move well, so every session opens with explosive work when the nervous system is fresh, then heavy lifts, and nothing goes to failure.",
+      "general_health": "You want to be healthy, so the plan meets the WHO minimums with the least friction: full-body sessions, easy cardio through the week, and a mobility hold at the end of each session.",
+      "mobility_rehab": "You are coming back or building movement, so every session opens with mobility, the first two weeks use slow tempo to re-learn the patterns, effort stays moderate, and loads climb carefully."
+    },
+    "secondary": {
+      "endurance": "You also run, so the run days are built into the week and the lifting is arranged around them.",
+      "hypertrophy": "You also want muscle, so the lifting keeps enough volume to build it alongside the running.",
+      "strength": "You also want to be strong, so the main lifts stay heavy while the running carries the conditioning.",
+      "general_health": "You also want to stay healthy, so mobility and easy movement stay in the week."
+    },
+    "split": {
+      "custom": "You chose the muscles for each of your {days} gym days, so each session is built from your list and the engine fills in sets, loads and order.",
+      "fullBody": "{days} days a week, every session full body: each muscle gets worked several times a week, which is where most of the progress comes from at this stage.",
+      "parts": "{days} days a week across {sessions} different sessions, so each muscle is trained more than once a week without any one session becoming a marathon.",
+      "whyFullBodyBeginner": "Full body rather than a split because frequency beats specialisation until the basics are solid.",
+      "whyFullBodyStrength": "Full body rather than a split because strength is a skill: the main lifts are practised as often as possible."
+    },
+    "volume": {
+      "start": {
+        "beginner": "Week one starts at the minimum that grows anything, {low} to {high} hard sets per muscle, so recovery keeps up.",
+        "intermediate": "Week one starts just above the minimum that grows anything, {low} to {high} hard sets per muscle.",
+        "advanced": "Week one starts inside the adaptive range, {low} to {high} hard sets per muscle, because your recovery can already carry it."
+      },
+      "ramp": "Each week adds about one set per muscle toward the most you can recover from. Lighter on purpose: week {deload}.",
+      "focus": "Your focus areas ({n}) get two extra sets a week."
+    },
+    "intensity": {
+      "hypertrophy": "Effort: the main lifts stay one to three reps in reserve; isolation work may reach failure in the hardest week.",
+      "strength": "Effort: sets of 1 to 5 at one to three reps in reserve. Never to failure on a barbell.",
+      "fat_loss": "Effort: the same intensity as building muscle, less of it, and short rests between paired exercises.",
+      "recomposition": "Effort: the main lifts stay one to three reps in reserve; isolation work may reach failure in the hardest week.",
+      "endurance": "Effort: moderate. The legs are saved for the runs that matter.",
+      "athletic_performance": "Effort: power work at three or more reps in reserve, moved as fast as possible; heavy lifts at two.",
+      "general_health": "Effort: moderate throughout, two reps in reserve on everything.",
+      "mobility_rehab": "Effort: never past RPE 7. Pain gets a say: report it and the movement changes.",
+      "minor": "Because you are under 18, nothing in this plan goes past RPE 8 and there is no max testing.",
+      "careful": "Because of your health answers, nothing in this plan goes past RPE 8, loads start lighter and volume starts lower.",
+      "bigLifts": "Barbell squats, deadlifts and bench stay two reps in reserve until you are an advanced lifter."
+    },
+    "time": "Every session fits {minutes} minutes. When it would not, the engine cuts isolation work first, then accessories, and says what it cut.",
+    "loads": {
+      "calibrate": "Loads start from bodyweight ratios and your first week finds the real numbers: leave two reps in the tank and log honestly.",
+      "fromMax": "Loads come from your logged sets: every completed set updates an estimated max, and the next session opens from it.",
+      "progression": "The main lifts progress by RPE and estimated max; accessories by double progression: clear the top of the rep range on every set and the load goes up."
+    },
+    "equipment": {
+      "dumbbells_bench": "Dumbbells and a bench only: every exercise was chosen from what you have, and the plates you own decide the loads.",
+      "home_none": "No equipment: every exercise is bodyweight, progressed by reps, tempo and harder variations."
+    },
+    "injuries": "Areas you flagged ({n}): any movement that loads them is excluded at selection, not merely warned about.",
+    "cardio": {
+      "paces": "{runs} runs a week with paces from your own recent run: easy {easy}/km, threshold {threshold}/km, intervals {interval}/km.",
+      "goal": "Race prediction for the {race}: {fast} to {slow}/km. A range, not a promise.",
+      "runWalk": "{runs} run/walk sessions a week that lengthen the running a minute at a time until you run half an hour straight.",
+      "polarised": "About four fifths of the running minutes stay easy; the hard fifth is the intervals and the threshold block.",
+      "zones": {
+        "max": "Heart-rate zones from an estimated max (211 minus 0.64 times your age). Add your resting heart rate for better ones.",
+        "hrr": "Heart-rate zones from your resting heart rate (Karvonen).",
+        "lthr": "Heart-rate zones from your lactate threshold (Friel)."
+      },
+      "interference": "Hard intervals never go before heavy legs: when they share a day you lift first, and leg volume is capped on hard run days and the day before the long run.",
+      "easyMinutes": "Outside the sessions: about {minutes} minutes a week of easy cardio, walks count.",
+      "steps": "A step target of about {steps} a day: the cheapest calories you will ever spend."
+    },
+    "food": {
+      "hypertrophy": "Food: a small surplus, protein at 1.8 g/kg, carbohydrate leaning toward training days.",
+      "strength": "Food: maintenance, protein at 1.8 g/kg, carbohydrate leaning toward training days.",
+      "fat_loss": "Food: a deficit capped at a safe weekly rate, protein at 2.2 g/kg, and the target adjusts to your two-week weight trend.",
+      "recomposition": "Food: maintenance, protein at 2 g/kg. Judge progress over months.",
+      "endurance": "Food: maintenance with carbohydrate leaning toward run days.",
+      "athletic_performance": "Food: maintenance, protein at 1.8 g/kg, carbohydrate on training days.",
+      "general_health": "Food: maintenance, protein at 1.6 g/kg, fibre by the calories.",
+      "mobility_rehab": "Food: maintenance, protein at 1.6 g/kg to support the tissue you are rebuilding.",
+      "noDeficit": {
+        "minor": "Food: maintenance. Under 18 there is no deficit, whatever the goal.",
+        "medical": "Food: maintenance. With your health answers there is no deficit until a doctor has cleared you.",
+        "disordered_eating": "Food: maintenance, always. This plan will never ask you to eat less."
+      }
+    },
+    "safety": {
+      "clearance": "One of your answers is a red flag for hard exercise. This is training guidance, not medical advice: please check with a doctor.",
+      "adapts": "Nothing here is fixed. Log your sessions, your readiness and your weight, and the plan adapts every week."
+    }
   }
 }

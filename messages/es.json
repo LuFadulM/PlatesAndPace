@@ -1183,8 +1183,8 @@
     "exercises": "Ejercicios",
     "effort": "RPE {rpe} · {rir} en reserva",
     "adjustments": {
-      "title": "{n, plural, one {1 ajuste para que quepa en tu día} other {# ajustes para que quepa en tu día}}",
-      "trimmed": "{name}: {sets, plural, one {1 serie menos} other {# series menos}}",
+      "title": "{n} ajustes para que quepa en tu día",
+      "trimmed": "{name}: {sets} series menos",
       "removed": "{name}: quedó fuera",
       "time": "para que quepa en el tiempo de tu sesión",
       "interference": "por la carrera alrededor de esta sesión",
@@ -1397,5 +1397,99 @@
   },
   "offline": {
     "body": "Estás sin conexión. Las series que registres se guardan en este dispositivo y se sincronizan cuando vuelvas a tener red."
+  },
+  "explain": {
+    "title": "Tu plan, y por qué",
+    "welcome": "Aquí está tu plan. Lee por qué es como es y luego empieza.",
+    "goToday": "Ir a la sesión de hoy",
+    "goal": {
+      "hypertrophy": "Quieres músculo, así que el volumen manda: suficientes series duras por músculo cada semana, la mayoría entre 6 y 12 repeticiones, cerca del fallo pero rara vez en él.",
+      "strength": "Quieres ser fuerte, así que la intensidad manda: series pesadas de 1 a 5 en los levantamientos principales, descansos largos, menos volumen total y una serie tope más pesada a medida que madura cada bloque.",
+      "fat_loss": "Quieres perder grasa, así que el plan conserva el estímulo de fuerza, recorta el volumen una quinta parte, empareja accesorios en superseries y se apoya en el movimiento diario y el cardio suave. La comida hace la mayor parte del trabajo.",
+      "recomposition": "Quieres cambiar tu forma sin dieta, así que entrenas como quien gana músculo y comes en mantenimiento con mucha proteína. Es más lento que una definición y funciona.",
+      "endurance": "Quieres correr mejor, así que la carrera es la prioridad y las pesas la apoyan: menos series de pierna, y las carreras deciden cuánto pueden trabajar las piernas cada día.",
+      "athletic_performance": "Quieres moverte bien, así que cada sesión abre con trabajo explosivo cuando el sistema nervioso está fresco, luego levantamientos pesados, y nada llega al fallo.",
+      "general_health": "Quieres estar sano, así que el plan cumple los mínimos de la OMS con la menor fricción: sesiones de cuerpo completo, cardio suave durante la semana y una pausa de movilidad al final de cada sesión.",
+      "mobility_rehab": "Estás volviendo o construyendo movimiento, así que cada sesión abre con movilidad, las dos primeras semanas usan tempo lento para reaprender los patrones, el esfuerzo se queda moderado y las cargas suben con cuidado."
+    },
+    "secondary": {
+      "endurance": "También corres, así que los días de carrera están dentro de la semana y las pesas se ordenan alrededor de ellos.",
+      "hypertrophy": "También quieres músculo, así que las pesas conservan volumen suficiente para construirlo junto a la carrera.",
+      "strength": "También quieres fuerza, así que los levantamientos principales siguen pesados mientras la carrera lleva el acondicionamiento.",
+      "general_health": "También quieres cuidar la salud, así que la movilidad y el movimiento suave se quedan en la semana."
+    },
+    "split": {
+      "custom": "Elegiste los músculos de cada uno de tus {days} días de gimnasio, así que cada sesión se arma desde tu lista y el motor pone series, cargas y orden.",
+      "fullBody": "{days} días por semana, todas las sesiones de cuerpo completo: cada músculo se trabaja varias veces por semana, que es de donde sale la mayor parte del progreso en esta etapa.",
+      "parts": "{days} días por semana repartidos en {sessions} sesiones distintas, para que cada músculo se entrene más de una vez por semana sin que ninguna sesión se vuelva un maratón.",
+      "whyFullBodyBeginner": "Cuerpo completo en vez de rutina dividida porque la frecuencia le gana a la especialización hasta que la base es sólida.",
+      "whyFullBodyStrength": "Cuerpo completo en vez de rutina dividida porque la fuerza es una habilidad: los levantamientos principales se practican lo más seguido posible."
+    },
+    "volume": {
+      "start": {
+        "beginner": "La semana uno empieza en el mínimo que hace crecer algo, de {low} a {high} series duras por músculo, para que la recuperación siga el ritmo.",
+        "intermediate": "La semana uno empieza justo por encima del mínimo que hace crecer algo, de {low} a {high} series duras por músculo.",
+        "advanced": "La semana uno empieza dentro del rango adaptativo, de {low} a {high} series duras por músculo, porque tu recuperación ya lo aguanta."
+      },
+      "ramp": "Cada semana suma más o menos una serie por músculo hacia lo máximo que puedes recuperar. Más ligera a propósito: la semana {deload}.",
+      "focus": "Tus zonas prioritarias ({n}) reciben dos series extra por semana."
+    },
+    "intensity": {
+      "hypertrophy": "Esfuerzo: los levantamientos principales se quedan a una a tres repeticiones del fallo; el trabajo de aislamiento puede llegar al fallo en la semana más dura.",
+      "strength": "Esfuerzo: series de 1 a 5 a una a tres repeticiones del fallo. Nunca al fallo con barra.",
+      "fat_loss": "Esfuerzo: la misma intensidad que para ganar músculo, menos cantidad, y descansos cortos entre ejercicios emparejados.",
+      "recomposition": "Esfuerzo: los levantamientos principales se quedan a una a tres repeticiones del fallo; el trabajo de aislamiento puede llegar al fallo en la semana más dura.",
+      "endurance": "Esfuerzo: moderado. Las piernas se guardan para las carreras que importan.",
+      "athletic_performance": "Esfuerzo: trabajo de potencia a tres o más repeticiones del fallo, lo más rápido posible; levantamientos pesados a dos.",
+      "general_health": "Esfuerzo: moderado en todo, dos repeticiones en reserva siempre.",
+      "mobility_rehab": "Esfuerzo: nunca más de RPE 7. El dolor tiene voz: repórtalo y el movimiento cambia.",
+      "minor": "Como eres menor de 18, nada en este plan pasa de RPE 8 y no hay pruebas de máximo.",
+      "careful": "Por tus respuestas de salud, nada en este plan pasa de RPE 8, las cargas empiezan más ligeras y el volumen más bajo.",
+      "bigLifts": "Sentadilla, peso muerto y press de banca con barra se quedan a dos repeticiones del fallo hasta que seas avanzado."
+    },
+    "time": "Cada sesión cabe en {minutes} minutos. Cuando no cabría, el motor recorta primero el aislamiento, luego los accesorios, y te dice qué recortó.",
+    "loads": {
+      "calibrate": "Las cargas parten de proporciones del peso corporal y tu primera semana encuentra los números reales: deja dos repeticiones en reserva y registra con honestidad.",
+      "fromMax": "Las cargas salen de tus series registradas: cada serie completada actualiza un máximo estimado y la siguiente sesión arranca desde ahí.",
+      "progression": "Los levantamientos principales progresan por RPE y máximo estimado; los accesorios por doble progresión: completa el tope del rango en todas las series y sube el peso."
+    },
+    "equipment": {
+      "dumbbells_bench": "Solo mancuernas y banco: cada ejercicio se eligió de lo que tienes, y los discos que posees deciden las cargas.",
+      "home_none": "Sin equipo: todos los ejercicios son con el peso corporal, progresados por repeticiones, tempo y variantes más difíciles."
+    },
+    "injuries": "Zonas que marcaste ({n}): cualquier movimiento que las cargue queda excluido en la selección, no solo con una advertencia.",
+    "cardio": {
+      "paces": "{runs} carreras por semana con ritmos sacados de tu propia carrera reciente: suave {easy}/km, umbral {threshold}/km, series {interval}/km.",
+      "goal": "Predicción para {race}: de {fast} a {slow}/km. Un rango, no una promesa.",
+      "runWalk": "{runs} sesiones de correr/caminar por semana que alargan la carrera un minuto cada vez hasta que corras media hora seguida.",
+      "polarised": "Cerca de cuatro quintos de los minutos de carrera se quedan suaves; el quinto duro son las series y el bloque de umbral.",
+      "zones": {
+        "max": "Zonas de frecuencia cardíaca según un máximo estimado (211 menos 0,64 por tu edad). Agrega tu frecuencia en reposo para mejorarlas.",
+        "hrr": "Zonas de frecuencia cardíaca según tu frecuencia en reposo (Karvonen).",
+        "lthr": "Zonas de frecuencia cardíaca según tu umbral de lactato (Friel)."
+      },
+      "interference": "Las series duras nunca van antes de piernas pesadas: cuando comparten día, primero pesas, y el volumen de pierna se limita en días de carrera dura y el día antes de la tirada larga.",
+      "easyMinutes": "Fuera de las sesiones: unos {minutes} minutos por semana de cardio suave; caminar cuenta.",
+      "steps": "Una meta de unos {steps} pasos al día: las calorías más baratas que vas a gastar."
+    },
+    "food": {
+      "hypertrophy": "Comida: un superávit pequeño, proteína a 1,8 g/kg y carbohidratos inclinados a los días de entreno.",
+      "strength": "Comida: mantenimiento, proteína a 1,8 g/kg y carbohidratos inclinados a los días de entreno.",
+      "fat_loss": "Comida: un déficit limitado a un ritmo semanal seguro, proteína a 2,2 g/kg, y el objetivo se ajusta a tu tendencia de peso de dos semanas.",
+      "recomposition": "Comida: mantenimiento, proteína a 2 g/kg. Juzga el progreso en meses.",
+      "endurance": "Comida: mantenimiento con carbohidratos inclinados a los días de carrera.",
+      "athletic_performance": "Comida: mantenimiento, proteína a 1,8 g/kg, carbohidratos en los días de entreno.",
+      "general_health": "Comida: mantenimiento, proteína a 1,6 g/kg y fibra según las calorías.",
+      "mobility_rehab": "Comida: mantenimiento, proteína a 1,6 g/kg para sostener el tejido que estás reconstruyendo.",
+      "noDeficit": {
+        "minor": "Comida: mantenimiento. Menor de 18, sin déficit, sea cual sea la meta.",
+        "medical": "Comida: mantenimiento. Con tus respuestas de salud no hay déficit hasta que un médico te dé el visto bueno.",
+        "disordered_eating": "Comida: mantenimiento, siempre. Este plan nunca te pedirá comer menos."
+      }
+    },
+    "safety": {
+      "clearance": "Una de tus respuestas es una señal de alerta para el ejercicio intenso. Esto es una guía de entrenamiento, no consejo médico: consulta con un médico.",
+      "adapts": "Nada aquí es fijo. Registra tus sesiones, tu estado y tu peso, y el plan se adapta cada semana."
+    }
   }
 }

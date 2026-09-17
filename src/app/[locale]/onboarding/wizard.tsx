@@ -97,7 +97,7 @@ export function OnboardingWizard({ locale, initial, editing }: { locale: Locale;
     setServerError(null)
     startTransition(async () => {
       const result = await saveAnswersAndGeneratePlan(draft)
-      if (result.ok) router.push('/today')
+      if (result.ok) router.push({ pathname: '/plan', query: { welcome: '1' } })
       else setServerError(result.errorKey)
     })
   }
