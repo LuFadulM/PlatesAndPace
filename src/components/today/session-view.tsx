@@ -405,6 +405,7 @@ export function SessionView({ date, day, units, plates, maxes, initialSets, init
         </>
       )}
 
+      {run && day.order === 'lift_first' && gym && <p role="note" className="rounded-full bg-(--color-plate-yellow) px-3 py-1 text-center text-xs font-semibold">{t('liftFirst')}</p>}
       {run && <RunCard run={run} date={date} locale={locale} />}
 
       {!done && (
@@ -470,7 +471,10 @@ function RunCard({ run, date, locale }: { run: NonNullable<PlannedDay['run']>; d
       </dl>
       {run.intervals && <p className="mt-2 text-sm">{t('intervalLine', { reps: run.intervals.reps, meters: run.intervals.workMeters, rest: formatDuration(run.intervals.restSec, locale), pace: formatPace(run.intervals.paceSecPerKm, locale) })}</p>}
       {run.runWalk && <p className="mt-2 text-sm">{t('runWalkLine', { repeats: run.runWalk.repeats, run: run.runWalk.runMinutes, walk: run.runWalk.walkMinutes })}</p>}
-      <p className="mt-1 text-xs text-(--color-ink-muted)">{t('zone', { zone: run.hrZone })}</p>
+      <p className="mt-1 text-xs text-(--color-ink-muted)">
+        {run.hrRange ? t('zoneRange', { zone: run.hrZone, min: run.hrRange.minBpm, max: run.hrRange.maxBpm }) : t('zone', { zone: run.hrZone })}
+        {run.hrRange ? ` · ${t(`zoneMethod.${run.hrRange.method}`)}${run.hrRange.maxEstimated ? ` · ${t('zoneMaxEstimated')}` : ''}` : ''}
+      </p>
       <Link href={{ pathname: '/run', query: { date } }} className="mt-3 flex min-h-11 items-center justify-center rounded-lg bg-(--color-plate-yellow) font-semibold">{t('guidedRun')}</Link>
       {!saved ? (
         <form className="mt-3 grid grid-cols-[1fr_1fr_auto] gap-2" onSubmit={(e) => { e.preventDefault(); startTransition(async () => { const r = await saveRun({ date, plannedType: run.kind === 'none' ? null : run.kind, minutes: Number(minutes), km: Number(km) }); if (r.ok) setSaved(true) }) }}>

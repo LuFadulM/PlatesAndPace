@@ -1,5 +1,6 @@
 import { fromISODate, type PlainDate } from '../dates'
 import { DEFAULT_PLATES, type PlateInventory } from '../strength/loads'
+import type { HeartRateProfile } from '../running/zones'
 import type { MuscleGroup } from '../strength/volume'
 import {
   ADULT_AGE,
@@ -76,6 +77,7 @@ export interface AthleteModel {
   knowsBigLifts: boolean
   recentRun?: { km: number; seconds: number }
   continuousRunMinutes?: number
+  heartRate: HeartRateProfile
 
   gymDays: number[]
   runDays: number[]
@@ -185,6 +187,7 @@ export function buildAthleteModel(
     knowsBigLifts: answers.experience.knowsBigLifts,
     recentRun,
     continuousRunMinutes: answers.experience.continuousRunMinutes,
+    heartRate: { restingHr: answers.experience.restingHr, maxHr: answers.experience.maxHr, lthr: answers.experience.lthr },
 
     gymDays: [...answers.schedule.gymDays].sort((a, b) => a - b),
     runDays: [...answers.schedule.runDays].sort((a, b) => a - b),

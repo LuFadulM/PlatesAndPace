@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import {
+  easyMinutesToAdd,
   estimatedMaxHeartRate,
   fiveKEquivalentSeconds,
   heartRateZones,
+  intensityDistribution,
   isFasterThanCurrent,
   longRunProgression,
+  predictSecondsFromVdot,
   riegelPredictSeconds,
   runWalkProgression,
   trainingPaces,
@@ -42,27 +45,43 @@ describe('Riegel', () => {
   })
 })
 
-describe('trainingPaces', () => {
+describe('trainingPaces (VDOT)', () => {
   const paces = trainingPaces(OWNER_RUN)
 
-  it('derives the owner-example paces stated in the plan', () => {
-    // 5K pace 6:53/km; easy 8:56; threshold 7:17; intervals 6:40.
-    expect(Math.round(paces.fiveK)).toBe(412)
-    expect(Math.round(paces.easy)).toBe(536)
-    expect(Math.round(paces.threshold)).toBe(437)
-    expect(Math.round(paces.interval)).toBe(400)
+  it('reads a VDOT off the recent effort and derives every pace from it', () => {
+    // 3 km in 20:00 is a modest effort: VDOT in the low twenties.
+    expect(paces.vdot).toBeGreaterThan(20)
+    expect(paces.vdot).toBeLessThan(30)
+    // Easy well above 5K pace, threshold between, intervals faster than 5K.
+    expect(paces.easy).toBeGreaterThan(paces.fiveK * 1.15)
+    expect(paces.threshold).toBeGreaterThan(paces.fiveK)
+    expect(paces.interval).toBeLessThan(paces.fiveK)
+  })
+
+  it('matches the published VDOT table within a few seconds per kilometre', () => {
+    // Daniels: a 19:57 5K is VDOT 50; T pace ≈ 4:15/km, I pace ≈ 3:55/km, E ≈ 5:00–5:30/km.
+    const fifty = trainingPaces({ km: 5, seconds: 19 * 60 + 57 })
+    expect(Math.round(fifty.vdot)).toBe(50)
+    expect(Math.abs(fifty.threshold - 255)).toBeLessThan(8)
+    expect(Math.abs(fifty.interval - 235)).toBeLessThan(8)
+    expect(fifty.easy).toBeGreaterThan(300)
+    expect(fifty.easy).toBeLessThan(335)
   })
 
   it('orders paces from fastest to slowest', () => {
-    expect(paces.interval).toBeLessThan(paces.fiveK)
-    expect(paces.fiveK).toBeLessThan(paces.threshold)
-    expect(paces.threshold).toBeLessThan(paces.easy)
+    expect(paces.repetition).toBeLessThan(paces.interval)
+    expect(paces.interval).toBeLessThan(paces.threshold)
+    expect(paces.threshold).toBeLessThan(paces.marathon)
+    expect(paces.marathon).toBeLessThan(paces.easy)
     expect(paces.easy).toBeLessThan(paces.long)
   })
 
-  it('omits goal pace until a race is chosen', () => {
+  it('omits goal pace until a race is chosen, then shows it as a band', () => {
     expect(paces.goal).toBeUndefined()
-    expect(trainingPaces(OWNER_RUN, '10k').goal).toBeDefined()
+    const goal = trainingPaces(OWNER_RUN, '10k')
+    expect(goal.goal).toBeDefined()
+    expect(goal.goalRange!.fast).toBeLessThan(goal.goal!)
+    expect(goal.goalRange!.slow).toBeGreaterThan(goal.goal!)
   })
 
   it('makes a longer goal race a slower goal pace', () => {
@@ -80,15 +99,25 @@ describe('trainingPaces', () => {
   })
 })
 
+describe('VDOT predictions', () => {
+  it('predicts a 10K from a 5K close to the published tables', () => {
+    // VDOT 50: 5K 19:57, 10K about 41:21.
+    const seconds = predictSecondsFromVdot(50, 10_000)
+    expect(Math.abs(seconds - (41 * 60 + 21))).toBeLessThan(45)
+  })
+})
+
 describe('heart-rate zones', () => {
-  it('uses the Tanaka estimate rather than 220 − age', () => {
-    expect(estimatedMaxHeartRate(30)).toBeCloseTo(187, 5)
-    expect(estimatedMaxHeartRate(50)).toBeCloseTo(173, 5)
+  it('uses the Nes estimate (211 − 0.64 × age) and says it is an estimate', () => {
+    expect(estimatedMaxHeartRate(30)).toBeCloseTo(191.8, 5)
+    expect(estimatedMaxHeartRate(50)).toBeCloseTo(179, 5)
+    expect(heartRateZones(30).maxEstimated).toBe(true)
+    expect(heartRateZones(30, { maxHr: 195 }).maxEstimated).toBe(false)
   })
 
-  it('returns five contiguous zones ending at max', () => {
-    const zones = heartRateZones(30)
-
+  it('returns five contiguous zones ending at max by default', () => {
+    const { zones, method } = heartRateZones(30)
+    expect(method).toBe('max')
     expect(zones).toHaveLength(5)
     for (let i = 1; i < zones.length; i += 1) {
       expect(zones[i]!.minBpm).toBe(zones[i - 1]!.maxBpm)
@@ -96,8 +125,39 @@ describe('heart-rate zones', () => {
     expect(zones[4]!.maxBpm).toBe(Math.round(estimatedMaxHeartRate(30)))
   })
 
+  it('prefers heart-rate reserve when resting HR is known: zone 2 sits higher than with percent of max', () => {
+    const byMax = heartRateZones(30)
+    const byReserve = heartRateZones(30, { restingHr: 50 })
+    expect(byReserve.method).toBe('hrr')
+    expect(byReserve.zones[1]!.minBpm).toBeGreaterThan(byMax.zones[1]!.minBpm)
+    // Karvonen: 50 + (191.8 − 50) × 0.6 ≈ 135.
+    expect(byReserve.zones[1]!.minBpm).toBe(135)
+  })
+
+  it('prefers Friel zones when LTHR is known, with zone 4 ending at LTHR', () => {
+    const friel = heartRateZones(30, { restingHr: 50, lthr: 170 })
+    expect(friel.method).toBe('lthr')
+    expect(friel.zones[3]!.maxBpm).toBe(170)
+    expect(friel.zones[4]!.minBpm).toBe(170)
+  })
+
   it('gives an older athlete lower zone boundaries', () => {
-    expect(heartRateZones(50)[3]!.minBpm).toBeLessThan(heartRateZones(25)[3]!.minBpm)
+    expect(heartRateZones(50).zones[3]!.minBpm).toBeLessThan(heartRateZones(25).zones[3]!.minBpm)
+  })
+})
+
+describe('80/20 distribution', () => {
+  it('counts only the hard minutes as hard, and says how much easy running would restore the balance', () => {
+    const week = intensityDistribution([
+      { kind: 'easy', minutes: 30, hardMinutes: 0 },
+      { kind: 'interval', minutes: 35, hardMinutes: 12 },
+      { kind: 'long', minutes: 50, hardMinutes: 0 },
+    ])
+    expect(week.hardMinutes).toBe(12)
+    expect(week.easyShare).toBeCloseTo(103 / 115, 5)
+    expect(easyMinutesToAdd(week)).toBe(0)
+    const lopsided = intensityDistribution([{ kind: 'interval', minutes: 40, hardMinutes: 20 }, { kind: 'easy', minutes: 30, hardMinutes: 0 }])
+    expect(easyMinutesToAdd(lopsided)).toBe(30)
   })
 })
 

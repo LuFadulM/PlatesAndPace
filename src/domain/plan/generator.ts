@@ -8,12 +8,16 @@ import {
 } from '../dates'
 import type { AthleteModel, MovementPattern } from '../profile/athlete'
 import {
+  easyMinutesToAdd,
   heartRateZones,
+  intensityDistribution,
   longRunProgression,
   runWalkProgression,
   trainingPaces,
+  type RunMinutes,
   type RunWalkWeek,
   type TrainingPaces,
+  type ZoneMethod,
 } from '../running'
 import { getExercise } from '../exercises/library'
 import { loadForTarget, roundLoad, startingLoadKg } from '../strength/loads'
@@ -104,6 +108,10 @@ export interface RunSession {
   km: number
   paceSecPerKm: number | null
   hrZone: number
+  /** Beats per minute for the zone, and how it was derived. */
+  hrRange?: { minBpm: number; maxBpm: number; method: ZoneMethod; maxEstimated: boolean }
+  /** Minutes of the session at a hard pace, for the 80/20 accounting. */
+  hardMinutes: number
   intervals?: IntervalSet
   runWalk?: RunWalkWeek
 }
@@ -117,6 +125,8 @@ export interface PlannedDay {
   type: DayType
   gym?: GymSession
   run?: RunSession
+  /** Set when a hard run and a leg session share the day: lift first, run after. */
+  order?: 'lift_first'
 }
 
 export interface GeneratedPlan {
@@ -519,8 +529,11 @@ function buildRunSession(
   if (kind === 'none') return undefined
   const phase = phaseParameters(week, model.blockWeeks)
   const deload = phase.phase === 'deload' ? 0.7 : 1
-  const zones = heartRateZones(model.ageYears)
-  const zoneFor = (z: number) => zones[z - 1]!.zone
+  const hr = heartRateZones(model.ageYears, model.heartRate)
+  const zoneFor = (z: number) => {
+    const zone = hr.zones[z - 1]!
+    return { hrZone: zone.zone, hrRange: { minBpm: zone.minBpm, maxBpm: zone.maxBpm, method: hr.method, maxEstimated: hr.maxEstimated } }
+  }
 
   if (kind === 'run_walk') {
     const ladder = runWalk[Math.min(week - 1, runWalk.length - 1)]!
@@ -531,7 +544,8 @@ function buildRunSession(
       minutes: ladder.totalMinutes,
       km: 0,
       paceSecPerKm: null,
-      hrZone: zoneFor(2),
+      ...zoneFor(2),
+      hardMinutes: 0,
       runWalk: ladder,
     }
   }
@@ -542,24 +556,48 @@ function buildRunSession(
   switch (kind) {
     case 'easy': {
       const km = (easyMinutes * 60) / paces.easy
-      return { kind, titleKey: 'runs.easy.title', intentKey: 'runs.easy.intent', minutes: Math.round(easyMinutes), km: Math.round(km * 10) / 10, paceSecPerKm: paces.easy, hrZone: zoneFor(2) }
+      return { kind, titleKey: 'runs.easy.title', intentKey: 'runs.easy.intent', minutes: Math.round(easyMinutes), km: Math.round(km * 10) / 10, paceSecPerKm: paces.easy, ...zoneFor(2), hardMinutes: 0 }
     }
     case 'long': {
       const km = longRunKm[Math.min(week - 1, longRunKm.length - 1)]!
-      return { kind, titleKey: 'runs.long.title', intentKey: 'runs.long.intent', minutes: Math.round((km * paces.long) / 60), km, paceSecPerKm: paces.long, hrZone: zoneFor(2) }
+      return { kind, titleKey: 'runs.long.title', intentKey: 'runs.long.intent', minutes: Math.round((km * paces.long) / 60), km, paceSecPerKm: paces.long, ...zoneFor(2), hardMinutes: 0 }
     }
     case 'threshold': {
       const minutes = Math.round(16 * deload)
-      return { kind, titleKey: 'runs.threshold.title', intentKey: 'runs.threshold.intent', minutes: minutes + 20, km: Math.round(((minutes * 60) / paces.threshold + (20 * 60) / paces.easy) * 10) / 10, paceSecPerKm: paces.threshold, hrZone: zoneFor(4) }
+      return { kind, titleKey: 'runs.threshold.title', intentKey: 'runs.threshold.intent', minutes: minutes + 20, km: Math.round(((minutes * 60) / paces.threshold + (20 * 60) / paces.easy) * 10) / 10, paceSecPerKm: paces.threshold, ...zoneFor(4), hardMinutes: minutes }
     }
     case 'interval': {
       const reps = Math.max(3, Math.min(8, 3 + week) - (phase.phase === 'deload' ? 2 : 0))
       const intervals: IntervalSet = { reps, workMeters: 400, restSec: 90, paceSecPerKm: paces.interval }
       const workKm = (reps * 400) / 1000
-      const minutes = Math.round(15 + (workKm * paces.interval) / 60 + (reps * 90) / 60)
-      return { kind, titleKey: 'runs.interval.title', intentKey: 'runs.interval.intent', minutes, km: Math.round((workKm + 3) * 10) / 10, paceSecPerKm: paces.interval, hrZone: zoneFor(5), intervals }
+      const hardMinutes = (workKm * paces.interval) / 60
+      const minutes = Math.round(15 + hardMinutes + (reps * 90) / 60)
+      return { kind, titleKey: 'runs.interval.title', intentKey: 'runs.interval.intent', minutes, km: Math.round((workKm + 3) * 10) / 10, paceSecPerKm: paces.interval, ...zoneFor(5), hardMinutes: Math.round(hardMinutes), intervals }
     }
   }
+}
+
+/**
+ * Keeps each week polarised (CLAUDE.md, rule 6): when the hard minutes are
+ * more than a fifth of the running, the easy runs grow to cover it, the plain
+ * easy days first and the long run only after, a quarter hour at most each.
+ */
+function polariseWeek(days: PlannedDay[]): void {
+  const runs = days.filter((d): d is PlannedDay & { run: RunSession } => d.run !== undefined)
+  const minutes: RunMinutes[] = runs.map((d) => ({ kind: d.run.kind, minutes: d.run.minutes, hardMinutes: d.run.hardMinutes }))
+  let missing = easyMinutesToAdd(intensityDistribution(minutes))
+  if (missing === 0) return
+  const stretch = (kinds: RunKind[], capEach: number) => {
+    for (const day of runs) {
+      if (missing <= 0 || !kinds.includes(day.run.kind) || day.run.paceSecPerKm === null) continue
+      const add = Math.min(capEach, missing)
+      day.run.minutes += add
+      day.run.km = Math.round((day.run.km + (add * 60) / day.run.paceSecPerKm) * 10) / 10
+      missing -= add
+    }
+  }
+  stretch(['easy'], 15)
+  stretch(['long'], 15)
 }
 
 export function generatePlan(model: AthleteModel, options: GenerateOptions): GeneratedPlan {
@@ -617,7 +655,12 @@ export function generatePlan(model: AthleteModel, options: GenerateOptions): Gen
     const run = buildRunSession(todaysRun, week, model, paces, longRunKm, runWalk)
 
     const type: DayType = gym && run ? 'gym_run' : gym ? 'gym' : run ? 'run' : 'rest'
-    days.push({ date: toISODate(date), week, phase, type, gym, run })
+    // A hard run and a leg session on one day: the lift comes first, so the
+    // intervals never sit in the hours before heavy legs (CLAUDE.md, rule 6).
+    const order = gym && run && run.hardMinutes > 0 && isLowerBodySession(gym.kind, gym.focus) ? ('lift_first' as const) : undefined
+    days.push({ date: toISODate(date), week, phase, type, gym, run, ...(order ? { order } : {}) })
+
+    if (dow === 7) polariseWeek(days.slice(-7))
   }
 
   return {

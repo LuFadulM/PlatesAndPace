@@ -155,7 +155,32 @@ describe('generatePlan — three profiles, three plans (PLAN.md §11.3)', () => 
   it('derives the runner paces from the 3 km in 20:00 example', () => {
     expect(Math.round(owner.paces!.fiveK)).toBe(412)
     const easy = owner.days[1]!.run!
-    expect(Math.round(easy.paceSecPerKm!)).toBe(536)
+    // Easy pace comes from the VDOT that effort implies: well slower than 5K pace.
+    expect(easy.paceSecPerKm).toBe(owner.paces!.easy)
+    expect(easy.paceSecPerKm!).toBeGreaterThan(owner.paces!.fiveK * 1.15)
+    expect(easy.hrRange?.method).toBe('max')
+  })
+
+  it('keeps every week polarised: at least four fifths of the running minutes easy', () => {
+    for (let week = 1; week <= 8; week += 1) {
+      const runs = owner.days.filter((d) => d.week === week && d.run).map((d) => d.run!)
+      const total = runs.reduce((s, r) => s + r.minutes, 0)
+      const hard = runs.reduce((s, r) => s + r.hardMinutes, 0)
+      expect(hard / total, `week ${week}`).toBeLessThanOrEqual(0.2 + 1e-9)
+    }
+  })
+
+  it('never grows a week\'s running by more than a tenth over the last build week', () => {
+    const totals = [1, 2, 3, 5, 6, 7].map((week) => owner.days.filter((d) => d.week === week && d.run).reduce((s, d) => s + d.run!.minutes, 0))
+    for (let i = 1; i < totals.length; i += 1) expect(totals[i]!).toBeLessThanOrEqual(totals[i - 1]! * 1.1 + 1)
+  })
+
+  it('puts the lift first when a hard run shares the day with a leg session', () => {
+    const thursday = owner.days[3]!
+    expect(thursday.run?.kind).toBe('interval')
+    if (thursday.gym && ['lower_a', 'glutes_lower_b', 'full_body_a', 'full_body_b', 'full_body_c', 'legs', 'lower'].includes(thursday.gym.kind)) {
+      expect(thursday.order).toBe('lift_first')
+    }
   })
 
   it('never lets the long run grow more than 10% between build weeks', () => {

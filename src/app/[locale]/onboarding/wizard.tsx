@@ -235,6 +235,15 @@ export function OnboardingWizard({ locale, initial, editing }: { locale: Locale;
           ) : (
             <label className={label}>{t('steps.experience.continuousMinutes')}<input type="number" inputMode="numeric" className={field} defaultValue={draft.experience.continuousRunMinutes ?? ''} onChange={(e) => update('experience', { continuousRunMinutes: Number(e.target.value) })} /></label>
           )}
+          <fieldset className="flex flex-col gap-3 rounded-xl border border-(--color-border) bg-(--color-surface) p-3">
+            <legend className="px-1 text-sm font-medium">{t('steps.experience.heartRate')}</legend>
+            <p className="text-xs text-(--color-ink-muted)">{t('steps.experience.heartRateHelp')}</p>
+            <div className="grid grid-cols-3 gap-3">
+              {(['restingHr', 'maxHr', 'lthr'] as const).map((k) => (
+                <label key={k} className={label}>{t(`steps.experience.${k}`)}<input type="number" inputMode="numeric" className={field} defaultValue={draft.experience[k] ?? ''} onChange={(e) => update('experience', { [k]: e.target.value ? Number(e.target.value) : undefined } as Partial<QuestionnaireAnswers['experience']>)} /></label>
+              ))}
+            </div>
+          </fieldset>
         </div>
       )}
 

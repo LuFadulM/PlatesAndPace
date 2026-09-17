@@ -99,6 +99,10 @@ export const experienceSchema = z
     recentRun: z.object({ km: z.number().positive(), minutes: z.number().positive() }).optional(),
     /** For someone who cannot yet run continuously. */
     continuousRunMinutes: z.number().min(0).max(120).optional(),
+    /** Optional heart-rate anchors; each unlocks a better zone method. */
+    restingHr: z.number().int().min(30).max(120).optional(),
+    maxHr: z.number().int().min(120).max(230).optional(),
+    lthr: z.number().int().min(100).max(220).optional(),
   })
   .refine(
     (experience) =>

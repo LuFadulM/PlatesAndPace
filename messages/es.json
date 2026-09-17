@@ -1007,7 +1007,12 @@
         "cannotRun": "Todavía no puedo correr sin parar",
         "recentKm": "Una carrera reciente: distancia (km)",
         "recentMinutes": "y tiempo (minutos)",
-        "continuousMinutes": "¿Cuántos minutos puedes correr sin detenerte?"
+        "continuousMinutes": "¿Cuántos minutos puedes correr sin detenerte?",
+        "heartRate": "Frecuencia cardíaca (opcional)",
+        "heartRateHelp": "Cada dato que tengas afina tus zonas: la frecuencia en reposo activa las zonas por reserva cardíaca; el umbral de una prueba de 30 minutos activa las zonas de Friel.",
+        "restingHr": "En reposo (ppm)",
+        "maxHr": "Máxima (ppm)",
+        "lthr": "Umbral (ppm)"
       },
       "schedule": {
         "title": "Tu semana",
@@ -1194,7 +1199,15 @@
     "plates": {
       "perSide": "Por lado: {plates} {unit} en una barra de {bar} {unit}",
       "barOnly": "Barra vacía de {bar} {unit}"
-    }
+    },
+    "zoneRange": "Zona de frecuencia cardíaca {zone} · {min}–{max} ppm",
+    "zoneMethod": {
+      "max": "según tu máximo estimado",
+      "hrr": "según tu frecuencia en reposo (Karvonen)",
+      "lthr": "según tu umbral de lactato (Friel)"
+    },
+    "zoneMaxEstimated": "el máximo es una estimación por tu edad",
+    "liftFirst": "Primero pesas, luego correr: las series duras nunca van antes de piernas pesadas."
   },
   "plan": {
     "title": "Plan",
