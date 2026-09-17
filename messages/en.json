@@ -47,7 +47,7 @@
     "emailLabel": "Email",
     "sendLink": "Send me a link",
     "sending": "Sending…",
-    "magicLinkHint": "The link works once and expires after an hour.",
+    "magicLinkHint": "The link works once and expires after an hour. Open it on this same device and browser.",
     "checkEmailTitle": "Check your email",
     "checkEmailBody": "We sent you a sign-in link. Open it on this device to continue.",
     "checkEmailSpam": "If it has not arrived in a minute, check your spam folder.",
@@ -57,7 +57,9 @@
       "sendFailed": "We could not send the link. Try again in a moment.",
       "linkExpired": "That link has expired. Ask for a new one.",
       "linkInvalid": "That link did not work. Ask for a new one.",
-      "signedOut": "You have been signed out. Sign in again to continue."
+      "signedOut": "You have been signed out. Sign in again to continue.",
+      "rateLimited": "Too many links requested for now. Wait a little while and try again, or use the link you already received.",
+      "otherDevice": "That link was opened in a different browser than the one that asked for it. Open it in the same browser, or ask for a new one from here."
     }
   },
   "coach": {

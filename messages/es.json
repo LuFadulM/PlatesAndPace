@@ -47,7 +47,7 @@
     "emailLabel": "Correo",
     "sendLink": "Enviarme el enlace",
     "sending": "Enviando…",
-    "magicLinkHint": "El enlace sirve una sola vez y vence en una hora.",
+    "magicLinkHint": "El enlace funciona una sola vez y caduca en una hora. Ábrelo en este mismo dispositivo y navegador.",
     "checkEmailTitle": "Revisa tu correo",
     "checkEmailBody": "Te enviamos un enlace para entrar. Ábrelo en este dispositivo para continuar.",
     "checkEmailSpam": "Si no llega en un minuto, revisa la carpeta de spam.",
@@ -57,7 +57,9 @@
       "sendFailed": "No pudimos enviar el enlace. Inténtalo de nuevo en un momento.",
       "linkExpired": "Ese enlace ya venció. Pide uno nuevo.",
       "linkInvalid": "Ese enlace no funcionó. Pide uno nuevo.",
-      "signedOut": "Se cerró tu sesión. Vuelve a iniciar sesión para continuar."
+      "signedOut": "Se cerró tu sesión. Vuelve a iniciar sesión para continuar.",
+      "rateLimited": "Se pidieron demasiados enlaces por ahora. Espera un rato e intenta de nuevo, o usa el enlace que ya recibiste.",
+      "otherDevice": "Ese enlace se abrió en un navegador distinto al que lo pidió. Ábrelo en el mismo navegador, o pide uno nuevo desde aquí."
     }
   },
   "coach": {

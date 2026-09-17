@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import type { EmailOtpType } from '@supabase/supabase-js'
 import { defaultLocale, isLocale } from '@/i18n/routing'
+import { classifyExchangeFailure } from '@/lib/auth/errors'
 import { safeRedirectPath } from '@/lib/auth/routes'
 import { createClient } from '@/lib/supabase/server'
 
@@ -33,7 +34,7 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (error) return NextResponse.redirect(`${origin}/${locale}/sign-in?error=exchange_failed`)
+    if (error) return NextResponse.redirect(`${origin}/${locale}/sign-in?error=${classifyExchangeFailure(error)}`)
     return NextResponse.redirect(`${origin}${next}`)
   }
 

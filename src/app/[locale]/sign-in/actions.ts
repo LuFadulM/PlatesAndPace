@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { z } from 'zod'
 import { defaultLocale, isLocale, type Locale } from '@/i18n/routing'
+import { classifySendFailure } from '@/lib/auth/errors'
 import { createClient } from '@/lib/supabase/server'
 
 const signInSchema = z.object({
@@ -51,7 +52,7 @@ export async function sendMagicLink(
   })
 
   if (error) {
-    return { errorKey: 'auth.errors.sendFailed' }
+    return { errorKey: `auth.errors.${classifySendFailure(error)}` }
   }
 
   redirect(`/${locale}/check-email`)
