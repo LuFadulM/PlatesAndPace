@@ -1,0 +1,87 @@
+@import 'tailwindcss';
+
+/* Plates & Pace design tokens — see PLAN.md §9.
+   Plate colours: blue = weights, yellow = runs, green = done, red = today. */
+@theme {
+  --color-bg: #eceff2;
+  --color-surface: #ffffff;
+  --color-surface-2: #f5f7f9;
+  --color-border: #d4dae0;
+  --color-ink: #14181c;
+  --color-ink-muted: #5b6771;
+
+  --color-plate-blue: #1d4ed8;
+  --color-plate-yellow: #e0a800;
+  --color-plate-green: #15803d;
+  --color-plate-red: #dc2626;
+
+  --font-display: var(--font-barlow-condensed), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-barlow), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      color-scheme: dark;
+      --color-bg: #12161a;
+      --color-surface: #1b2127;
+      --color-surface-2: #222a31;
+      --color-border: #323c45;
+      --color-ink: #eef2f5;
+      --color-ink-muted: #9aa8b4;
+      --color-plate-blue: #5b8dff;
+      --color-plate-yellow: #f5c542;
+      --color-plate-green: #3fbc69;
+      --color-plate-red: #ff6b60;
+    }
+  }
+
+  :root[data-theme='dark'] {
+    color-scheme: dark;
+    --color-bg: #12161a;
+    --color-surface: #1b2127;
+    --color-surface-2: #222a31;
+    --color-border: #323c45;
+    --color-ink: #eef2f5;
+    --color-ink-muted: #9aa8b4;
+    --color-plate-blue: #5b8dff;
+    --color-plate-yellow: #f5c542;
+    --color-plate-green: #3fbc69;
+    --color-plate-red: #ff6b60;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: 0.01em;
+  }
+
+  /* Every interactive target meets the 44px minimum (PLAN.md §9). */
+  button, a[role='button'], [type='button'], [type='submit'] {
+    min-height: 44px;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-plate-blue);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
