@@ -47,7 +47,7 @@ the architecture, schema, screens and milestones stand on the brief alone.
 
 Hybrid athlete, Bogotá, gym Mon–Fri, runs Tue (easy) / Thu (intervals) / Sat (long),
 3 km in 20:00. The engine reads that as: 5-day split (§6.2), hybrid goal shape (§6.3),
-5K-equivalent pace 6:53/km via Riegel (§6.7), legs kept light on Thu and Fri so Saturday's
+5K-equivalent pace 6:52/km via Riegel (§6.7), legs kept light on Thu and Fri so Saturday's
 long run is fresh (§6.3), `America/Bogota` for every date computation (§5).
 
 Every other profile flows through the identical code path with different inputs — §11.3
@@ -312,7 +312,7 @@ Normalize to a 5K-equivalent, then derive paces as multipliers of 5K pace:
 | Easy | 1.30 |
 | Long run | 1.35 |
 
-*(3 km in 20:00 → 5K equivalent ≈ 34:22 → 6:53/km; easy ≈ 8:56/km, threshold ≈ 7:17/km,
+*(3 km in 20:00 → 5K equivalent ≈ 34:22 → 6:52/km; easy ≈ 8:56/km, threshold ≈ 7:17/km,
 intervals ≈ 6:40/km. Recomputed exactly in code, not from this table.)*
 
 - **Goal pace** comes from the target race (5K/10K/21K) and, if set, the race date — the

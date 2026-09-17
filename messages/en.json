@@ -30,5 +30,31 @@
     "today": "Today",
     "tomorrow": "Tomorrow",
     "yesterday": "Yesterday"
+  },
+  "nutrition": {
+    "notes": {
+      "estimateOnly": "These are estimates to start from, not medical advice. Adjust them to how you feel and how your training goes.",
+      "noDeficitUnder18": "You are under 18, so this plan does not use a calorie deficit.",
+      "conservativeMode": "Your health answers put you in a careful start, so this plan does not use a calorie deficit.",
+      "calorieFloorApplied": "This has been raised to a safe minimum rather than going lower."
+    }
+  },
+  "auth": {
+    "signInTitle": "Sign in",
+    "signInBody": "Enter your email and we will send you a link to sign in. No password to remember.",
+    "emailLabel": "Email",
+    "sendLink": "Send me a link",
+    "sending": "Sending…",
+    "magicLinkHint": "The link works once and expires after an hour.",
+    "checkEmailTitle": "Check your email",
+    "checkEmailBody": "We sent you a sign-in link. Open it on this device to continue.",
+    "checkEmailSpam": "If it has not arrived in a minute, check your spam folder.",
+    "signOut": "Sign out",
+    "errors": {
+      "invalidEmail": "That does not look like an email address.",
+      "sendFailed": "We could not send the link. Try again in a moment.",
+      "linkExpired": "That link has expired. Ask for a new one.",
+      "linkInvalid": "That link did not work. Ask for a new one."
+    }
   }
 }
