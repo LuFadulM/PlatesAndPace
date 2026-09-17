@@ -15,6 +15,7 @@ import {
   type RunWalkWeek,
   type TrainingPaces,
 } from '../running'
+import { getExercise } from '../exercises/library'
 import { loadForTarget, roundToIncrement, startingLoadKg } from '../strength/loads'
 import { phaseParameters, type Phase } from '../strength/periodization'
 import { createRng, planSeed } from '../strength/rng'
@@ -27,8 +28,17 @@ import {
   type SessionKind,
 } from '../strength/splits'
 import { goalPolicy } from '../strength/goals'
-import { sessionTemplate, type SlotRole } from '../strength/templates'
-import type { MuscleGroup } from '../strength/volume'
+import { DELOAD_EVERY, phaseParameters as phaseOf } from '../strength/periodization'
+import { sessionTemplate, type Slot, type SlotRole } from '../strength/templates'
+import {
+  MAX_SESSION_SETS_PER_MUSCLE,
+  MAX_SETS_PER_SLOT,
+  MUSCLE_GROUPS,
+  VOLUME_LANDMARKS,
+  SECONDARY_SET_CREDIT,
+  weeklyVolumeTargets,
+  type MuscleGroup,
+} from '../strength/volume'
 
 /**
  * Turns an athlete model into a concrete session for every calendar day of a
@@ -56,6 +66,15 @@ export interface PlannedExercise {
   holdSeconds?: number
 }
 
+/** Something the engine changed about a session, and why. Never silent. */
+export interface SessionAdjustment {
+  reason: 'time' | 'interference' | 'volume_cap'
+  exerciseId: string
+  setsRemoved: number
+  /** True when the exercise was dropped altogether. */
+  removed: boolean
+}
+
 export interface GymSession {
   kind: SessionKind
   /** The muscle groups a custom session was built from, in priority order. */
@@ -66,6 +85,8 @@ export interface GymSession {
   exercises: PlannedExercise[]
   finisher?: PlannedExercise
   estimatedMinutes: number
+  /** What was trimmed to fit the time budget or the running around it, and why. */
+  adjustments?: SessionAdjustment[]
 }
 
 export interface IntervalSet {
@@ -187,8 +208,55 @@ export function labelExercises(exercises: PlannedExercise[]): void {
 
 /** Eight minutes to warm up, forty seconds a set plus its rest, six for a finisher. */
 export function estimateSessionMinutes(exercises: readonly PlannedExercise[], hasFinisher: boolean): number {
-  const workSeconds = exercises.reduce((sum, e) => sum + e.sets * (40 + e.restSec), 0)
+  const workSeconds = exercises.reduce((sum, e) => {
+    const def = getExercise(e.exerciseId)
+    const perSet = (e.holdSeconds ?? 40) * (def.unilateral ? 2 : 1)
+    return sum + e.sets * (perSet + e.restSec)
+  }, 0)
   return Math.round(8 + workSeconds / 60 + (hasFinisher ? 6 : 0))
+}
+
+/**
+ * The week's volume ledger (CLAUDE.md, rule 2). Targets come from the
+ * landmarks; every session consumes its share, credits the muscles it worked
+ * (a compound counts fully for its primary and half for each secondary), and
+ * later slots for the same muscle see what is left.
+ */
+export interface WeekVolume {
+  targets: Record<MuscleGroup, number>
+  done: Record<MuscleGroup, number>
+  /** Sum of the weights of this week's slots for each muscle not yet planned. */
+  remainingWeight: Record<MuscleGroup, number>
+}
+
+/** How much of a muscle's weekly budget a slot deserves relative to the others. */
+const SLOT_WEIGHT: Record<SlotRole, number> = { power: 0, primary: 1.5, secondary: 1.2, accessory: 1, isolation: 1, core: 1, mobility: 0, finisher: 0 }
+
+const zeroByMuscle = (): Record<MuscleGroup, number> => Object.fromEntries(MUSCLE_GROUPS.map((m) => [m, 0])) as Record<MuscleGroup, number>
+
+export function newWeekVolume(model: AthleteModel, week: number, templates: readonly Slot[][]): WeekVolume {
+  const phase = phaseOf(week, model.blockWeeks)
+  const targets = weeklyVolumeTargets({
+    tier: model.tier,
+    accumulationWeek: ((week - 1) % DELOAD_EVERY) + 1,
+    deload: phase.phase === 'deload',
+    focusAreas: model.focusAreas,
+    conservativeMode: model.conservativeMode,
+    goalScale: goalPolicy(model.goal).volumeScale,
+  })
+  const remainingWeight = zeroByMuscle()
+  for (const template of templates) for (const slot of template) remainingWeight[slot.muscle] += SLOT_WEIGHT[slot.role]
+  return { targets, done: zeroByMuscle(), remainingWeight }
+}
+
+/** The athlete's structural week: one template per gym day, in weekday order. */
+export function weekTemplates(model: AthleteModel, split: readonly SessionKind[]): Map<number, Slot[]> {
+  const templates = new Map<number, Slot[]>()
+  model.gymDays.forEach((dow, i) => {
+    const focus = model.customSplit?.get(dow)
+    templates.set(dow, sessionTemplate(split[i]!, model.goal, model.tier, model.sessionMinutes, focus))
+  })
+  return templates
 }
 
 function repTarget(slot: { repMin: number; repMax: number }): number {
@@ -204,6 +272,7 @@ function buildGymSession(
   todaysRun: RunKind,
   tomorrowsRun: RunKind,
   continuity: Map<string, string>,
+  volume: WeekVolume,
   focus?: readonly MuscleGroup[],
 ): GymSession {
   const phase = phaseParameters(week, model.blockWeeks)
@@ -224,12 +293,34 @@ function buildGymSession(
 
   const chosen = new Set<string>()
   const exercises: PlannedExercise[] = []
+  const adjustments: SessionAdjustment[] = []
   let finisher: PlannedExercise | undefined
   let lowerSets = 0
-  const volumeScale = phase.volumeMultiplier * policy.volumeScale * (week === 1 ? (options.reviewVolumeMultiplier ?? 1) : 1)
+  const sessionDirect = zeroByMuscle()
+  // The weekly review may still scale the first week of a block up or down.
+  const reviewScale = week === 1 ? (options.reviewVolumeMultiplier ?? 1) : 1
 
   template.forEach((slot, slotIndex) => {
     const continuityKey = `${continuityPrefix}:${slotIndex}`
+    const isVolumeSlot = slot.role !== 'power' && slot.role !== 'mobility' && slot.role !== 'finisher'
+
+    // This slot's share of the muscle's weekly budget, decided before the
+    // exercise is chosen: a slot that finds nothing still spends its weight,
+    // so the rest of the week does not overreach to compensate.
+    let share = 0
+    if (isVolumeSlot) {
+      const m = slot.muscle
+      const w = SLOT_WEIGHT[slot.role]
+      const remaining = Math.max(0, volume.targets[m] * reviewScale - volume.done[m])
+      share = volume.remainingWeight[m] > 0 ? (remaining * w) / volume.remainingWeight[m] : 0
+      volume.remainingWeight[m] = Math.max(0, volume.remainingWeight[m] - w)
+      // The lifts that carry progression are practised even when the week's
+      // budget is already met; accessories and isolation give way.
+      const floor = slot.role === 'primary' || slot.role === 'secondary' ? 2 : 0
+      if (Math.round(share) < 1 && floor === 0) return
+      share = Math.max(floor, share)
+    }
+
     const exercise = selectExercise(slot, { ...dayCtx, preferred: continuity.get(continuityKey) }, chosen)
     if (!exercise) return
     chosen.add(exercise.id)
@@ -237,14 +328,33 @@ function buildGymSession(
 
     const timed = exercise.timed === true
     // Mobility and power ride outside the volume ramp: a hold is a hold.
-    const scale = slot.role === 'mobility' || slot.role === 'power' ? 1 : volumeScale
-    let sets = Math.max(1, Math.round(slot.sets * scale))
+    // A strength primary may run to six sets of a heavy triple; everything
+    // else is better served by a second movement past five.
+    const slotCap = model.goal === 'strength' && slot.role === 'primary' ? MAX_SETS_PER_SLOT + 1 : MAX_SETS_PER_SLOT
+    let sets = isVolumeSlot ? Math.min(slotCap, Math.max(1, Math.round(share))) : slot.sets
+    if (isVolumeSlot) {
+      const room = MAX_SESSION_SETS_PER_MUSCLE - sessionDirect[exercise.primary]
+      if (room <= 0) return
+      if (sets > room) {
+        adjustments.push({ reason: 'volume_cap', exerciseId: exercise.id, setsRemoved: sets - room, removed: false })
+        sets = room
+      }
+    }
     const isLower = exercise.region === 'lower'
     if (isLower && lowerBody && slot.role !== 'mobility') {
       const room = limits.maxLowerBodySets - lowerSets
-      if (room <= 0) return
+      if (room <= 0) {
+        adjustments.push({ reason: 'interference', exerciseId: exercise.id, setsRemoved: sets, removed: true })
+        return
+      }
+      if (sets > room) adjustments.push({ reason: 'interference', exerciseId: exercise.id, setsRemoved: sets - room, removed: false })
       sets = Math.min(sets, room)
       lowerSets += sets
+    }
+    if (isVolumeSlot) {
+      sessionDirect[exercise.primary] += sets
+      volume.done[exercise.primary] += sets
+      for (const m of exercise.secondary) volume.done[m] += SECONDARY_SET_CREDIT * sets
     }
 
     // The phase sets the target; the goal, the athlete and the movement cap it.
@@ -316,6 +426,7 @@ function buildGymSession(
     }
   })
 
+  trimToBudget(exercises, finisher !== undefined, model.sessionMinutes, adjustments)
   labelExercises(exercises)
   const estimatedMinutes = estimateSessionMinutes(exercises, finisher !== undefined)
 
@@ -328,7 +439,73 @@ function buildGymSession(
     exercises,
     finisher,
     estimatedMinutes,
+    ...(adjustments.length > 0 ? { adjustments: mergeAdjustments(adjustments) } : {}),
   }
+}
+
+const TRIMMABLE: ReadonlySet<SlotRole> = new Set(['isolation', 'core', 'accessory'])
+
+/**
+ * Cuts from the bottom of the session order until it fits the athlete's time,
+ * one set at a time, and only then drops an exercise. Every cut is recorded
+ * (CLAUDE.md, rule 5): the athlete is told what went and why.
+ */
+function trimToBudget(exercises: PlannedExercise[], hasFinisher: boolean, budgetMinutes: number, adjustments: SessionAdjustment[]): void {
+  let guard = 0
+  while (estimateSessionMinutes(exercises, hasFinisher) > budgetMinutes && guard < 60) {
+    guard += 1
+    let index = -1
+    for (let i = exercises.length - 1; i >= 0; i -= 1) {
+      const e = exercises[i]!
+      if (TRIMMABLE.has(e.role) && e.sets > 1) {
+        index = i
+        break
+      }
+    }
+    if (index >= 0) {
+      exercises[index]!.sets -= 1
+      adjustments.push({ reason: 'time', exerciseId: exercises[index]!.exerciseId, setsRemoved: 1, removed: false })
+      continue
+    }
+    let drop = -1
+    for (let i = exercises.length - 1; i >= 0; i -= 1) {
+      if (TRIMMABLE.has(exercises[i]!.role)) {
+        drop = i
+        break
+      }
+    }
+    if (drop >= 0) {
+      const [gone] = exercises.splice(drop, 1)
+      adjustments.push({ reason: 'time', exerciseId: gone!.exerciseId, setsRemoved: gone!.sets, removed: true })
+      continue
+    }
+    // Only the main lifts are left: they give up sets down to three, never fewer.
+    let heavy = -1
+    for (let i = exercises.length - 1; i >= 0; i -= 1) {
+      const e = exercises[i]!
+      if ((e.role === 'primary' || e.role === 'secondary') && e.sets > 3) {
+        heavy = i
+        break
+      }
+    }
+    if (heavy < 0) return
+    exercises[heavy]!.sets -= 1
+    adjustments.push({ reason: 'time', exerciseId: exercises[heavy]!.exerciseId, setsRemoved: 1, removed: false })
+  }
+}
+
+/** One line per exercise and reason, so the UI can say "−2 sets, leg curl". */
+function mergeAdjustments(list: readonly SessionAdjustment[]): SessionAdjustment[] {
+  const merged = new Map<string, SessionAdjustment>()
+  for (const a of list) {
+    const key = `${a.reason}:${a.exerciseId}`
+    const current = merged.get(key)
+    if (current) {
+      current.setsRemoved += a.setsRemoved
+      current.removed = current.removed || a.removed
+    } else merged.set(key, { ...a })
+  }
+  return [...merged.values()]
 }
 
 function buildRunSession(
@@ -409,6 +586,8 @@ export function generatePlan(model: AthleteModel, options: GenerateOptions): Gen
   const start = startOfPlanWeek(model.startDate)
   const days: PlannedDay[] = []
   const usedThisWeek = new Set<string>()
+  const templates = weekTemplates(model, split)
+  let volume: WeekVolume = newWeekVolume(model, 1, [...templates.values()])
   // Slot → exercise chosen last time this session kind ran, so the lifts that
   // carry progression recur week to week (see SelectionContext.preferred).
   const continuity = new Map<string, string>()
@@ -419,7 +598,10 @@ export function generatePlan(model: AthleteModel, options: GenerateOptions): Gen
     const week = weekIndex(date, start)
     const phase = phaseParameters(week, model.blockWeeks).phase
 
-    if (dow === 1) usedThisWeek.clear()
+    if (dow === 1) {
+      usedThisWeek.clear()
+      volume = newWeekVolume(model, week, [...templates.values()])
+    }
 
     const gymIndex = model.gymDays.indexOf(dow)
     const todaysRun: RunKind = runKinds.get(dow) ?? 'none'
@@ -428,7 +610,7 @@ export function generatePlan(model: AthleteModel, options: GenerateOptions): Gen
     let gym: GymSession | undefined
     if (gymIndex >= 0) {
       const dayCtx: SelectionContext = { ...ctx, recentlyUsed: new Set([...ctx.recentlyUsed, ...usedThisWeek]) }
-      gym = buildGymSession(split[gymIndex]!, week, model, dayCtx, options, todaysRun, tomorrowsRun, continuity, model.customSplit?.get(dow))
+      gym = buildGymSession(split[gymIndex]!, week, model, dayCtx, options, todaysRun, tomorrowsRun, continuity, volume, model.customSplit?.get(dow))
       for (const e of gym.exercises) usedThisWeek.add(e.exerciseId)
     }
 
@@ -484,6 +666,19 @@ export function regenerateGymSession(model: AthleteModel, options: RegenerateOpt
     recentlyUsed: options.recentlyUsed ?? new Set(),
     swaps: options.swaps ?? new Map(),
   }
+  // A day rebuilt on its own still takes only its fair share of the week: the
+  // ledger is seeded with the athlete's structural week, and this session's
+  // slots replace the ones it stands in for.
+  const split: SessionKind[] = model.customSplit ? model.gymDays.map(() => 'custom' as const) : selectSplit(model.gymDays.length, model.tier, model.goal)
+  const structural = [...weekTemplates(model, split).values()]
+  const today = sessionTemplate('custom', model.goal, model.tier, model.sessionMinutes, options.focus)
+  const volume = newWeekVolume(model, options.week, [...structural.slice(1), today])
+  // The muscles the athlete named get a real session: at least the bottom of
+  // their adaptive range this week, and all of it lands today.
+  for (const m of new Set(options.focus)) {
+    volume.targets[m] = Math.max(volume.targets[m], Math.round(VOLUME_LANDMARKS[m].mavMin * goalPolicy(model.goal).volumeScale))
+    volume.remainingWeight[m] = today.filter((slot) => slot.muscle === m).reduce((sum, slot) => sum + SLOT_WEIGHT[slot.role], 0)
+  }
   return buildGymSession(
     'custom',
     options.week,
@@ -493,6 +688,7 @@ export function regenerateGymSession(model: AthleteModel, options: RegenerateOpt
     options.todaysRun,
     options.tomorrowsRun,
     new Map(),
+    volume,
     options.focus,
   )
 }

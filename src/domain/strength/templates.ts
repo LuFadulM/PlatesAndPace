@@ -243,10 +243,9 @@ export function sessionTemplate(
 
   const slots: Slot[] = blueprint.map(([role, muscle]) => {
     const shape = shapes[role]
-    // Beginners do fewer sets per slot: the same total is spread over more
-    // sessions and their recovery cannot yet absorb the extra.
-    const sets = tier === 'beginner' && role !== 'primary' ? Math.max(2, SETS_BY_ROLE[role] - 1) : SETS_BY_ROLE[role]
-    return { role, muscle, sets, ...shape }
+    // Default set counts; the generator replaces them from the weekly volume
+    // ledger, and a beginner's lighter start comes from the landmarks.
+    return { role, muscle, sets: SETS_BY_ROLE[role], ...shape }
   })
 
   if (wantsSupersets(goal)) {

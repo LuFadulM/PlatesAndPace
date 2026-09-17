@@ -232,7 +232,8 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
       ? gym.focus.map((m) => tMuscles(m)).join(' · ')
       : tCoach(gym.titleKey)
     : ''
-  const summaryOf = (e: PlannedExercise) => `${e.sets} × ${e.repMin}–${e.repMax}${e.loadKg ? `, ${displayLoad(e.loadKg * (adjustment?.loadMultiplier ?? 1), units)} ${unit}` : ''}`
+  const summaryOf = (e: PlannedExercise) => `${e.sets} × ${e.holdSeconds ? `${e.holdSeconds} s` : `${e.repMin}–${e.repMax}`}${e.loadKg ? `, ${displayLoad(e.loadKg * (adjustment?.loadMultiplier ?? 1), units)} ${unit}` : ''}`
+  const effortOf = (e: PlannedExercise) => (e.role === 'mobility' ? '' : t('effort', { rpe: e.rpeTarget, rir: Math.max(0, Math.round((10 - e.rpeTarget) * 2) / 2) }))
   const shortDate = (iso: string) => new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(new Date(`${iso}T12:00:00`))
   const lastLine = (e: PlannedExercise) => {
     const last = lastTime[e.exerciseId]
@@ -272,6 +273,19 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
             </div>
           )}
 
+          {gym.adjustments && gym.adjustments.length > 0 && (
+            <details className="rounded-xl border border-dashed border-(--color-border) bg-(--color-surface) text-sm">
+              <summary className="flex min-h-11 cursor-pointer items-center px-4 font-semibold">{t('adjustments.title', { n: gym.adjustments.length })}</summary>
+              <ul className="flex flex-col gap-1 px-4 pb-3 text-(--color-ink-muted)">
+                {gym.adjustments.map((a) => (
+                  <li key={`${a.reason}-${a.exerciseId}`}>
+                    {t(a.removed ? 'adjustments.removed' : 'adjustments.trimmed', { name: tEx(`${a.exerciseId}.name`), sets: a.setsRemoved })} · {t(`adjustments.${a.reason}`, { minutes: gym.estimatedMinutes })}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
+
           <Section title={t('readiness')} defaultOpen={!readiness && !done}>
             {readiness ? (
               <p className="text-sm">{tCoach(readinessAdjustment(readiness).messageKey)}</p>
@@ -301,7 +315,7 @@ export function SessionView({ date, day, units, initialSets, initialReadiness, a
                     <ExerciseFigure animation={getExercise(e.exerciseId).animation} title={tEx(`${e.exerciseId}.name`)} className="h-12 w-12 shrink-0 text-(--color-ink)" />
                     <span className="min-w-0 flex-1">
                       <span className="block font-semibold">{tEx(`${e.exerciseId}.name`)}</span>
-                      <span className="block text-xs text-(--color-ink-muted)">{summaryOf(e)}{e.technique !== 'straight' ? ` · ${t(`technique.${e.technique}`)}` : ''}</span>
+                      <span className="block text-xs text-(--color-ink-muted)">{summaryOf(e)}{effortOf(e) ? ` · ${effortOf(e)}` : ''}{e.technique !== 'straight' ? ` · ${t(`technique.${e.technique}`)}` : ''}</span>
                     </span>
                     <span className={`text-sm font-semibold tabular-nums ${complete ? 'text-(--color-plate-green)' : ''}`}>{count}/{e.sets}</span>
                   </button>

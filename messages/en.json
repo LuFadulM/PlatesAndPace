@@ -1167,7 +1167,16 @@
       "error": "Could not save the change. Try again.",
       "errorPast": "Past sessions are the record of what happened and can't be edited."
     },
-    "exercises": "Exercises"
+    "exercises": "Exercises",
+    "effort": "RPE {rpe} · {rir} in reserve",
+    "adjustments": {
+      "title": "{n, plural, one {1 change to fit your day} other {# changes to fit your day}}",
+      "trimmed": "{name}: {sets, plural, one {1 set fewer} other {# sets fewer}}",
+      "removed": "{name}: left out",
+      "time": "to fit your session time",
+      "interference": "because of the run around this session",
+      "volume_cap": "past ten sets a muscle stops growing and starts hurting"
+    }
   },
   "plan": {
     "title": "Plan",
@@ -1328,7 +1337,10 @@
     "bodyweight": "Body weight",
     "waist": "Waist",
     "table": "Show as table",
-    "empty": "Log a session and your progress will start showing here."
+    "empty": "Log a session and your progress will start showing here.",
+    "mev": "Minimum to grow",
+    "mrv": "Maximum you can recover from",
+    "landmarksHelp": "Aim between the two marks. Below the first, little changes; above the second, fatigue wins."
   },
   "offline": {
     "body": "You are offline. Sets you log are saved on this device and will sync when you are back online."

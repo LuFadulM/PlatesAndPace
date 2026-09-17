@@ -1167,7 +1167,16 @@
       "error": "No se pudo guardar el cambio. Intenta de nuevo.",
       "errorPast": "Las sesiones pasadas son el registro de lo que pasó y no se pueden editar."
     },
-    "exercises": "Ejercicios"
+    "exercises": "Ejercicios",
+    "effort": "RPE {rpe} · {rir} en reserva",
+    "adjustments": {
+      "title": "{n, plural, one {1 ajuste para que quepa en tu día} other {# ajustes para que quepa en tu día}}",
+      "trimmed": "{name}: {sets, plural, one {1 serie menos} other {# series menos}}",
+      "removed": "{name}: quedó fuera",
+      "time": "para que quepa en el tiempo de tu sesión",
+      "interference": "por la carrera alrededor de esta sesión",
+      "volume_cap": "pasadas diez series un músculo deja de crecer y empieza a doler"
+    }
   },
   "plan": {
     "title": "Plan",
@@ -1328,7 +1337,10 @@
     "bodyweight": "Peso corporal",
     "waist": "Cintura",
     "table": "Ver como tabla",
-    "empty": "Registra una sesión y tu progreso empezará a aparecer aquí."
+    "empty": "Registra una sesión y tu progreso empezará a aparecer aquí.",
+    "mev": "Mínimo para crecer",
+    "mrv": "Máximo que puedes recuperar",
+    "landmarksHelp": "Apunta entre las dos marcas. Por debajo de la primera cambia poco; por encima de la segunda gana la fatiga."
   },
   "offline": {
     "body": "Estás sin conexión. Las series que registres se guardan en este dispositivo y se sincronizan cuando vuelvas a tener red."
