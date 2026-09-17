@@ -4,9 +4,15 @@ import { expect, test } from '@playwright/test'
 test('serves both languages and the install manifest', async ({ page }) => {
   await page.goto('/en')
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Training that adapts to you')
-  await page.goto('/es')
+  await expect(page.getByRole('link', { name: 'Get started' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Sign in' })).toBeVisible()
+  // The language switch keeps the visitor on the page they were reading.
+  await page.getByRole('link', { name: 'Español' }).click()
+  await expect(page).toHaveURL(/\/es$/)
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Entrenamiento que se adapta a ti')
-  await page.goto('/es/sign-in')
+  await expect(page.getByRole('link', { name: 'Empezar' })).toBeVisible()
+  await page.getByRole('link', { name: 'Iniciar sesión' }).click()
+  await expect(page).toHaveURL(/\/es\/sign-in$/)
   await expect(page.getByRole('button', { name: 'Enviarme el enlace' })).toBeVisible()
   const manifest = await page.request.get('/manifest.webmanifest')
   expect(manifest.ok()).toBe(true)
