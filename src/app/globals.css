@@ -22,6 +22,13 @@
   --color-chart-3: #7e22ce;
   --color-chart-4: #0d9488;
 
+  /* The marketing hero is dark in both themes: a deliberate contrast panel. */
+  --color-hero-bg: #0f1418;
+  --color-hero-surface: #1a2128;
+  --color-hero-ink: #f4f6f8;
+  --color-hero-muted: #a7b3bd;
+  --color-accent: #d6ff3f;
+
   --font-display: var(--font-barlow-condensed), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-barlow), ui-sans-serif, system-ui, sans-serif;
 }
