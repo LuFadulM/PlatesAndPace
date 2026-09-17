@@ -18,7 +18,7 @@ port = 54323
 
 # Catches the magic-link and confirmation emails locally so onboarding can be
 # walked through end to end without sending real mail.
-[inbucket]
+[local_smtp]
 enabled = true
 port = 54324
 

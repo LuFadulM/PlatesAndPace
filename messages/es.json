@@ -9,7 +9,8 @@
     "progress": "Progreso",
     "library": "Ejercicios",
     "group": "Grupo",
-    "settings": "Ajustes"
+    "settings": "Ajustes",
+    "primary": "Navegación principal"
   },
   "landing": {
     "headline": "Entrenamiento que se adapta a ti",
@@ -29,7 +30,8 @@
   "dates": {
     "today": "Hoy",
     "tomorrow": "Mañana",
-    "yesterday": "Ayer"
+    "yesterday": "Ayer",
+    "weekStrip": "Esta semana"
   },
   "nutrition": {
     "notes": {
@@ -54,7 +56,8 @@
       "invalidEmail": "Eso no parece un correo electrónico.",
       "sendFailed": "No pudimos enviar el enlace. Inténtalo de nuevo en un momento.",
       "linkExpired": "Ese enlace ya venció. Pide uno nuevo.",
-      "linkInvalid": "Ese enlace no funcionó. Pide uno nuevo."
+      "linkInvalid": "Ese enlace no funcionó. Pide uno nuevo.",
+      "signedOut": "Se cerró tu sesión. Vuelve a iniciar sesión para continuar."
     }
   },
   "coach": {
@@ -657,5 +660,348 @@
   "warmup": {
     "lower": "5 min de cardio suave, luego sentadillas sin peso, balanceos de pierna y dos series ligeras de tu primer ejercicio.",
     "upper": "5 min de cardio suave, luego círculos de brazos, remos ligeros y dos series ligeras de tu primer ejercicio."
+  },
+  "onboarding": {
+    "errors": {
+      "invalid": "Faltan respuestas o hay alguna inválida.",
+      "underage": "Plates & Pace es para personas de 16 años o más.",
+      "save": "No pudimos guardar tus respuestas. Inténtalo de nuevo."
+    },
+    "title": "Arma tu plan",
+    "stepOf": "Paso {step} de {total}",
+    "next": "Siguiente",
+    "back": "Atrás",
+    "finish": "Crear mi plan",
+    "building": "Creando tu plan…",
+    "disclaimer": "Plates & Pace da una guía general de entrenamiento, no consejo médico. Si tienes alguna condición de salud, consulta a un médico antes de entrenar fuerte.",
+    "steps": {
+      "basics": {
+        "title": "Sobre ti",
+        "displayName": "¿Cómo te llamamos?",
+        "locale": "Idioma",
+        "timezone": "Zona horaria",
+        "units": "Unidades",
+        "metric": "kg / cm",
+        "imperial": "lb / in"
+      },
+      "body": {
+        "title": "Tu cuerpo",
+        "sex": "Sexo",
+        "female": "Femenino",
+        "male": "Masculino",
+        "unspecified": "Prefiero no decirlo",
+        "birthDate": "Fecha de nacimiento",
+        "height": "Estatura",
+        "weight": "Peso",
+        "waist": "Cintura (opcional)",
+        "sexHelp": "Solo se usa para estimar pesos iniciales y calorías."
+      },
+      "health": {
+        "title": "Chequeo de salud",
+        "intro": "Responde con honestidad. Un sí no te impide entrenar: hace tus primeras semanas más cuidadosas.",
+        "heartCondition": "¿Algún médico te ha dicho que tienes una condición cardíaca?",
+        "chestPain": "¿Sientes dolor en el pecho al hacer actividad física?",
+        "dizziness": "¿Pierdes el equilibrio por mareos o has perdido el conocimiento?",
+        "jointProblem": "¿Tienes algún problema de huesos o articulaciones que el ejercicio pueda empeorar?",
+        "bloodPressureMedication": "¿Tomas medicamentos para la presión o el corazón?",
+        "pregnancy": "¿Estás embarazada o diste a luz en los últimos seis meses?",
+        "other": "¿Hay alguna otra razón por la que no deberías hacer actividad física intensa?",
+        "otherNote": "Cuéntanos más (opcional)",
+        "yes": "Sí",
+        "no": "No",
+        "clearance": "Respondiste que sí a al menos una pregunta. Te recomendamos una autorización médica antes de entrenar fuerte. Tu plan empezará en modo cuidadoso: menos peso y menos volumen."
+      },
+      "goals": {
+        "title": "Tu meta",
+        "primary": "¿Qué es lo más importante ahora?",
+        "build_muscle": "Ganar músculo",
+        "get_strong": "Ganar fuerza",
+        "lose_fat": "Perder grasa",
+        "fit_and_firm": "Estar en forma y firme",
+        "run_faster": "Correr más rápido o más lejos",
+        "hybrid": "Ambas: pesas y correr",
+        "targetRace": "Distancia objetivo",
+        "5k": "5K",
+        "10k": "10K",
+        "half": "Media maratón",
+        "raceDate": "Fecha de la carrera (opcional)"
+      },
+      "experience": {
+        "title": "Experiencia",
+        "lifting": "¿Cuánto llevas entrenando con pesas?",
+        "none": "Todavía no empiezo",
+        "under_1_year": "Menos de un año",
+        "1_to_3_years": "De 1 a 3 años",
+        "3_plus_years": "Más de 3 años",
+        "knowsBigLifts": "Sé hacer sentadilla, peso muerto y press de banca con barra",
+        "running": "Correr",
+        "canRun": "Puedo correr sin parar",
+        "cannotRun": "Todavía no puedo correr sin parar",
+        "recentKm": "Una carrera reciente: distancia (km)",
+        "recentMinutes": "y tiempo (minutos)",
+        "continuousMinutes": "¿Cuántos minutos puedes correr sin detenerte?"
+      },
+      "schedule": {
+        "title": "Tu semana",
+        "gymDays": "Días de gimnasio",
+        "runDays": "Días de correr",
+        "longRunDay": "Día de tirada larga",
+        "sessionMinutes": "Duración de la sesión",
+        "minutes": "{n} min",
+        "startDate": "Fecha de inicio",
+        "blockWeeks": "Duración del bloque",
+        "weeks": "{n} semanas",
+        "startHelp": "Los planes empiezan el lunes de esa semana."
+      },
+      "equipment": {
+        "title": "Equipo",
+        "setting": "¿Dónde entrenas?",
+        "full_gym": "Gimnasio completo con máquinas",
+        "dumbbells_bench": "Mancuernas y un banco",
+        "home_none": "En casa, sin equipo",
+        "unavailable": "Máquinas que no tienes (opcional)"
+      },
+      "injuries": {
+        "title": "Lesiones y límites",
+        "intro": "Evitaremos o cambiaremos los ejercicios que carguen estas zonas.",
+        "knees": "Rodillas",
+        "lower_back": "Espalda baja",
+        "shoulders": "Hombros",
+        "hips": "Caderas",
+        "wrists": "Muñecas",
+        "neck": "Cuello",
+        "note": "¿Algo más que debamos saber? (opcional)"
+      },
+      "preferences": {
+        "title": "Preferencias",
+        "focusAreas": "Zonas para enfocarte",
+        "glutes": "Glúteos",
+        "legs": "Piernas",
+        "arms": "Brazos",
+        "shoulders": "Hombros",
+        "back": "Espalda",
+        "chest": "Pecho",
+        "abs": "Abdomen",
+        "intensity": "¿Qué tan duro lo quieres?",
+        "moderate": "Moderado",
+        "hard": "Duro",
+        "very_hard": "Muy duro",
+        "avoid": "Ejercicios que prefieres evitar (opcional)"
+      }
+    },
+    "days": {
+      "1": "Lun",
+      "2": "Mar",
+      "3": "Mié",
+      "4": "Jue",
+      "5": "Vie",
+      "6": "Sáb",
+      "7": "Dom"
+    },
+    "editingNote": "Al guardar, tu plan se regenera de hoy en adelante. Las sesiones y registros anteriores se conservan."
+  },
+  "today": {
+    "noPlan": "No hay nada planeado para este día. Descansa o revisa la pestaña Plan.",
+    "estimate": "~{minutes} min",
+    "readiness": "¿Cómo estás hoy?",
+    "warmup": "Calentamiento",
+    "fuel": "Alimentación",
+    "fuelLine": "Unas {kcal} kcal hoy, {protein} g de proteína y {water} L de agua.",
+    "finisher": "Remate",
+    "finisherLine": "8 a 12 minutos, a ritmo constante. Termina con algo de reserva.",
+    "finish": "Terminar sesión",
+    "sessionDone": "Sesión terminada. Buen trabajo.",
+    "savedOffline": "Sin conexión: se guarda en este dispositivo y se sincroniza al volver",
+    "rest": "Descanso {time}",
+    "skipRest": "Saltar",
+    "kg": "Peso",
+    "reps": "Reps",
+    "rpe": "RPE",
+    "setDone": "Serie hecha",
+    "technique": {
+      "straight": "series normales",
+      "top_set_backoff": "serie pesada + respaldo",
+      "drop_set": "serie descendente en la última",
+      "rest_pause": "pausa-descanso en la última"
+    },
+    "readinessForm": {
+      "sleep": "Sueño",
+      "soreness": "Dolor muscular",
+      "energy": "Energía",
+      "save": "Ajustar mi sesión"
+    },
+    "runMinutes": "min",
+    "pace": "ritmo",
+    "zone": "Zona de frecuencia cardíaca {zone}",
+    "guidedRun": "Iniciar carrera guiada",
+    "logRun": "Registrar",
+    "runSaved": "Carrera registrada.",
+    "intervalLine": "{reps} × {meters} m a {pace}/km, {rest} suave entre cada una.",
+    "runWalkLine": "{repeats} × (correr {run} min / caminar {walk} min).",
+    "km": "km"
+  },
+  "plan": {
+    "title": "Plan",
+    "empty": "Aún no hay plan. Completa el cuestionario para crear uno.",
+    "block": "Bloque {block} · {weeks} semanas",
+    "previousMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente",
+    "weekOf": "Semana {week} de {total}",
+    "rest": "Descanso",
+    "legend": {
+      "gym": "Pesas",
+      "run": "Correr",
+      "done": "Hecho",
+      "today": "Hoy"
+    },
+    "table": {
+      "day": "Día",
+      "session": "Sesión",
+      "time": "Tiempo"
+    }
+  },
+  "library": {
+    "title": "Biblioteca de ejercicios",
+    "all": "Todos",
+    "filterMuscle": "Filtrar por músculo",
+    "filterEquipment": "Filtrar por equipo",
+    "count": "{n} ejercicios",
+    "cues": "Cómo hacerlo",
+    "mistakes": "Errores comunes",
+    "alsoWorks": "También trabaja"
+  },
+  "run": {
+    "noRun": "No hay carrera planeada para este día.",
+    "segmentOf": "Tramo {n} de {total}",
+    "left": "restantes",
+    "start": "Empezar",
+    "pause": "Pausa",
+    "resume": "Continuar",
+    "exit": "Salir",
+    "finished": "Carrera completada.",
+    "saveAndExit": "Guardar carrera",
+    "segments": {
+      "warmup": "Calentamiento",
+      "work": "Dale",
+      "rest": "Suave",
+      "run": "Corre",
+      "walk": "Camina",
+      "steady": "Constante",
+      "cooldown": "Vuelta a la calma"
+    },
+    "cues": {
+      "warmup": "Calienta, muy suave.",
+      "work": "Dale fuerte.",
+      "workWithPace": "Dale. Objetivo {pace} por kilómetro.",
+      "rest": "Trote suave.",
+      "run": "Corre.",
+      "walk": "Camina.",
+      "steady": "Ritmo constante.",
+      "steadyWithPace": "Constante, cerca de {pace} por kilómetro.",
+      "cooldown": "Baja el ritmo. Ya casi.",
+      "done": "Listo. Gran carrera.",
+      "warmupWithPace": "Calienta, muy suave.",
+      "restWithPace": "Trote suave.",
+      "runWithPace": "Corre.",
+      "walkWithPace": "Camina.",
+      "cooldownWithPace": "Baja el ritmo. Ya casi."
+    },
+    "perKm": "/km"
+  },
+  "group": {
+    "title": "Grupo",
+    "leave": "Salir",
+    "inviteCode": "Código de invitación",
+    "copyLink": "Copiar enlace de invitación",
+    "member": "Integrante",
+    "thisWeek": "Esta semana",
+    "streak": "Racha",
+    "remove": "Quitar",
+    "you": "tú",
+    "privacy": "Los integrantes solo ven nombres, sesiones de la semana y rachas. Nunca pesos, datos corporales ni registros.",
+    "createTitle": "Crear un grupo",
+    "create": "Crear",
+    "joinTitle": "Unirse con un código de 6 caracteres",
+    "join": "Unirme",
+    "errors": {
+      "name": "Ponle un nombre al grupo.",
+      "create": "No se pudo crear el grupo.",
+      "code": "Ese código no es válido o ya venció."
+    }
+  },
+  "settings": {
+    "title": "Ajustes",
+    "hello": "Sesión iniciada como {name}",
+    "plan": "Tu plan",
+    "planHelp": "Cambia tus respuestas y el plan se regenera desde hoy. Las sesiones y registros anteriores se conservan.",
+    "editAnswers": "Editar mis respuestas",
+    "units": "Unidades",
+    "metric": "kg / cm",
+    "imperial": "lb / in",
+    "timezone": "Zona horaria",
+    "timezoneHelp": "\"Hoy\" siempre se calcula en esta zona.",
+    "save": "Guardar",
+    "data": "Tus datos",
+    "export": "Exportar mis datos (JSON)",
+    "privacyLink": "Privacidad",
+    "disclaimerTitle": "No es consejo médico",
+    "signOut": "Cerrar sesión",
+    "deleteTitle": "Eliminar cuenta",
+    "deleteHelp": "Elimina tu cuenta y todos tus datos. No se puede deshacer.",
+    "deleteConfirmLabel": "Escribe ELIMINAR para confirmar",
+    "deleteWord": "ELIMINAR",
+    "deleteButton": "Eliminar mi cuenta"
+  },
+  "privacy": {
+    "title": "Privacidad",
+    "intro": "Plates & Pace guarda lo necesario para crear y adaptar tu plan, y nada se comparte con otras personas a menos que decidas unirte a un grupo.",
+    "stored": {
+      "title": "Qué guardamos",
+      "body": "Tus respuestas del cuestionario, medidas corporales, el plan que generamos y las series y carreras que registras. Todo está ligado únicamente a tu cuenta."
+    },
+    "visible": {
+      "title": "Quién puede verlo",
+      "body": "Tú. Cada tabla está protegida con seguridad a nivel de fila en la base de datos, así que otro usuario no puede leer tus datos ni siquiera consultando la base de datos directamente."
+    },
+    "groups": {
+      "title": "Grupos",
+      "body": "Si te unes a un grupo, sus integrantes ven tu nombre, cuántas sesiones completaste esta semana y tu racha. Nunca tus pesos, datos corporales, respuestas de salud ni registros. No existe ninguna opción para compartirlos."
+    },
+    "export": {
+      "title": "Exportar",
+      "body": "Ajustes → Exportar mis datos descarga todo lo que tenemos sobre ti en un solo archivo JSON."
+    },
+    "delete": {
+      "title": "Eliminar",
+      "body": "Ajustes → Eliminar cuenta borra tu cuenta y todos los datos ligados a ella, de inmediato y para siempre."
+    },
+    "health": {
+      "title": "Respuestas de salud",
+      "body": "Tus respuestas del chequeo de salud solo deciden si tu plan empieza con cuidado. Nunca se muestran a nadie ni se usan para nada más."
+    }
+  },
+  "progress": {
+    "title": "Progreso",
+    "streak": "Racha",
+    "thisWeek": "Sesiones esta semana",
+    "sessionsPerWeek": "Sesiones por semana",
+    "sessions": "sesiones",
+    "week": "Semana",
+    "e1rm": "1RM estimado",
+    "weeklyVolume": "Series duras esta semana, por músculo",
+    "sets": "series",
+    "muscle": "Músculo",
+    "runDistance": "Distancia corrida",
+    "runPace": "Ritmo de carrera",
+    "distance": "Distancia",
+    "pace": "Ritmo",
+    "date": "Fecha",
+    "bodyweight": "Peso corporal",
+    "waist": "Cintura",
+    "table": "Ver como tabla",
+    "empty": "Registra una sesión y tu progreso empezará a aparecer aquí."
+  },
+  "offline": {
+    "body": "Estás sin conexión. Las series que registres se guardan en este dispositivo y se sincronizan cuando vuelvas a tener red."
   }
 }

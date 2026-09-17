@@ -37,10 +37,11 @@ export const config = {
   matcher: [
     '/',
     '/(en|es)/:path*',
-    // `auth` is excluded deliberately. /auth/callback lives outside the
-    // [locale] segment because Supabase redirects to a fixed URL, and letting
-    // the intl middleware prefix it with a locale would send every magic link
-    // to /en/auth/callback, which does not exist.
-    '/((?!api|auth|_next|_vercel|.*\\..*).*)',
+    // `auth` and `offline` are excluded deliberately: both live outside the
+    // [locale] segment. /auth/callback is the fixed URL Supabase redirects to,
+    // and /offline is what the service worker serves when the network is gone.
+    // Letting the intl middleware prefix either with a locale sends it to a
+    // route that does not exist.
+    '/((?!api|auth|offline|_next|_vercel|.*\\..*).*)',
   ],
 }

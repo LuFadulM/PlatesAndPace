@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { notFound } from 'next/navigation'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server'
@@ -35,7 +35,20 @@ export async function generateMetadata({
   return {
     title: t('name'),
     description: t('tagline'),
+    manifest: '/manifest.webmanifest',
+    appleWebApp: { capable: true, statusBarStyle: 'default', title: t('name') },
+    icons: { icon: '/icons/icon.svg', apple: '/apple-touch-icon.png' },
   }
+}
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#eceff2' },
+    { media: '(prefers-color-scheme: dark)', color: '#12161a' },
+  ],
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
 }
 
 export default async function LocaleLayout({

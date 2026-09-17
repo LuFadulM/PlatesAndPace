@@ -9,7 +9,8 @@
     "progress": "Progress",
     "library": "Library",
     "group": "Group",
-    "settings": "Settings"
+    "settings": "Settings",
+    "primary": "Main navigation"
   },
   "landing": {
     "headline": "Training that adapts to you",
@@ -29,7 +30,8 @@
   "dates": {
     "today": "Today",
     "tomorrow": "Tomorrow",
-    "yesterday": "Yesterday"
+    "yesterday": "Yesterday",
+    "weekStrip": "This week"
   },
   "nutrition": {
     "notes": {
@@ -54,7 +56,8 @@
       "invalidEmail": "That does not look like an email address.",
       "sendFailed": "We could not send the link. Try again in a moment.",
       "linkExpired": "That link has expired. Ask for a new one.",
-      "linkInvalid": "That link did not work. Ask for a new one."
+      "linkInvalid": "That link did not work. Ask for a new one.",
+      "signedOut": "You have been signed out. Sign in again to continue."
     }
   },
   "coach": {
@@ -657,5 +660,348 @@
   "warmup": {
     "lower": "5 min easy cardio, then bodyweight squats, leg swings and two light sets of your first lift.",
     "upper": "5 min easy cardio, then arm circles, band or light rows, and two light sets of your first lift."
+  },
+  "onboarding": {
+    "errors": {
+      "invalid": "Some answers are missing or invalid.",
+      "underage": "Plates & Pace is for people aged 16 and over.",
+      "save": "We could not save your answers. Try again."
+    },
+    "title": "Set up your plan",
+    "stepOf": "Step {step} of {total}",
+    "next": "Next",
+    "back": "Back",
+    "finish": "Build my plan",
+    "building": "Building your plan…",
+    "disclaimer": "Plates & Pace gives general training guidance, not medical advice. If you have a health condition, talk to a doctor before training hard.",
+    "steps": {
+      "basics": {
+        "title": "About you",
+        "displayName": "What should we call you?",
+        "locale": "Language",
+        "timezone": "Time zone",
+        "units": "Units",
+        "metric": "kg / cm",
+        "imperial": "lb / in"
+      },
+      "body": {
+        "title": "Your body",
+        "sex": "Sex",
+        "female": "Female",
+        "male": "Male",
+        "unspecified": "Prefer not to say",
+        "birthDate": "Date of birth",
+        "height": "Height",
+        "weight": "Weight",
+        "waist": "Waist (optional)",
+        "sexHelp": "Used only to estimate starting weights and calories."
+      },
+      "health": {
+        "title": "Health check",
+        "intro": "Answer honestly. A yes does not stop you training — it makes your first weeks more careful.",
+        "heartCondition": "Has a doctor ever said you have a heart condition?",
+        "chestPain": "Do you feel chest pain during physical activity?",
+        "dizziness": "Do you lose balance from dizziness, or ever lose consciousness?",
+        "jointProblem": "Do you have a bone or joint problem that exercise could make worse?",
+        "bloodPressureMedication": "Do you take medication for blood pressure or a heart condition?",
+        "pregnancy": "Are you pregnant, or gave birth in the last six months?",
+        "other": "Is there any other reason you should not do hard physical activity?",
+        "otherNote": "Tell us more (optional)",
+        "yes": "Yes",
+        "no": "No",
+        "clearance": "You answered yes to at least one question. We recommend getting medical clearance before hard training. Your plan will start in a careful mode: lighter weights and less volume."
+      },
+      "goals": {
+        "title": "Your goal",
+        "primary": "What matters most right now?",
+        "build_muscle": "Build muscle",
+        "get_strong": "Get strong",
+        "lose_fat": "Lose fat",
+        "fit_and_firm": "Get fit and firm",
+        "run_faster": "Run faster or further",
+        "hybrid": "Both: lift and run",
+        "targetRace": "Target distance",
+        "5k": "5K",
+        "10k": "10K",
+        "half": "Half marathon",
+        "raceDate": "Race date (optional)"
+      },
+      "experience": {
+        "title": "Experience",
+        "lifting": "How long have you been lifting?",
+        "none": "I have not started",
+        "under_1_year": "Under a year",
+        "1_to_3_years": "1 to 3 years",
+        "3_plus_years": "More than 3 years",
+        "knowsBigLifts": "I know how to squat, deadlift and bench press with a barbell",
+        "running": "Running",
+        "canRun": "I can run continuously",
+        "cannotRun": "I can't run continuously yet",
+        "recentKm": "A recent run: distance (km)",
+        "recentMinutes": "and time (minutes)",
+        "continuousMinutes": "How many minutes can you run without stopping?"
+      },
+      "schedule": {
+        "title": "Your week",
+        "gymDays": "Gym days",
+        "runDays": "Run days",
+        "longRunDay": "Long run day",
+        "sessionMinutes": "Session length",
+        "minutes": "{n} min",
+        "startDate": "Start date",
+        "blockWeeks": "Block length",
+        "weeks": "{n} weeks",
+        "startHelp": "Plans start on the Monday of that week."
+      },
+      "equipment": {
+        "title": "Equipment",
+        "setting": "Where do you train?",
+        "full_gym": "Full gym with machines",
+        "dumbbells_bench": "Dumbbells and a bench",
+        "home_none": "At home, no equipment",
+        "unavailable": "Machines you do not have (optional)"
+      },
+      "injuries": {
+        "title": "Injuries and limits",
+        "intro": "We will skip or swap exercises that load these areas.",
+        "knees": "Knees",
+        "lower_back": "Lower back",
+        "shoulders": "Shoulders",
+        "hips": "Hips",
+        "wrists": "Wrists",
+        "neck": "Neck",
+        "note": "Anything else we should know? (optional)"
+      },
+      "preferences": {
+        "title": "Preferences",
+        "focusAreas": "Areas to focus on",
+        "glutes": "Glutes",
+        "legs": "Legs",
+        "arms": "Arms",
+        "shoulders": "Shoulders",
+        "back": "Back",
+        "chest": "Chest",
+        "abs": "Abs",
+        "intensity": "How hard do you want it?",
+        "moderate": "Moderate",
+        "hard": "Hard",
+        "very_hard": "Very hard",
+        "avoid": "Exercises to avoid (optional)"
+      }
+    },
+    "days": {
+      "1": "Mon",
+      "2": "Tue",
+      "3": "Wed",
+      "4": "Thu",
+      "5": "Fri",
+      "6": "Sat",
+      "7": "Sun"
+    },
+    "editingNote": "Saving regenerates your plan from today onward. Past sessions and logs are kept."
+  },
+  "today": {
+    "noPlan": "Nothing planned for this day. Rest, or check the Plan tab.",
+    "estimate": "~{minutes} min",
+    "readiness": "How are you today?",
+    "warmup": "Warm-up",
+    "fuel": "Fuel",
+    "fuelLine": "About {kcal} kcal today, {protein} g protein, {water} L water.",
+    "finisher": "Finisher",
+    "finisherLine": "8–12 minutes, steady. Stop with something left.",
+    "finish": "Finish session",
+    "sessionDone": "Session done. Nice work.",
+    "savedOffline": "Offline — saving on this device, will sync when back online",
+    "rest": "Rest {time}",
+    "skipRest": "Skip",
+    "kg": "Load",
+    "reps": "Reps",
+    "rpe": "RPE",
+    "setDone": "Set done",
+    "technique": {
+      "straight": "straight sets",
+      "top_set_backoff": "top set + back-offs",
+      "drop_set": "drop set on the last",
+      "rest_pause": "rest-pause on the last"
+    },
+    "readinessForm": {
+      "sleep": "Sleep",
+      "soreness": "Soreness",
+      "energy": "Energy",
+      "save": "Set my session"
+    },
+    "runMinutes": "min",
+    "pace": "pace",
+    "zone": "Heart-rate zone {zone}",
+    "guidedRun": "Start guided run",
+    "logRun": "Log",
+    "runSaved": "Run logged.",
+    "intervalLine": "{reps} × {meters} m at {pace}/km, {rest} easy between.",
+    "runWalkLine": "{repeats} × (run {run} min / walk {walk} min).",
+    "km": "km"
+  },
+  "plan": {
+    "title": "Plan",
+    "empty": "No plan yet. Finish the questionnaire to build one.",
+    "block": "Block {block} · {weeks} weeks",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "weekOf": "Week {week} of {total}",
+    "rest": "Rest",
+    "legend": {
+      "gym": "Gym",
+      "run": "Run",
+      "done": "Done",
+      "today": "Today"
+    },
+    "table": {
+      "day": "Day",
+      "session": "Session",
+      "time": "Time"
+    }
+  },
+  "library": {
+    "title": "Exercise library",
+    "all": "All",
+    "filterMuscle": "Filter by muscle",
+    "filterEquipment": "Filter by equipment",
+    "count": "{n} exercises",
+    "cues": "How to do it",
+    "mistakes": "Common mistakes",
+    "alsoWorks": "Also works"
+  },
+  "run": {
+    "noRun": "No run planned for this day.",
+    "segmentOf": "Segment {n} of {total}",
+    "left": "left",
+    "start": "Start",
+    "pause": "Pause",
+    "resume": "Resume",
+    "exit": "Exit",
+    "finished": "Run complete.",
+    "saveAndExit": "Save run",
+    "segments": {
+      "warmup": "Warm-up",
+      "work": "Go",
+      "rest": "Easy",
+      "run": "Run",
+      "walk": "Walk",
+      "steady": "Steady",
+      "cooldown": "Cool-down"
+    },
+    "cues": {
+      "warmup": "Warm up, nice and easy.",
+      "work": "Go hard.",
+      "workWithPace": "Go. Target {pace} per kilometre.",
+      "rest": "Easy jog.",
+      "run": "Run.",
+      "walk": "Walk.",
+      "steady": "Steady pace.",
+      "steadyWithPace": "Steady, around {pace} per kilometre.",
+      "cooldown": "Cool down. Nearly done.",
+      "done": "Done. Great run.",
+      "warmupWithPace": "Warm up, nice and easy.",
+      "restWithPace": "Easy jog.",
+      "runWithPace": "Run.",
+      "walkWithPace": "Walk.",
+      "cooldownWithPace": "Cool down. Nearly done."
+    },
+    "perKm": "/km"
+  },
+  "group": {
+    "title": "Group",
+    "leave": "Leave",
+    "inviteCode": "Invite code",
+    "copyLink": "Copy invite link",
+    "member": "Member",
+    "thisWeek": "This week",
+    "streak": "Streak",
+    "remove": "Remove",
+    "you": "you",
+    "privacy": "Members see only names, sessions this week and streaks. Never weights, body data or logs.",
+    "createTitle": "Create a group",
+    "create": "Create",
+    "joinTitle": "Join with a 6-character code",
+    "join": "Join",
+    "errors": {
+      "name": "Give the group a name.",
+      "create": "Could not create the group.",
+      "code": "That code is not valid or has expired."
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "hello": "Signed in as {name}",
+    "plan": "Your plan",
+    "planHelp": "Change your answers and the plan regenerates from today. Past sessions and logs are kept.",
+    "editAnswers": "Edit my answers",
+    "units": "Units",
+    "metric": "kg / cm",
+    "imperial": "lb / in",
+    "timezone": "Time zone",
+    "timezoneHelp": "\"Today\" is always worked out in this zone.",
+    "save": "Save",
+    "data": "Your data",
+    "export": "Export my data (JSON)",
+    "privacyLink": "Privacy",
+    "disclaimerTitle": "Not medical advice",
+    "signOut": "Sign out",
+    "deleteTitle": "Delete account",
+    "deleteHelp": "Deletes your account and every piece of data with it. This cannot be undone.",
+    "deleteConfirmLabel": "Type DELETE to confirm",
+    "deleteWord": "DELETE",
+    "deleteButton": "Delete my account"
+  },
+  "privacy": {
+    "title": "Privacy",
+    "intro": "Plates & Pace stores what it needs to build and adapt your plan, and nothing is shared with other people unless you choose to join a group.",
+    "stored": {
+      "title": "What we store",
+      "body": "Your questionnaire answers, body measurements, the plan we generate, and the sets and runs you log. All of it is tied to your account only."
+    },
+    "visible": {
+      "title": "Who can see it",
+      "body": "You. Every table is protected by row-level security in the database, so another user cannot read your rows even by asking the database directly."
+    },
+    "groups": {
+      "title": "Groups",
+      "body": "If you join a group, members see your display name, how many sessions you completed this week, and your streak. Never your weights, body data, health answers or logs. There is no setting that shares those."
+    },
+    "export": {
+      "title": "Export",
+      "body": "Settings → Export my data downloads everything we hold about you as one JSON file."
+    },
+    "delete": {
+      "title": "Delete",
+      "body": "Settings → Delete account removes your account and every row tied to it, immediately and permanently."
+    },
+    "health": {
+      "title": "Health answers",
+      "body": "Your health screening answers only decide whether your plan starts carefully. They are never shown to anyone and are never used for anything else."
+    }
+  },
+  "progress": {
+    "title": "Progress",
+    "streak": "Streak",
+    "thisWeek": "Sessions this week",
+    "sessionsPerWeek": "Sessions per week",
+    "sessions": "sessions",
+    "week": "Week",
+    "e1rm": "Estimated 1RM",
+    "weeklyVolume": "Hard sets this week, by muscle",
+    "sets": "sets",
+    "muscle": "Muscle",
+    "runDistance": "Run distance",
+    "runPace": "Run pace",
+    "distance": "Distance",
+    "pace": "Pace",
+    "date": "Date",
+    "bodyweight": "Body weight",
+    "waist": "Waist",
+    "table": "Show as table",
+    "empty": "Log a session and your progress will start showing here."
+  },
+  "offline": {
+    "body": "You are offline. Sets you log are saved on this device and will sync when you are back online."
   }
 }
