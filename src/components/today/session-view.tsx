@@ -56,6 +56,11 @@ interface Props {
   editable: boolean
   /** Last week's verdict, already applied to the session above. */
   review: ReviewOutcome | null
+  /**
+   * Today or earlier: a session the athlete could have done, so pain can be
+   * reported against it. A future day has nothing to report yet.
+   */
+  reportable: boolean
   /** Pain already reported for this date, per exercise. */
   painToday: Record<string, number>
   /** How many times each movement has hurt before today. */
@@ -73,7 +78,7 @@ function Section({ title, children, defaultOpen = false }: { title: string; chil
 
 const input = 'min-h-11 w-full rounded-lg border border-(--color-border) px-2 text-center'
 
-export function SessionView({ date, day, units, plates, maxes, initialSets, initialReadiness, alreadyDone, initialNotes, nutrition, latestWeightKg, alternatives, catalogue, lastTime, editable, review, painToday, painHistory }: Props) {
+export function SessionView({ date, day, units, plates, maxes, initialSets, initialReadiness, alreadyDone, initialNotes, nutrition, latestWeightKg, alternatives, catalogue, lastTime, editable, review, reportable, painToday, painHistory }: Props) {
   const t = useTranslations('today')
   const tEx = useTranslations('exercises')
   const tCoach = useTranslations()
@@ -391,7 +396,7 @@ export function SessionView({ date, day, units, plates, maxes, initialSets, init
                           </button>
                         )}
                       </div>
-                      {!done && (
+                      {!done && reportable && (
                         <PainReport
                           date={date}
                           exerciseId={e.exerciseId}

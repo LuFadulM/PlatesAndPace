@@ -28,6 +28,11 @@ function gymDayThisWeek(): string | null {
   return null
 }
 
+/** Today's ISO weekday, so a fixture can book the gym on the day the test runs. */
+function todayWeekday(): number {
+  return new Date(`${todayIso()}T00:00:00Z`).getUTCDay() || 7
+}
+
 /**
  * The coaching rule that a movement which keeps hurting comes out of the plan
  * (CLAUDE.md, rule 2). Two reports on the same lift reach the athlete as an
@@ -89,14 +94,13 @@ test('taking the easy week shortens the session', async ({ page }) => {
  * taps it mid-session should not find it gone when they come back.
  */
 test('reports joint pain on one exercise and keeps it across a reload', async ({ page }) => {
-  const gymDate = gymDayThisWeek()
-  test.skip(gymDate === null, 'no gym day left in the current week')
-
   const email = unique('report')
   await createUser(email)
   await signIn(page, email, 'en')
-  await completeOnboarding(page, 'en', { name: 'Rae' })
-  await page.goto(`/en/today?date=${gymDate}`)
+  // Pain is reported against a session that has happened, so the fixture books
+  // the gym on today rather than on a day the athlete has not reached yet.
+  await completeOnboarding(page, 'en', { name: 'Rae', gymWeekdays: [todayWeekday()] })
+  await page.goto(`/en/today?date=${todayIso()}`)
 
   const rows = page.getByRole('list', { name: 'Exercises' }).locator(':scope > li')
   await expect(rows.first()).toBeVisible()

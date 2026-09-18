@@ -92,6 +92,10 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
 
   // What hurt today, and how often each movement has hurt before it, so the
   // control can say "this has happened before" rather than repeating itself.
+  // Pain is a report about a session that happened, so the control is offered
+  // on today and earlier only. It also could not be read back on a future day:
+  // the window ends today.
+  const reportable = compareDates(selected, today) <= 0
   const painToday = painOn(painReports, iso)
   const painHistory = painBefore(painReports, iso)
 
@@ -164,6 +168,7 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
         lastTime={lastTime}
         editable={editable}
         review={thisWeek && !deloadTaken ? review : null}
+        reportable={reportable}
         painToday={painToday}
         painHistory={painHistory}
       />

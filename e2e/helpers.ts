@@ -39,10 +39,22 @@ export async function signIn(page: Page, email: string, locale: 'en' | 'es' = 'e
   await page.waitForURL(/\/(en|es)\/(today|onboarding)/, { timeout: 30_000 })
 }
 
-export async function completeOnboarding(page: Page, locale: 'en' | 'es', opts: { name: string; runner?: boolean }) {
+/** The weekday chips, by ISO weekday, as the onboarding wizard labels them. */
+const WEEKDAY_LABELS = {
+  es: { 1: 'Lun', 2: 'Mar', 3: 'Mié', 4: 'Jue', 5: 'Vie', 6: 'Sáb', 7: 'Dom' },
+  en: { 1: 'Mon', 2: 'Tue', 3: 'Wed', 4: 'Thu', 5: 'Fri', 6: 'Sat', 7: 'Sun' },
+} as const
+
+export async function completeOnboarding(
+  page: Page,
+  locale: 'en' | 'es',
+  /** `gymWeekdays` defaults to Monday, Wednesday and Friday. */
+  opts: { name: string; runner?: boolean; gymWeekdays?: readonly number[] },
+) {
   const t = locale === 'es'
     ? { next: 'Siguiente', finish: 'Crear mi plan', mon: 'Lun', wed: 'Mié', fri: 'Vie', tue: 'Mar', sat: 'Sáb' }
     : { next: 'Next', finish: 'Build my plan', mon: 'Mon', wed: 'Wed', fri: 'Fri', tue: 'Tue', sat: 'Sat' }
+  const gymLabels = (opts.gymWeekdays ?? [1, 3, 5]).map((d) => WEEKDAY_LABELS[locale][d as 1])
   await page.goto(`/${locale}/onboarding`)
   // basics
   await page.getByLabel(/call you|te llamamos/i).fill(opts.name)
@@ -69,7 +81,7 @@ export async function completeOnboarding(page: Page, locale: 'en' | 'es', opts: 
   await page.locator('input[type=number]').nth(1).fill('20')
   await page.getByRole('button', { name: t.next }).click()
   // schedule
-  for (const d of [t.mon, t.wed, t.fri]) await page.getByRole('group', { name: /gym|gimnasio/i }).getByRole('button', { name: d, exact: true }).click()
+  for (const d of gymLabels) await page.getByRole('group', { name: /gym|gimnasio/i }).getByRole('button', { name: d, exact: true }).click()
   if (opts.runner) {
     for (const d of [t.tue, t.sat]) await page.getByRole('group', { name: /run days|días de correr/i }).getByRole('button', { name: d, exact: true }).click()
     await page.getByRole('group', { name: /long run|tirada larga/i }).getByRole('button', { name: t.sat, exact: true }).click()
