@@ -107,6 +107,39 @@ For Google sign-in, create an OAuth client in Google Cloud, add the Supabase cal
 it prints, enable the provider in Supabase → Authentication → Providers, and set the two
 `SUPABASE_AUTH_GOOGLE_*` values.
 
+## Accounts
+
+Two ways in, and the fast one asks for nothing.
+
+**Start without an email.** The sign-in screen leads with it. Supabase issues an anonymous
+user, which is a real row in `auth.users`, so every row level security policy here — all of
+them keyed on `auth.uid() = user_id` — applies unchanged. No address, no link to open, no
+confirmation. The trade is real and the screen says it: the session lives in that browser,
+so clearing its data or picking up another phone loses the account. Settings offers a field
+to attach an email whenever they want, which turns the anonymous user into a permanent one
+without touching a row of their data.
+
+This needs one switch in the Supabase dashboard, under **Authentication → Sign In / Up →
+Anonymous sign-ins**. With it off, the button returns a message saying so rather than
+failing silently. Anonymous users are free on the free tier; if the app is ever abused to
+mint accounts in bulk, the same screen has a Captcha option.
+
+**Magic link**, for someone coming back on a new device. If links sometimes appear to work
+and then do not sign the person in, the cause is almost always PKCE: the default email
+template sends the browser through the auth server and back with a `code`, and exchanging
+that code needs a verifier cookie held by the browser that *asked* for the link. Open the
+link in a mail app's built-in browser and the verifier is somewhere else, so the exchange
+fails. The app already detects this case and says "you opened it on another device" rather
+than blaming an expired link.
+
+The fix is to stop sending PKCE links, which is step 3 of the deployment list above. If
+you are seeing this failure, that step has not been applied to the project the app is
+actually pointed at: check the **Magic Link** template really carries
+`{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email` rather than
+`{{ .ConfirmationURL }}`, and that **Redirect URLs** includes `https://<domain>/**`. A link
+whose redirect is not on that list is sent to the Site URL instead, which looks exactly
+like clicking the link and nothing happening.
+
 ## Inviting people
 
 Anyone can sign up at `/en/sign-in` or `/es/sign-in` with their email; there are no

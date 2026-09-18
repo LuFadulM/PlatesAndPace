@@ -58,6 +58,32 @@ export async function sendMagicLink(
   redirect(`/${locale}/check-email`)
 }
 
+/**
+ * Starts an account with no email and no link to click.
+ *
+ * Supabase issues a real user row for an anonymous sign-in, so every row level
+ * security policy in this schema — all of them keyed on `auth.uid() = user_id`
+ * — applies unchanged. Nothing about the data model knows or cares that the
+ * account has no address on it.
+ *
+ * The cost is honest and the interface says it plainly: the session lives in
+ * this browser. Clear its storage or pick up another phone and the account is
+ * gone, unless an email is attached from Settings first.
+ */
+export async function startWithoutEmail(locale: string): Promise<SignInState> {
+  const target: Locale = isLocale(locale) ? locale : defaultLocale
+  const supabase = await createClient()
+
+  const { error } = await supabase.auth.signInAnonymously()
+  if (error) {
+    // The likeliest cause by far is the project setting still being off, which
+    // is a one-switch fix rather than anything the athlete did wrong.
+    return { errorKey: 'auth.errors.anonymousDisabled' }
+  }
+
+  redirect(`/${target}/onboarding`)
+}
+
 export async function signOut(locale: string) {
   const target: Locale = isLocale(locale) ? locale : defaultLocale
   const supabase = await createClient()
