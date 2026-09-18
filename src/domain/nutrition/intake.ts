@@ -97,10 +97,14 @@ export function fold(name: string): string {
 
 /** `history` is oldest first, as the reader returns it. */
 export function frequentFoods(history: readonly FoodEntry[], limit = 6): FrequentFood[] {
-  const byName = new Map<string, FrequentFood>()
-  for (const entry of history) {
+  // `last` is the position of the most recent time this food was logged. A Map
+  // keeps a key at its first insertion, so without it two foods logged the same
+  // number of times would come back in the order they were first eaten — which
+  // is oldest-first, the opposite of what the chips are for.
+  const byName = new Map<string, FrequentFood & { last: number }>()
+  history.forEach((entry, index) => {
     const key = fold(entry.name)
-    if (key.length === 0) continue
+    if (key.length === 0) return
     const seen = byName.get(key)
     // Later entries overwrite the macros: the most recent portion wins.
     byName.set(key, {
@@ -110,7 +114,11 @@ export function frequentFoods(history: readonly FoodEntry[], limit = 6): Frequen
       carbsG: entry.carbsG,
       fatG: entry.fatG,
       times: (seen?.times ?? 0) + 1,
+      last: index,
     })
-  }
-  return [...byName.values()].sort((a, b) => b.times - a.times).slice(0, limit)
+  })
+  return [...byName.values()]
+    .sort((a, b) => b.times - a.times || b.last - a.last)
+    .slice(0, limit)
+    .map(({ last: _last, ...food }) => food)
 }

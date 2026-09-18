@@ -176,20 +176,28 @@
     "emailLabel": "Correo",
     "sendLink": "Enviarme el enlace",
     "sending": "Enviando…",
-    "magicLinkHint": "El enlace funciona una sola vez y caduca en una hora. Ábrelo en este mismo dispositivo y navegador.",
+    "magicLinkHint": "El enlace funciona una vez y caduca en una hora. Si no te deja entrar, usa el código de seis dígitos del mismo correo.",
     "checkEmailTitle": "Revisa tu correo",
-    "checkEmailBody": "Te enviamos un enlace para entrar. Ábrelo en este dispositivo para continuar.",
+    "checkEmailBody": "Te enviamos un enlace para entrar. Ábrelo en este dispositivo, o escribe abajo el código de seis dígitos del mismo correo.",
     "checkEmailSpam": "Si no llega en un minuto, revisa la carpeta de spam.",
+    "codeToggle": "¿El enlace no funcionó?",
+    "codeLabel": "Código de seis dígitos del correo",
+    "codeSubmit": "Entrar",
+    "codeChecking": "Comprobando…",
     "signOut": "Cerrar sesión",
     "errors": {
       "invalidEmail": "Eso no parece un correo electrónico.",
       "sendFailed": "No pudimos enviar el enlace. Inténtalo de nuevo en un momento.",
+      "emailDisabled": "Entrar por correo está desactivado en esta app ahora mismo. Es un ajuste de nuestro lado, no algo que hiciste tú: volver a intentarlo no sirve.",
       "linkExpired": "Ese enlace ya venció. Pide uno nuevo.",
       "linkInvalid": "Ese enlace no funcionó. Pide uno nuevo.",
       "signedOut": "Se cerró tu sesión. Vuelve a iniciar sesión para continuar.",
       "rateLimited": "Se pidieron demasiados enlaces por ahora. Espera un rato e intenta de nuevo, o usa el enlace que ya recibiste.",
       "otherDevice": "Ese enlace se abrió en un navegador distinto al que lo pidió. Ábrelo en el mismo navegador, o pide uno nuevo desde aquí.",
-      "anonymousDisabled": "Empezar sin correo está desactivado en este momento. Entra con tu correo."
+      "anonymousDisabled": "Empezar sin correo está desactivado en este momento. Entra con tu correo.",
+      "codeInvalid": "Ese código no es correcto. Revisa los seis dígitos del correo.",
+      "codeExpired": "Ese código ya se usó o caducó. Pide un correo nuevo.",
+      "codeNoEmail": "Perdimos el rastro de a qué correo correspondía. Pide un enlace nuevo desde la pantalla de inicio de sesión."
     },
     "startFree": "Empezar sin correo",
     "startFreeHint": "Sin enlaces que abrir. Tu plan se guarda en este dispositivo y puedes agregar un correo después para conservarlo.",
@@ -2347,6 +2355,9 @@
     "privacyLink": "Privacidad",
     "disclaimerTitle": "No es consejo médico",
     "signOut": "Cerrar sesión",
+    "signOutAnonymousTitle": "Cerrar sesión termina esta cuenta",
+    "signOutAnonymousHelp": "Esta cuenta no tiene correo, así que este navegador es la única forma de volver a entrar. Si cierras sesión ahora, pierdes tu plan y tus registros para siempre. Agrega un correo arriba y podrás entrar desde donde sea.",
+    "signOutUnderstand": "Entiendo que voy a perder mi plan.",
     "deleteTitle": "Eliminar cuenta",
     "deleteHelp": "Elimina tu cuenta y todos tus datos. No se puede deshacer.",
     "deleteConfirmLabel": "Escribe ELIMINAR para confirmar",
@@ -2359,8 +2370,9 @@
       "email": "Correo",
       "attach": "Agregar mi correo",
       "attaching": "Enviando…",
-      "attachSent": "Revisa tu correo y abre el enlace para terminar. No pierdes nada si lo haces más tarde.",
+      "attachSent": "Si ese correo está libre, ya va en camino un enlace: ábrelo para terminar. No pierdes nada si lo haces más tarde.",
       "attachFailed": "No se pudo agregar ese correo. Puede que ya pertenezca a otra cuenta.",
+      "attachNotAllowed": "Esta cuenta ya tiene un correo.",
       "signedInAs": "Sesión iniciada como {email}"
     }
   },
@@ -2624,6 +2636,7 @@
   "food": {
     "title": "Lo que comiste",
     "empty": "Aún no has registrado nada hoy.",
+    "emptyPast": "No se registró nada este día.",
     "eaten": "{kcal} de {target} kcal",
     "over": "{kcal} de más",
     "left": "quedan {kcal}",
@@ -2639,6 +2652,7 @@
     "remove": "Quitar {name}",
     "again": "Registrar otra vez",
     "error": "No se pudo agregar. Inténtalo de nuevo.",
+    "removeError": "No se pudo quitar. Inténtalo de nuevo.",
     "noDatabase": "Tú pones tus propios números. Hyex no busca los alimentos, así que aquí no hay nada adivinado."
   }
 }

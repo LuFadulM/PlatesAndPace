@@ -56,6 +56,19 @@ describe('frequentFoods', () => {
     expect(frequentFoods([])).toEqual([])
   })
 
+  it('breaks a tie by what was eaten most recently', () => {
+    // Both logged twice. The one the athlete has eaten most recently is the one
+    // they are likeliest to want again, so it leads — a Map would otherwise keep
+    // them in the order they were first eaten, which is exactly backwards.
+    const history = [
+      entry({ id: '1', name: 'Avena' }),
+      entry({ id: '2', name: 'Avena' }),
+      entry({ id: '3', name: 'Huevos' }),
+      entry({ id: '4', name: 'Huevos' }),
+    ]
+    expect(frequentFoods(history).map((f) => f.name)).toEqual(['Huevos', 'Avena'])
+  })
+
   it('ranks by how often each food was logged', () => {
     const history = [
       entry({ id: '1', name: 'Pollo' }),

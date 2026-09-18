@@ -57,6 +57,21 @@ NOUNS = [
     ('Military Press', 'Press militar'), ('Overhead Press', 'Press sobre la cabeza'), ('Leg Press', 'Prensa de piernas'),
     ('Push Press', 'Push press'), ('Floor Press', 'Press en el suelo'), ('Pin Press', 'Press desde soportes'),
     ('Good Morning', 'Buenos días'), ('Sit-Up', 'Abdominal'), ('Sit-Ups', 'Abdominales'), ('Push-Up', 'Flexión'), ('Push-Ups', 'Flexiones'), ('Pushups', 'Flexiones'),
+    ("World's Greatest Stretch", 'El mejor estiramiento del mundo'),
+    ('Dorsi-SMR', 'Automasaje dorsal con rodillo'), ('Tibialis-SMR', 'Automasaje del tibial con rodillo'),
+    ('Brachialis-SMR', 'Automasaje del braquial con rodillo'), ('Calves-SMR', 'Automasaje de pantorrillas con rodillo'),
+    ('Foot-SMR', 'Automasaje del pie con rodillo'), ('Hamstring-SMR', 'Automasaje de isquios con rodillo'),
+    ('Peroneals-SMR', 'Automasaje de peroneos con rodillo'), ('Quadriceps-SMR', 'Automasaje de cuádriceps con rodillo'),
+    ('Neck-SMR', 'Automasaje de cuello con rodillo'), ('Back-SMR', 'Automasaje de espalda con rodillo'),
+    ('Rhomboids-SMR', 'Automasaje de romboides con rodillo'), ('Piriformis-SMR', 'Automasaje del piriforme con rodillo'),
+    ('Tract-SMR', 'Automasaje de la banda iliotibial con rodillo'), ('Adductors-SMR', 'Automasaje de aductores con rodillo'),
+    ('Pinch', 'Agarre de pinza'),
+    ('Walking Lunge', 'Zancada caminando'), ('Side Lunge', 'Zancada lateral'), ('Reverse Lunge', 'Zancada inversa'),
+    ('Glute-Ham Raise', 'Elevación glúteo-isquio'), ('Good Mornings', 'Buenos días'), ('Skullcrusher', 'Rompecráneos'),
+    ('Push-up', 'Flexión'), ('Push-Up', 'Flexión'), ('Pushup', 'Flexión'), ('Pullup', 'Dominada'), ('Pull-Ups', 'Dominadas'),
+    ('Sit Up', 'Abdominal'), ('Otis-Up', 'Abdominal Otis'), ('Butt-Ups', 'Elevación de glúteo'), ('Body-Up', 'Fondo en anillas'),
+    ('Windmills', 'Molinos'), ('Wipers', 'Limpiaparabrisas'), ('Step-up', 'Subida al cajón'),
+    ('Handstand', 'Pino'), ('Scaption', 'Elevación en escaición'), ('Hyperextension', 'Hiperextensión'),
     ('Face Pull', 'Face pull'), ('Inverted Row', 'Remo invertido'), ('T-Bar Row', 'Remo en T'), ('Pallof Press', 'Press Pallof'), ('Hip Flexor Stretch', 'Estiramiento de flexores de cadera'), ('Step Ups', 'Subida al cajón'), ('Pullups', 'Dominadas'), ('Chins', 'Dominadas'), ('Chin', 'Dominada'), ('Long Jump', 'Salto de longitud'), ('Pelvic Tilt', 'Báscula pélvica'), ('Stomach Vacuum', 'Vacío abdominal'), ('Battling Ropes', 'Cuerdas de batalla'), ('Jackknife', 'Navaja'), ('Tuck Jump', 'Salto con rodillas al pecho'), ('Renegade Row', 'Remo renegado'),
     ('Pull-Up', 'Dominada'), ('Pull-Ups', 'Dominadas'), ('Chin-Up', 'Dominada supina'), ('Chin-Ups', 'Dominadas supinas'), ('Muscle Up', 'Muscle-up'),
     ('Deadlift', 'Peso muerto'), ('Deadlifts', 'Peso muerto'), ('Romanian Deadlift', 'Peso muerto rumano'), ('Stiff-Legged Deadlift', 'Peso muerto piernas rígidas'),
@@ -87,18 +102,94 @@ IMPLEMENTS = {  # word -> "con ..." suffix
     'Barbell': 'con barra', 'Dumbbell': 'con mancuerna', 'Dumbbells': 'con mancuernas', 'Two-Dumbbell': 'con dos mancuernas', 'Cable': 'en polea', 'Machine': 'en máquina', 'Kettlebell': 'con kettlebell', 'Kettlebells': 'con kettlebells',
     'Band': 'con banda', 'Bands': 'con bandas', 'Smith': 'en multipower', 'EZ-Bar': 'con barra Z', 'EZ': 'con barra Z', 'Plate': 'con disco', 'Rope': 'con cuerda', 'Sled': 'con trineo', 'Chains': 'con cadenas', 'Chain': 'con cadena', 'Leverage': 'en máquina',
     'Medicine': 'con balón medicinal', 'Ball': '', 'Exercise': 'con fitball', 'Bodyweight': 'con peso corporal', 'Weighted': 'con lastre', 'Suspended': 'en suspensión', 'V-Bar': 'con agarre en V', 'Trap': 'con barra hexagonal', 'Hex': 'con barra hexagonal', 'Landmine': 'en landmine', 'Bosu': 'en bosu', 'Roller': 'con rodillo', 'Foam': '', 'Wheel': 'con rueda', 'Board': 'con tabla', 'Box': 'con cajón', 'Bench': 'en banco', 'Chair': 'en silla', 'Wall': 'en pared', 'Floor': 'en el suelo', 'Towel': 'con toalla', 'Pulley': 'en polea', 'Low-Pulley': 'en polea baja', 'High-Pulley': 'en polea alta', 'Stick': 'con palo', 'Broomstick': 'con palo', 'Blocks': 'desde bloques', 'Rack': 'en rack',
+    'Sandbag': 'con saco de arena', 'Keg': 'con barril', 'Tire': 'con neumático', 'Sledgehammer': 'con mazo',
+    'Prowler': 'con prowler', 'Yoke': 'con yugo', 'Axle': 'con barra axle', 'Log': 'con log', 'Stone': 'con piedra',
+    'Stones': 'con piedras', 'Harness': 'con arnés', 'Straps': 'con correas', 'Ring': 'en anillas', 'Bars': 'en barras',
+    'Physioball': 'con fitball', 'Stability': 'con fitball', 'Platform': 'en plataforma', 'Hurdle': 'sobre vallas',
+    'Cone': 'con conos', 'Single-Cone': 'con un cono', 'Bag': 'con saco', 'Pin': 'desde pines', 'Pins': 'desde pines',
+    'Stairs': 'en escaleras', 'Trail': 'en sendero', 'Air': 'al aire',
 }
 MODIFIERS = {  # word -> Spanish modifier placed after the noun
     'Incline': 'inclinado', 'Decline': 'declinado', 'Flat': 'plano', 'Seated': 'sentado', 'Standing': 'de pie', 'Lying': 'tumbado', 'Kneeling': 'de rodillas', 'Hanging': 'colgado', 'Prone': 'boca abajo', 'Supine': 'boca arriba', 'Bent-Over': 'inclinado', 'Bent': 'inclinado', 'Over': '', 'Elevated': 'elevado',
     'Reverse': 'inverso', 'Alternating': 'alterno', 'Alternate': 'alterno', 'One-Arm': 'a un brazo', 'Single-Arm': 'a un brazo', 'Two-Arm': 'a dos brazos', 'One-Leg': 'a una pierna', 'Single-Leg': 'a una pierna', 'Single': 'a una pierna', 'Double': 'doble', 'One': 'a un lado', 'Two': 'doble',
-    'Wide-Grip': 'agarre ancho', 'Wide': 'ancho', 'Close-Grip': 'agarre cerrado', 'Narrow': 'agarre cerrado', 'Medium': 'agarre medio', 'Close': 'cerrado', 'Palms-Up': 'palmas arriba', 'Palms-Down': 'palmas abajo', 'Palms': '', 'Overhead': 'sobre la cabeza', 'Behind': 'por detrás', 'Front': 'frontal', 'Rear': 'trasero', 'Side': 'lateral', 'Lateral': 'lateral', 'Cross': 'cruzado', 'Crossed': 'cruzado', 'Sumo': 'sumo', 'Romanian': 'rumano', 'Bulgarian': 'búlgara', 'Zercher': 'Zercher', 'Jefferson': 'Jefferson', 'Arnold': 'Arnold', 'Bradford': 'Bradford', 'Zottman': 'Zottman', 'Spider': 'araña', 'Drag': 'de arrastre', 'Isometric': 'isométrico', 'Static': 'estático', 'Dynamic': 'dinámico', 'Explosive': 'explosivo', 'Speed': 'de velocidad', 'Power': 'de potencia', 'Hang': 'colgante', 'Deficit': 'con déficit', 'Partial': 'parcial', 'Full': 'completo', 'Half': 'medio', 'Quarter': 'cuarto de', 'Low': 'bajo', 'High': 'alto', 'Upper': 'alto', 'Lower': 'bajo', 'Mid': 'medio', 'Straight-Arm': 'brazos rectos', 'Straight': 'recto', 'Bent-Arm': 'brazos flexionados', 'Stiff-Legged': 'piernas rígidas', 'Stiff': 'rígido', 'Assisted': 'asistido', 'Weighted': 'lastrado', 'Wide-Stance': 'postura ancha', 'Narrow-Stance': 'postura cerrada', 'Stance': '', 'Split': 'dividido', 'Walking': 'caminando', 'Backward': 'hacia atrás', 'Forward': 'hacia adelante', 'Linear': 'lineal', 'Rotational': 'rotacional', 'Internal': 'interna', 'External': 'externa', 'Oblique': 'oblicuo', 'Russian': 'ruso', 'Jump': 'con salto', 'Quick': 'rápido', 'Fast': 'rápido', 'Slow': 'lento', 'Cross-Body': 'cruzado', 'Elbow': 'de codo', 'Elbows': 'de codos', 'Iron': '', 'Atlas': 'Atlas', 'Butt': 'de glúteo', 'Hip': 'de cadera', 'Depth': 'en profundidad', '90': 'a 90 grados', 'Extended': 'extendido', 'Squatting': 'en sentadilla', 'Leaning': 'inclinado', 'Push': 'de empuje', 'Pull': 'de tirón',
+    'Wide-Grip': 'agarre ancho', 'Wide': 'ancho', 'Close-Grip': 'agarre cerrado', 'Narrow': 'postura cerrada', 'Medium': 'agarre medio', 'Close': 'cerrado', 'Palms-Up': 'palmas arriba', 'Palms-Down': 'palmas abajo', 'Palms': '', 'Overhead': 'sobre la cabeza', 'Behind': 'por detrás', 'Front': 'frontal', 'Rear': 'trasero', 'Side': 'lateral', 'Lateral': 'lateral', 'Cross': 'cruzado', 'Crossed': 'cruzado', 'Sumo': 'sumo', 'Romanian': 'rumano', 'Bulgarian': 'búlgara', 'Zercher': 'Zercher', 'Jefferson': 'Jefferson', 'Arnold': 'Arnold', 'Bradford': 'Bradford', 'Zottman': 'Zottman', 'Spider': 'araña', 'Drag': 'de arrastre', 'Isometric': 'isométrico', 'Static': 'estático', 'Dynamic': 'dinámico', 'Explosive': 'explosivo', 'Speed': 'de velocidad', 'Power': 'de potencia', 'Hang': 'colgante', 'Deficit': 'con déficit', 'Partial': 'parcial', 'Full': 'completo', 'Half': 'medio', 'Quarter': 'cuarto de', 'Low': 'bajo', 'High': 'alto', 'Upper': 'alto', 'Lower': 'bajo', 'Mid': 'medio', 'Straight-Arm': 'brazos rectos', 'Straight': 'recto', 'Bent-Arm': 'brazos flexionados', 'Stiff-Legged': 'piernas rígidas', 'Stiff': 'rígido', 'Assisted': 'asistido', 'Weighted': 'lastrado', 'Wide-Stance': 'postura ancha', 'Narrow-Stance': 'postura cerrada', 'Stance': '', 'Split': 'dividido', 'Walking': 'caminando', 'Backward': 'hacia atrás', 'Forward': 'hacia adelante', 'Linear': 'lineal', 'Rotational': 'rotacional', 'Internal': 'interna', 'External': 'externa', 'Oblique': 'oblicuo', 'Russian': 'ruso', 'Jump': 'con salto', 'Quick': 'rápido', 'Fast': 'rápido', 'Slow': 'lento', 'Cross-Body': 'cruzado', 'Elbow': 'de codo', 'Elbows': 'de codos', 'Iron': '', 'Atlas': 'Atlas', 'Butt': 'de glúteo', 'Hip': 'de cadera', 'Depth': 'en profundidad', '90': 'a 90 grados', 'Extended': 'extendido', 'Squatting': 'en sentadilla', 'Leaning': 'inclinado', 'Push': 'de empuje', 'Pull': 'de tirón',
+    'Lunge': 'en zancada', 'Pike': 'en pica', 'Tuck': 'con rodillas recogidas', 'Tucks': 'con rodillas recogidas',
+    'Underhand': 'agarre supino', 'Supinated': 'supino', 'Pronated': 'pronado', 'Neutral': 'neutro',
+    'Mixed': 'mixto', 'Vertical': 'vertical', 'Diagonal': 'diagonal', 'Upward': 'ascendente', 'Downward': 'descendente',
+    'Anterior': 'anterior', 'Posterior': 'posterior', 'Inner': 'interno', 'Middle': 'medio', 'Parallel': 'paralelo',
+    'Heavy': 'pesado', 'Freehand': 'sin peso', 'Manual': 'manual', 'Natural': 'natural', 'Advanced': 'avanzado',
+    'Intermediate': 'intermedio', 'Olympic': 'olímpico', 'Powerlifting': 'de powerlifting', 'Plyo': 'pliométrico',
+    'Kipping': 'con kipping', 'Scapular': 'escapular', 'Sissy': 'sissy', 'Recumbent': 'reclinado',
+    'Side-Lying': 'de lado', 'One-Legged': 'a una pierna', 'Bent-Knee': 'con rodillas dobladas',
+    'Rocking': 'con balanceo', 'Moving': 'en movimiento', 'Running': 'corriendo', 'Jogging': 'trotando',
+    'Skating': 'de patinador', 'Star': 'estrella', 'Round': 'redondo', 'Open': 'abierto', 'Partials': 'parciales',
+    'Seesaw': 'alterno', 'See-Saw': 'alterno', 'Iso': 'isométrico', 'Butterfly': 'mariposa',
+    'Straddle': 'con piernas abiertas', 'Scissor': 'en tijera', 'Crucifix': 'en cruz', 'Halo': 'halo',
+    'Pyramid': 'en pirámide', 'Series': 'en serie', 'Long': 'largo', 'Above': 'por encima', 'Below': 'por debajo',
+    'Apart': 'separadas', 'Across': 'cruzado', 'Around': 'alrededor', 'Through': 'a través',
+    'Upright': 'al mentón', 'Concentration': 'concentrado', 'Preacher': 'en banco Scott', 'Cambered': 'curvada',
+    'Heaving': 'con impulso', 'Hack': 'hack', 'Dead': 'desde parado', 'Drop': 'en caída', 'Catch': 'con recepción',
+    'Pinch': 'con pinza', 'Squeeze': 'con apretón', 'Squeezes': 'con apretón', 'Release': 'con soltada',
+    'Release-': 'con soltada', 'Start': 'de inicio', 'Return': 'de vuelta', 'Delivery': 'de entrega',
 }
 BODY = {  # word -> "de ..." complement
     'Leg': 'de pierna', 'Legs': 'de piernas', 'Arm': 'de brazo', 'Arms': 'de brazos', 'Chest': 'de pecho', 'Shoulder': 'de hombro', 'Shoulders': 'de hombros', 'Back': 'de espalda', 'Neck': 'de cuello', 'Wrist': 'de muñeca', 'Calf': 'de pantorrilla', 'Calves': 'de pantorrillas', 'Hamstring': 'de isquios', 'Hamstrings': 'de isquios', 'Quad': 'de cuádriceps', 'Quads': 'de cuádriceps', 'Glute': 'de glúteo', 'Glutes': 'de glúteos', 'Hip': 'de cadera', 'Hips': 'de cadera', 'Triceps': 'de tríceps', 'Tricep': 'de tríceps', 'Biceps': 'de bíceps', 'Bicep': 'de bíceps', 'Delt': 'de deltoides', 'Deltoid': 'de deltoides', 'Lat': 'dorsal', 'Lats': 'dorsal', 'Trap': 'de trapecio', 'Ab': 'abdominal', 'Abs': 'abdominal', 'Abdominal': 'abdominal', 'Oblique': 'oblicuo', 'Groin': 'de aductores', 'Adductor': 'de aductores', 'Abductor': 'de abductores', 'Ankle': 'de tobillo', 'Knee': 'de rodilla', 'Knees': 'de rodillas', 'Torso': 'de tronco', 'Core': 'de core', 'Head': 'de cabeza', 'Flexor': 'flexor', 'Forearm': 'de antebrazo', 'Toe': 'de puntas', 'Toes': 'de puntas', 'Heel': 'de talón', 'Thigh': 'de muslo', 'Spine': 'de columna', 'Spinal': 'de columna', 'Piriformis': 'del piriforme', 'Pec': 'de pectoral', 'Muscle': '', 'Rotator': 'del manguito rotador', 'Cuff': '',
+    'Quadriceps': 'de cuádriceps', 'Soleus': 'del sóleo', 'Gastrocnemius': 'del gemelo', 'Tibialis': 'del tibial',
+    'Peroneals': 'de los peroneos', 'Latissimus': 'dorsal', 'Rhomboids': 'de romboides', 'Iliotibial': 'de la banda iliotibial',
+    'Achilles': 'del tendón de Aquiles', 'Sternum': 'al esternón', 'Chin': 'de barbilla', 'Finger': 'de dedos',
+    'Hand': 'de mano', 'Palm': 'de palma', 'Flexors': 'flexores', 'Ham': 'de isquios', 'Piriformis': 'del piriforme',
+    'Brachialis': 'del braquial', 'Rear-Delt': 'de deltoides posterior', 'Calves': 'de pantorrillas',
 }
-NOISE = {'with', 'With', 'the', 'The', 'a', 'A', 'an', 'An', 'on', 'On', 'to', 'To', 'and', 'And', 'from', 'of', 'Of', 'in', 'In', '-', 'Exercise', 'Version', 'Position', 'Attachment', 'Handle', 'Grip', 'Style', 'Movement', 'Stationary', 'Against', 'Off', 'off', 'Up', 'Ups', 'Down', 'Out', 'In', 'Between', 'Elbows', 'Hands', 'Feet', 'Bar', 'Response)', '(Male', '(Female', 'response)', 'Variation'}
+NOISE = {'with', 'With', 'the', 'The', 'a', 'A', 'an', 'An', 'on', 'On', 'to', 'To', 'and', 'And', 'from', 'of', 'Of', 'in', 'In', '-', 'Exercise', 'Version', 'Position', 'Attachment', 'Handle', 'Grip', 'Style', 'Movement', 'Stationary', 'Against', 'Off', 'off', 'Up', 'Ups', 'Down', 'Out', 'In', 'Between', 'Elbows', 'Hands', 'Feet', 'Bar', 'Response)', '(Male', '(Female', 'response)', 'Variation',
+    
+     
+    'Cocoons', 'Groiners', 'Spell', 'Caster', 'Clock', 'Wind', 'Wood', 'Mill',
+    'DB', 'SMR', 'IT', 'No', 'At', 'On-Your-Back', 'Your', 'point', 'Para', 'From', 'Into', 'Looking', 'Facing',
+    'All', 'Fours', 'Technique',
+    'Range', 'Range-Of-Motion', 'Progression', 'Drill', 'Drivers', 'Movers', 'Load', 'Resistance', 'Car',
+    'Bottoms', 'Bottoms-Up', 'Back-Leg', 'Leg-Over', 'Leg-Up',
+    'Hop-Sprint', 'Acceleration', 'Stride', 'Hug', 'Grab', 'Climb', 'Touches', 'Slides', 'Crosses', 'Sides',
+    'Bends', 'Bridges', 'Bridge', 'Drags', 'Adductions', 'Laterals', 'Flyes', 'Pass', 'Fallout', 'Plie', 'Pose',
+    'Handed', 'Palm-In', 'Palm-Up', 'Palms-In', '-Pronated', 'Pronation', 'Supination', 'Sit', 'Step', 'Body',
+    '3', '4', '3-Part', "180's", ',', 'Jogging,', 'Running,', 'Walking,', 'Ships', 'Calf-Machine', 'Ceiling'}
+
+# Late additions, kept apart so the tables above stay readable. The dataset
+# suffixes foam-rolling entries with -SMR, for self-myofascial release.
+BODY.update({
+    'Dorsi-SMR': 'dorsal con rodillo', 'Tibialis-SMR': 'del tibial con rodillo',
+    'Brachialis-SMR': 'del braquial con rodillo', 'Calves-SMR': 'de pantorrillas con rodillo',
+    'Foot-SMR': 'del pie con rodillo', 'Hamstring-SMR': 'de isquios con rodillo',
+    'Peroneals-SMR': 'de peroneos con rodillo', 'Quadriceps-SMR': 'de cuádriceps con rodillo',
+    'Neck-SMR': 'de cuello con rodillo', 'Back-SMR': 'de espalda con rodillo',
+    'Rhomboids-SMR': 'de romboides con rodillo', 'Piriformis-SMR': 'del piriforme con rodillo',
+    'Tract-SMR': 'de la banda iliotibial con rodillo', 'Adductors-SMR': 'de aductores con rodillo',
+    'Quadriceps': 'de cuádriceps', 'Soleus': 'del sóleo', 'Gastrocnemius': 'del gemelo',
+    'Tibialis': 'del tibial', 'Peroneals': 'de los peroneos', 'Latissimus': 'dorsal',
+    'Rhomboids': 'de romboides', 'Iliotibial': 'de la banda iliotibial', 'Achilles': 'del tendón de Aquiles',
+    'Sternum': 'al esternón', 'Chin': 'de barbilla', 'Finger': 'de dedos', 'Hand': 'de mano',
+    'Palm': 'de palma', 'Flexors': 'flexores', 'Ham': 'de isquios', 'Piriformis': 'del piriforme',
+    'Brachialis': 'del braquial', 'Rear-Delt': 'de deltoides posterior', 'Calves': 'de pantorrillas',
+})
+MODIFIERS.update({
+    'Hammer': 'martillo', 'Face': 'a la cara', 'Bell': 'de campana', 'Scoop': 'de cuchara',
+    'Push-off': 'de impulso', 'Inner-Biceps': 'de bíceps interno',
+    # Eponyms and nicknames. Spanish speakers say most of these untranslated,
+    # so they are kept rather than dropped, which is what made "Cuban Press"
+    # come out as a bare "Press".
+    'Gironda': 'Gironda', 'Svend': 'Svend', 'Tate': 'Tate', 'JM': 'JM', 'Janda': 'Janda',
+    'Otis': 'Otis', "Conan's": 'de Conan', 'Frankenstein': 'Frankenstein', 'Cuban': 'cubano',
+    'Judo': 'de judo', 'Carioca': 'carioca', 'Rocky': 'Rocky', 'London': 'London',
+    'Monster': 'monster', 'Gorilla': 'de gorila', 'Bear': 'de oso',
+    'Locust': 'del saltamontes', 'Cat': 'del gato', 'Donkey': 'de burro', 'Claw': 'de garra',
+    'Pirate': 'pirata', 'Circus': 'de circo', 'Rocket': 'cohete', 'Rickshaw': 'rickshaw',
+    'Jammer': 'jammer', 'Anti-Gravity': 'antigravedad', 'Guillotine': 'guillotina',
+    'Prowler': 'con prowler', "Child's": 'del niño', "Dancer's": 'de bailarina',
+    "Runner's": 'de corredor', "World's": 'del mundo', 'Worlds': 'del mundo', 'World': 'del mundo',
+    'Greatest': 'mejor', 'Shotgun': 'shotgun',
+})
 
 NOUN_INDEX = sorted(NOUNS, key=lambda kv: -len(kv[0]))
+NOUN_LOOKUP = dict(NOUNS)
 
 def spanish_name(name):
     """Glossary-based Spanish name. Returns (name, unknown_words)."""
@@ -126,6 +217,9 @@ def spanish_name(name):
             if MODIFIERS[w]: mods.append(MODIFIERS[w])
         elif w in BODY:
             if BODY[w]: comps.append(BODY[w])
+        elif w in NOUN_LOOKUP:
+            # Already the head of some other entry; keep it in Spanish.
+            mods.append(NOUN_LOOKUP[w][:1].lower() + NOUN_LOOKUP[w][1:])
         else:
             unknown.append(w)
     parts = [head] if head else []

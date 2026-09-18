@@ -16,7 +16,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ local
     <main className="flex flex-col gap-4 px-4 py-6">
       <h1 className="font-display text-3xl font-bold">{t('title')}</h1>
       <AccountCard locale={locale} email={identity.email} anonymous={identity.anonymous} />
-      <SettingsPanel locale={locale} units={profile.units as 'metric' | 'imperial'} timezone={profile.timezone} displayName={profile.display_name} />
+      <SettingsPanel locale={locale} units={profile.units as 'metric' | 'imperial'} timezone={profile.timezone} displayName={profile.display_name} anonymous={identity.anonymous} />
     </main>
   )
 }

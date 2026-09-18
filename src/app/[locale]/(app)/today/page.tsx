@@ -99,6 +99,7 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
   // on today and earlier only. It also could not be read back on a future day:
   // the window ends today.
   const reportable = compareDates(selected, today) <= 0
+  const isToday = compareDates(selected, today) === 0
   const painToday = painOn(painReports, iso)
   const painHistory = painBefore(painReports, iso)
 
@@ -172,6 +173,7 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
         editable={editable}
         review={thisWeek && !deloadTaken ? review : null}
         reportable={reportable}
+        isToday={isToday}
         food={food}
         frequentFoods={frequentFoods}
         painToday={painToday}

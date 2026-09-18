@@ -124,21 +124,41 @@ Anonymous sign-ins**. With it off, the button returns a message saying so rather
 failing silently. Anonymous users are free on the free tier; if the app is ever abused to
 mint accounts in bulk, the same screen has a Captcha option.
 
-**Magic link**, for someone coming back on a new device. If links sometimes appear to work
-and then do not sign the person in, the cause is almost always PKCE: the default email
-template sends the browser through the auth server and back with a `code`, and exchanging
-that code needs a verifier cookie held by the browser that *asked* for the link. Open the
-link in a mail app's built-in browser and the verifier is somewhere else, so the exchange
-fails. The app already detects this case and says "you opened it on another device" rather
-than blaming an expired link.
+**Magic link**, for someone coming back on a new device. Three things break it, and the
+project's own auth log (Supabase dashboard → Logs → Auth) names which one every time. Read
+it before changing anything: each failure below is a distinct line there.
 
-The fix is to stop sending PKCE links, which is step 3 of the deployment list above. If
-you are seeing this failure, that step has not been applied to the project the app is
-actually pointed at: check the **Magic Link** template really carries
-`{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email` rather than
-`{{ .ConfirmationURL }}`, and that **Redirect URLs** includes `https://<domain>/**`. A link
-whose redirect is not on that list is sent to the Site URL instead, which looks exactly
-like clicking the link and nothing happening.
+`422 Email logins are disabled` — the Email provider is switched off under **Authentication
+→ Sign In / Up → Email**. Nothing is sent, nothing is retryable, and the sign-in screen now
+says exactly this rather than "we could not send the link".
+
+`429 email rate limit exceeded` — Supabase's built-in mailer is capped at a couple of
+messages an hour per project and is explicitly not for production. This is the usual cause
+of "it worked yesterday and not today": the third attempt in an hour silently sends
+nothing. The real fix is custom SMTP under **Authentication → Emails → SMTP Settings**;
+Resend's free tier (3,000 a month) and Brevo's (300 a day) both cover an app this size at
+no cost. Until then the screen tells the athlete to wait rather than to keep pressing.
+
+`403 Email link is invalid or has expired` / `One-time token not found` — the token was
+already spent. Either the link was opened in a browser other than the one that asked for it
+(PKCE: exchanging the code needs a verifier cookie held by the *requesting* browser, which a
+mail app's built-in browser does not have), or a mail scanner followed the link before the
+athlete did. A single GET spends it either way.
+
+The durable answer to that last one is the **six-digit code**, which the check-email screen
+now offers behind "the link did not work?". It is verified from the browser the athlete is
+already sitting in, so there is no verifier to be missing, and no scanner can spend it by
+looking at it. It needs the code to actually be in the email: under **Authentication →
+Emails → Magic Link**, the template must include `{{ .Token }}`. The default template is
+link-only, so add a line such as
+
+```html
+<p>Or enter this code: <strong>{{ .Token }}</strong></p>
+```
+
+Also worth checking once: **Redirect URLs** must include `https://<domain>/**`. A link whose
+redirect is not on that list is sent to the Site URL instead, which looks exactly like
+clicking the link and nothing happening.
 
 ## Inviting people
 

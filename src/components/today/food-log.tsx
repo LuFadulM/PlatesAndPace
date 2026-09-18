@@ -19,12 +19,15 @@ const field = 'min-h-11 w-full rounded-lg border border-(--color-border) bg-(--c
  */
 export function FoodLog({
   date,
+  isToday,
   entries,
   frequent,
   targetKcal,
   macros,
 }: {
   date: string
+  /** Whether `date` is the athlete's own today, which changes the empty copy. */
+  isToday: boolean
   entries: FoodEntry[]
   frequent: FrequentFood[]
   targetKcal: number
@@ -33,6 +36,7 @@ export function FoodLog({
   const t = useTranslations('food')
   const [open, setOpen] = useState(false)
   const [failed, setFailed] = useState(false)
+  const [removeFailed, setRemoveFailed] = useState(false)
   const [pending, startTransition] = useTransition()
   const [form, setForm] = useState({ name: '', kcal: '', proteinG: '', carbsG: '', fatG: '' })
 
@@ -41,6 +45,7 @@ export function FoodLog({
 
   const submit = (entry: { name: string; kcal: number; proteinG: number; carbsG: number; fatG: number }) => {
     setFailed(false)
+    setRemoveFailed(false)
     startTransition(async () => {
       const result = await logFood({ date, ...entry })
       if (!result?.ok) setFailed(true)
@@ -82,7 +87,7 @@ export function FoodLog({
       </dl>
 
       {entries.length === 0 ? (
-        <p className="text-xs text-(--color-ink-muted)">{t('empty')}</p>
+        <p className="text-xs text-(--color-ink-muted)">{isToday ? t('empty') : t('emptyPast')}</p>
       ) : (
         <ul className="flex flex-col gap-1" aria-label={t('title')}>
           {entries.map((e) => (
@@ -93,7 +98,15 @@ export function FoodLog({
                 type="button"
                 aria-label={t('remove', { name: e.name })}
                 disabled={pending}
-                onClick={() => startTransition(async () => { await removeFood({ id: e.id }) })}
+                onClick={() => {
+                  setRemoveFailed(false)
+                  startTransition(async () => {
+                    const result = await removeFood({ id: e.id })
+                    // The row is rendered from the server's copy, so a failed
+                    // delete leaves it on screen with nothing said. Say it.
+                    if (!result?.ok) setRemoveFailed(true)
+                  })
+                }}
                 className="min-h-11 shrink-0 px-2 text-(--color-plate-red)"
               >
                 ×
@@ -120,6 +133,7 @@ export function FoodLog({
       )}
 
       {failed && <p role="alert" className="text-xs text-(--color-plate-red)">{t('error')}</p>}
+      {removeFailed && <p role="alert" className="text-xs text-(--color-plate-red)">{t('removeError')}</p>}
 
       {open ? (
         <form

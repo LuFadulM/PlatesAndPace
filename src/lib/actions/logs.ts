@@ -2,8 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
-import { compareDates, fromISODate, todayInZone } from '@/domain/dates'
-import { getActiveAnswers } from '@/lib/data/profile'
+import { compareDates, fromISODate } from '@/domain/dates'
+import { getAthleteToday } from '@/lib/data/profile'
 import { createClient } from '@/lib/supabase/server'
 import type { Json } from '@/types/database'
 
@@ -173,8 +173,8 @@ export async function reportPain(input: unknown) {
   // A session in the future has not happened, so there is nothing to report
   // about it, and the reader's window ends today: a row written there would be
   // invisible for ever.
-  const answers = await getActiveAnswers()
-  if (answers && compareDates(fromISODate(date), todayInZone(answers.basics.timezone)) > 0) {
+  const today = await getAthleteToday()
+  if (today && compareDates(fromISODate(date), today) > 0) {
     return { ok: false as const }
   }
 

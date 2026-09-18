@@ -2,8 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
-import { compareDates, fromISODate, todayInZone } from '@/domain/dates'
-import { getActiveAnswers } from '@/lib/data/profile'
+import { compareDates, fromISODate } from '@/domain/dates'
+import { getAthleteToday } from '@/lib/data/profile'
 import { createClient } from '@/lib/supabase/server'
 
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
@@ -32,9 +32,10 @@ export async function logFood(input: unknown) {
   if (!user) return { ok: false as const }
 
   // Food belongs to a day that has happened. A meal cannot be eaten in advance,
-  // and the fuel card only ever reads today and earlier.
-  const answers = await getActiveAnswers()
-  if (answers && compareDates(fromISODate(date), todayInZone(answers.basics.timezone)) > 0) {
+  // and the fuel card only ever reads today and earlier. "Today" is the zone the
+  // athlete set in Settings, the same one the page used to decide what to show.
+  const today = await getAthleteToday()
+  if (today && compareDates(fromISODate(date), today) > 0) {
     return { ok: false as const }
   }
 

@@ -1,11 +1,44 @@
 'use server'
 
+import type { Route } from 'next'
 import { redirect } from 'next/navigation'
-import { headers } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { z } from 'zod'
 import { defaultLocale, isLocale, type Locale } from '@/i18n/routing'
-import { classifySendFailure } from '@/lib/auth/errors'
+import { classifySendFailure, classifyVerifyFailure } from '@/lib/auth/errors'
+import { safeRedirectPath } from '@/lib/auth/routes'
 import { createClient } from '@/lib/supabase/server'
+
+/**
+ * Where the address just typed is parked while the athlete goes to their inbox.
+ *
+ * `verifyOtp` needs the address alongside the code, and the check-email screen
+ * has no other way to know it. It stays server-side in an httpOnly cookie
+ * rather than riding in the URL, so it never reaches a browser history, a
+ * referrer header or an access log. Where they were headed rides along for the
+ * same reason, and so the screen keeps a static route.
+ */
+const PENDING_EMAIL = 'hyex_pending_email'
+const PENDING_TTL_SECONDS = 60 * 60
+
+interface PendingSignIn {
+  email: string
+  next?: string
+}
+
+async function readPending(): Promise<PendingSignIn | null> {
+  const raw = (await cookies()).get(PENDING_EMAIL)?.value
+  if (!raw) return null
+  try {
+    const parsed: unknown = JSON.parse(raw)
+    if (typeof parsed !== 'object' || parsed === null) return null
+    const { email, next } = parsed as Record<string, unknown>
+    if (typeof email !== 'string' || email.length === 0) return null
+    return { email, next: typeof next === 'string' ? next : undefined }
+  } catch {
+    return null
+  }
+}
 
 const signInSchema = z.object({
   email: z.string().trim().min(1).email(),
@@ -55,7 +88,63 @@ export async function sendMagicLink(
     return { errorKey: `auth.errors.${classifySendFailure(error)}` }
   }
 
+  const jar = await cookies()
+  jar.set(PENDING_EMAIL, JSON.stringify({ email, next } satisfies PendingSignIn), {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
+    maxAge: PENDING_TTL_SECONDS,
+  })
+
   redirect(`/${locale}/check-email`)
+}
+
+/** Whether the check-email screen can offer the code box at all. */
+export async function hasPendingEmail(): Promise<boolean> {
+  return (await readPending()) !== null
+}
+
+const codeSchema = z.object({
+  code: z.string().trim().regex(/^\d{6}$/),
+  locale: z.string().refine(isLocale),
+})
+
+/**
+ * Signs in from the six-digit code in the email instead of the link.
+ *
+ * The link is the fragile half of this flow, for two reasons the project's auth
+ * log shows plainly. It carries a PKCE code whose verifier lives in the browser
+ * that asked for it, so opening it in a mail app's built-in browser cannot
+ * work; and a single GET spends it, so a scanner that follows links before the
+ * athlete does leaves them a token that is already gone.
+ *
+ * A typed code has neither problem. It is verified from the session that asked
+ * for it, on the device in front of them, and nothing can spend it by looking
+ * at it.
+ */
+export async function verifyEmailCode(
+  _previous: SignInState,
+  formData: FormData,
+): Promise<SignInState> {
+  const parsed = codeSchema.safeParse({
+    code: formData.get('code'),
+    locale: formData.get('locale'),
+  })
+  if (!parsed.success) return { errorKey: 'auth.errors.codeInvalid' }
+
+  const { code, locale } = parsed.data
+  const pending = await readPending()
+  if (!pending) return { errorKey: 'auth.errors.codeNoEmail' }
+
+  const supabase = await createClient()
+  const { error } = await supabase.auth.verifyOtp({ email: pending.email, token: code, type: 'email' })
+  if (error) return { errorKey: `auth.errors.${classifyVerifyFailure(error)}` }
+
+  ;(await cookies()).delete(PENDING_EMAIL)
+  // Already validated to a same-origin, locale-relative path; the cast is only
+  // to satisfy typed routes, which cannot know that from a string.
+  redirect(safeRedirectPath(pending.next ?? null, locale) as Route)
 }
 
 /**
