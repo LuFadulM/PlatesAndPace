@@ -3,7 +3,8 @@ import type { PrimaryGoal, Units } from '../profile/types'
 import { loadForTarget, roundLoad, type PlateInventory } from '../strength/loads'
 import { phaseParameters } from '../strength/periodization'
 import { doubleProgression, progressionScheme, type LoggedSetLike, type ProgressionReason, type ProgressionScheme } from '../strength/progression'
-import type { GymSession, PlannedExercise } from './generator'
+import type { GymSession, PlannedExercise, RunSession } from './generator'
+import type { TrainingPaces } from '../running'
 
 /** The smallest step the implement offers, for double progression. */
 const INCREMENT_KG: Record<string, number> = { barbell: 2.5, dumbbell: 2, machine: 5, cable: 2.5, bodyweight: 0 }
@@ -63,4 +64,56 @@ export function resolveLoads(
     return { ...e, loadKg: round(raw), progression: { scheme, reason: 'max' } }
   }
   return { ...gym, exercises: gym.exercises.map(resolve), finisher: gym.finisher ? resolve(gym.finisher) : undefined }
+}
+
+/** Warm-up and cool-down either side of a threshold block, in minutes. */
+const THRESHOLD_SHOULDER_MINUTES = 20
+/** Easy kilometres either side of an interval session. */
+const INTERVAL_SHOULDER_KM = 3
+
+const round1 = (km: number) => Math.round(km * 10) / 10
+
+/**
+ * Re-derives a run's targets from the athlete's current paces, the same way
+ * `resolveLoads` re-derives weights.
+ *
+ * A session generated in week one still shows this week's paces, so the runs
+ * an athlete logs actually change what the plan asks of them. Each kind keeps
+ * whatever the generator treated as fixed — a long run keeps its distance and
+ * an easy run keeps its duration — so getting faster means covering more
+ * ground in the same time, not being handed a longer session.
+ */
+export function resolveRunPaces(run: RunSession, paces: TrainingPaces | null): RunSession {
+  if (!paces) return run
+
+  switch (run.kind) {
+    case 'easy':
+      return { ...run, paceSecPerKm: paces.easy, km: round1((run.minutes * 60) / paces.easy) }
+
+    case 'long':
+      return { ...run, paceSecPerKm: paces.long, minutes: Math.round((run.km * paces.long) / 60) }
+
+    case 'threshold': {
+      const work = run.hardMinutes
+      const km = (work * 60) / paces.threshold + (THRESHOLD_SHOULDER_MINUTES * 60) / paces.easy
+      return { ...run, paceSecPerKm: paces.threshold, minutes: work + THRESHOLD_SHOULDER_MINUTES, km: round1(km) }
+    }
+
+    case 'interval': {
+      if (!run.intervals) return { ...run, paceSecPerKm: paces.interval }
+      const intervals = { ...run.intervals, paceSecPerKm: paces.interval }
+      const workKm = (intervals.reps * intervals.workMeters) / 1000
+      return {
+        ...run,
+        intervals,
+        paceSecPerKm: paces.interval,
+        km: round1(workKm + INTERVAL_SHOULDER_KM),
+        hardMinutes: Math.round((workKm * paces.interval) / 60),
+      }
+    }
+
+    // Run/walk is prescribed in minutes by someone who cannot yet hold a pace.
+    default:
+      return run
+  }
 }

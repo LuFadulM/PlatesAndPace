@@ -5,6 +5,8 @@ import { z } from 'zod'
 import { addDays, compareDates, fromISODate, todayInZone, toISODate, type PlainDate } from '@/domain/dates'
 import { generatePlan, regenerateGymSession, type GeneratedPlan, type PlannedDay } from '@/domain/plan'
 import { buildAthleteModel } from '@/domain/profile/athlete'
+import { improvedBaseline } from '@/domain/running'
+import { getRunEfforts } from '@/lib/data/running'
 import { anyHealthFlag, hasRedFlag, questionnaireSchema } from '@/domain/profile/questionnaire'
 import { planSeed } from '@/domain/strength/rng'
 import { MUSCLE_GROUPS, type MuscleGroup } from '@/domain/strength/volume'
@@ -86,13 +88,19 @@ async function materialise(
   const { data: current } = await supabase.from('plans').select('*').eq('user_id', userId).order('block', { ascending: false }).limit(1).maybeSingle()
   const block = (current?.block ?? 0) + 1
 
-  const [maxes, swaps, recent] = await Promise.all([
+  const [maxes, swaps, recent, efforts] = await Promise.all([
     latestMaxes(today),
     getSwaps(),
     exerciseIdsUsedSince(addDays(today, -7)),
+    getRunEfforts(),
   ])
 
-  const plan: GeneratedPlan = generatePlan(model, {
+  // A new block starts from the fitness the athlete has now, not the answer
+  // they gave at signup: long runs and interval paces both come off this.
+  const learned = improvedBaseline(model.recentRun, efforts)
+  const fitNow = learned ? { ...model, recentRun: learned } : model
+
+  const plan: GeneratedPlan = generatePlan(fitNow, {
     block,
     seed: planSeed(userId, block),
     previousMaxes: maxes,

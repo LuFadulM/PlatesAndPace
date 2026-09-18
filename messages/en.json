@@ -2539,5 +2539,36 @@
       "authored": "Coached",
       "open": "Open catalogue"
     }
+  },
+  "running": {
+    "title": "Your running",
+    "baseline": "Current 5K equivalent",
+    "vdot": "VDOT",
+    "paces": "Training paces",
+    "predictions": "What you could race today",
+    "predictionsHint": "Estimated from your best logged effort, as a range. The further from that distance, the wider the range.",
+    "learned": "Improved from a run you logged, not just what you told us at signup.",
+    "race": {
+      "5k": "5K",
+      "10k": "10K",
+      "half": "Half marathon"
+    },
+    "pace": {
+      "easy": "Easy",
+      "long": "Long run",
+      "marathon": "Marathon",
+      "threshold": "Threshold",
+      "interval": "Intervals",
+      "repetition": "Reps"
+    },
+    "paceHint": {
+      "easy": "Most of your week. Conversational on purpose.",
+      "long": "Slower than easy, for the weekend run.",
+      "marathon": "Steady, all-day effort.",
+      "threshold": "Comfortably hard, about an hour's race pace.",
+      "interval": "Hard reps around 3 to 5 minutes.",
+      "repetition": "Short and fast, for speed rather than fitness."
+    },
+    "empty": "Tell us a recent run, or log one, and your paces will appear here."
   }
 }

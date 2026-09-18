@@ -2539,5 +2539,36 @@
       "authored": "Con coaching",
       "open": "Catálogo abierto"
     }
+  },
+  "running": {
+    "title": "Tu carrera",
+    "baseline": "Equivalente actual a 5K",
+    "vdot": "VDOT",
+    "paces": "Ritmos de entrenamiento",
+    "predictions": "Lo que podrías correr hoy",
+    "predictionsHint": "Estimado a partir de tu mejor esfuerzo registrado, como un rango. Cuanto más lejos de esa distancia, más amplio el rango.",
+    "learned": "Mejorado con una carrera que registraste, no solo con lo que nos dijiste al principio.",
+    "race": {
+      "5k": "5K",
+      "10k": "10K",
+      "half": "Media maratón"
+    },
+    "pace": {
+      "easy": "Suave",
+      "long": "Tirada larga",
+      "marathon": "Maratón",
+      "threshold": "Umbral",
+      "interval": "Series",
+      "repetition": "Repeticiones"
+    },
+    "paceHint": {
+      "easy": "La mayor parte de tu semana. Conversacional a propósito.",
+      "long": "Más lento que el suave, para la tirada del fin de semana.",
+      "marathon": "Constante, de los que aguantas todo el día.",
+      "threshold": "Cómodamente duro, el ritmo de una hora de competencia.",
+      "interval": "Series duras de 3 a 5 minutos.",
+      "repetition": "Cortas y rápidas, para velocidad más que para fondo."
+    },
+    "empty": "Cuéntanos una carrera reciente, o registra una, y tus ritmos aparecerán aquí."
   }
 }

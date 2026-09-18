@@ -5,7 +5,7 @@ import { SessionView, type LoggedSet } from '@/components/today/session-view'
 import { ageOn } from '@/domain/profile/types'
 import { estimateNutrition, type NutritionEstimate } from '@/domain/nutrition'
 import { compareDates, endOfPlanWeek, fromISODate, isValidPlainDate, startOfPlanWeek, todayInZone, toISODate, weekStrip } from '@/domain/dates'
-import { resolveLoads } from '@/domain/plan'
+import { resolveLoads, resolveRunPaces } from '@/domain/plan'
 import { applyReviewToSession } from '@/domain/review'
 import { alternativesFor, catalogueFor } from '@/domain/plan/edit'
 import { buildAthleteModel } from '@/domain/profile/athlete'
@@ -17,6 +17,7 @@ import { getSessionLogWithSets, lastPerformances, latestMaxDetails, type MaxDeta
 import { getCurrentPlan, getDoneDates, getPlannedDay, getPlannedDays } from '@/lib/data/plan'
 import { getActiveAnswers, getLatestWeightKg, getRecentWeights, requireProfile } from '@/lib/data/profile'
 import { getLastWeekReview } from '@/lib/data/review'
+import { getCurrentPaces } from '@/lib/data/running'
 
 export default async function TodayPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ date?: string }> }) {
   const { locale } = await params
@@ -40,9 +41,16 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
     getActiveAnswers(),
     getLatestWeightKg(),
   ])
-  const [recentWeights, review] = await Promise.all([
+  const [recentWeights, review, running] = await Promise.all([
     getRecentWeights(toISODate(today)),
     getLastWeekReview(today),
+    // Paces learned from logged runs, so a runner who got faster trains faster.
+    answers?.experience.recentRun
+      ? getCurrentPaces(
+          { km: answers.experience.recentRun.km, seconds: answers.experience.recentRun.minutes * 60 },
+          answers.goals.targetRace,
+        )
+      : getCurrentPaces(undefined),
   ])
   const maxes = Object.fromEntries(Object.entries(maxDetails).map(([id, d]) => [id, d.e1rm]))
   const units = profile.units as 'metric' | 'imperial'
@@ -60,6 +68,9 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
   // athlete scrolls back to already happened, and one further out will get its
   // own review when that week arrives.
   const thisWeek = compareDates(selected, startOfPlanWeek(today)) >= 0 && compareDates(selected, endOfPlanWeek(today)) <= 0
+  if (resolved?.run) {
+    resolved = { ...resolved, run: resolveRunPaces(resolved.run, running?.paces ?? null) }
+  }
   if (resolved?.gym && review && thisWeek) {
     resolved = { ...resolved, gym: applyReviewToSession(resolved.gym, review, { units, plates, focus: (answers?.preferences.focusAreas ?? []).flatMap(musclesForFocusArea) }) }
   }
