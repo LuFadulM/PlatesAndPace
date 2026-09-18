@@ -66,7 +66,9 @@ export function AccountCard({ locale, email, anonymous }: { locale: Locale; emai
           </label>
           {errorKey && (
             <p role="alert" className="text-sm text-(--color-plate-red)">
-              {errorKey.startsWith('auth.') ? tAuth(errorKey.replace('auth.', '')) : t('attachFailed')}
+              {errorKey.startsWith('auth.')
+                ? tAuth(errorKey.replace('auth.', ''))
+                : t(errorKey.replace('settings.account.', ''))}
             </p>
           )}
           <button type="submit" disabled={pending || !value.trim()} className="min-h-11 rounded-lg bg-(--color-plate-blue) font-semibold text-white disabled:opacity-60">

@@ -23,6 +23,12 @@ export async function getFoodLog(date: string): Promise<FoodEntry[]> {
 /**
  * The athlete's own most-used entries, for one-tap repeats. Read over a window
  * rather than all time so a food they have stopped eating stops being offered.
+ *
+ * The cap is there so a heavy logger cannot drag a page load; it has to take the
+ * newest rows, not the oldest, or someone who logs six times a day would spend
+ * the whole budget on the far end of the window and be offered chips from a
+ * month ago. The rows come back newest first for that reason and are reversed
+ * here, because `frequentFoods` reads oldest first.
  */
 export async function getFrequentFoods(today: PlainDate, days = 30): Promise<FrequentFood[]> {
   const supabase = await createClient()
@@ -34,7 +40,7 @@ export async function getFrequentFoods(today: PlainDate, days = 30): Promise<Fre
     .eq('user_id', user.id)
     .gte('date', toISODate(addDays(today, -days)))
     .lte('date', toISODate(today))
-    .order('logged_at')
+    .order('logged_at', { ascending: false })
     .limit(500)
-  return frequentFoods((data ?? []).map(toEntry))
+  return frequentFoods((data ?? []).reverse().map(toEntry))
 }

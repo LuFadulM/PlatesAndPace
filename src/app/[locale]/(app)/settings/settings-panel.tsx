@@ -7,9 +7,16 @@ import type { Locale } from '@/i18n/routing'
 import { signOut } from '@/app/[locale]/sign-in/actions'
 import { deleteMyAccount, exportMyData, updateLocale, updateTimezone, updateUnits } from '@/lib/actions/account'
 
-interface Props { locale: Locale; units: 'metric' | 'imperial'; timezone: string; displayName: string }
+interface Props {
+  locale: Locale
+  units: 'metric' | 'imperial'
+  timezone: string
+  displayName: string
+  /** True while the account has no email, so this session is the only key to it. */
+  anonymous: boolean
+}
 
-export function SettingsPanel({ locale, units, timezone, displayName }: Props) {
+export function SettingsPanel({ locale, units, timezone, displayName, anonymous }: Props) {
   const t = useTranslations('settings')
   const tLocale = useTranslations('locale')
   const tD = useTranslations('disclaimer')
@@ -18,6 +25,7 @@ export function SettingsPanel({ locale, units, timezone, displayName }: Props) {
   const [pending, start] = useTransition()
   const [tz, setTz] = useState(timezone)
   const [confirmDelete, setConfirmDelete] = useState('')
+  const [confirmSignOut, setConfirmSignOut] = useState(false)
   const field = 'min-h-11 w-full rounded-lg border border-(--color-border) bg-(--color-surface) px-3'
   const row = 'flex flex-col gap-2 rounded-xl border border-(--color-border) bg-(--color-surface) p-4'
 
@@ -73,8 +81,21 @@ export function SettingsPanel({ locale, units, timezone, displayName }: Props) {
         <p className="text-sm text-(--color-ink-muted)">{tD('long')}</p>
       </section>
 
-      <section className={row}>
-        <button type="button" disabled={pending} onClick={() => start(async () => { await signOut(locale) })} className="min-h-11 rounded-lg border border-(--color-border) font-semibold">{t('signOut')}</button>
+      {/* On an account with no email there is no second way back in: the session
+          cookie is the only key, so signing out is a delete in everything but
+          name. It gets a gate of its own rather than sharing the plain button. */}
+      <section className={anonymous ? `${row} border-(--color-plate-red)` : row}>
+        {anonymous && (
+          <>
+            <h2 className="font-display text-lg font-bold text-(--color-plate-red)">{t('signOutAnonymousTitle')}</h2>
+            <p className="text-sm text-(--color-ink-muted)">{t('signOutAnonymousHelp')}</p>
+            <label className="flex items-start gap-2 text-sm">
+              <input type="checkbox" checked={confirmSignOut} onChange={(e) => setConfirmSignOut(e.target.checked)} className="mt-1 size-4" />
+              <span>{t('signOutUnderstand')}</span>
+            </label>
+          </>
+        )}
+        <button type="button" disabled={pending || (anonymous && !confirmSignOut)} onClick={() => start(async () => { await signOut(locale) })} className={`min-h-11 rounded-lg border font-semibold disabled:opacity-40 ${anonymous ? 'border-(--color-plate-red) text-(--color-plate-red)' : 'border-(--color-border)'}`}>{t('signOut')}</button>
       </section>
 
       <section className={`${row} border-(--color-plate-red)`}>

@@ -1,5 +1,6 @@
 import { redirect } from '@/i18n/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { todayInZone, type PlainDate } from '@/domain/dates'
 import { questionnaireSchema, type QuestionnaireAnswers } from '@/domain/profile/questionnaire'
 import type { WeightPoint } from '@/domain/nutrition'
 import type { Tables } from '@/types/database'
@@ -52,6 +53,23 @@ export async function requireProfile(locale: 'en' | 'es'): Promise<Profile> {
   const profile = await getProfile()
   if (!profile?.onboarded_at) redirect({ href: '/onboarding', locale })
   return profile as Profile
+}
+
+/**
+ * The athlete's own calendar date.
+ *
+ * Settings writes the zone to `profiles.timezone`; the questionnaire's copy is a
+ * snapshot from onboarding and stops moving the moment Settings is used. Every
+ * screen reads the profile, so a guard that read the questionnaire instead would
+ * disagree with what the athlete is looking at — by a day, and permanently. The
+ * questionnaire is only a fallback for an account whose profile predates the
+ * column being filled.
+ */
+export async function getAthleteToday(): Promise<PlainDate | null> {
+  const profile = await getProfile()
+  if (profile?.timezone) return todayInZone(profile.timezone)
+  const answers = await getActiveAnswers()
+  return answers ? todayInZone(answers.basics.timezone) : null
 }
 
 /** Daily weights over the last `days`, oldest first, for the adaptive nutrition loop. */

@@ -2347,6 +2347,9 @@
     "privacyLink": "Privacy",
     "disclaimerTitle": "Not medical advice",
     "signOut": "Sign out",
+    "signOutAnonymousTitle": "Sign out ends this account",
+    "signOutAnonymousHelp": "There is no email on this account, so this browser is the only way back into it. Sign out now and your plan and your logs are gone for good. Add an email above first and you can sign back in from anywhere.",
+    "signOutUnderstand": "I understand I will lose my plan.",
     "deleteTitle": "Delete account",
     "deleteHelp": "Deletes your account and every piece of data with it. This cannot be undone.",
     "deleteConfirmLabel": "Type DELETE to confirm",
@@ -2359,8 +2362,9 @@
       "email": "Email",
       "attach": "Add my email",
       "attaching": "Sending…",
-      "attachSent": "Check your inbox and open the link to finish. Nothing is lost if you do it later.",
+      "attachSent": "If that address is free, a link is on its way — open it to finish. Nothing is lost if you do it later.",
       "attachFailed": "Could not add that address. It may already belong to another account.",
+      "attachNotAllowed": "This account already has an email on it.",
       "signedInAs": "Signed in as {email}"
     }
   },
@@ -2624,6 +2628,7 @@
   "food": {
     "title": "What you ate",
     "empty": "Nothing logged yet today.",
+    "emptyPast": "Nothing was logged on this day.",
     "eaten": "{kcal} of {target} kcal",
     "over": "{kcal} over",
     "left": "{kcal} left",
@@ -2639,6 +2644,7 @@
     "remove": "Remove {name}",
     "again": "Log again",
     "error": "Could not add that. Try again.",
+    "removeError": "Could not remove that. Try again.",
     "noDatabase": "You enter your own numbers. Hyex does not look foods up, so nothing here is guessed."
   }
 }
