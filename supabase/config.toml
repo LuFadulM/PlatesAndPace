@@ -36,7 +36,12 @@ enable_signup = true
 
 [auth.email]
 enable_signup = true
-enable_confirmations = true
+# Off on purpose, and the production project should match. With confirmations on,
+# a new account gets no session until a link is opened — which puts the inbox
+# back in the way of every sign-up and hands the mailer's two-an-hour cap the
+# power to stop anyone signing up at all. A password is the credential here; the
+# address is for recovery.
+enable_confirmations = false
 
 # Google sign-in is configured but left off until credentials exist, so the
 # local stack starts without them (PLAN.md §14).

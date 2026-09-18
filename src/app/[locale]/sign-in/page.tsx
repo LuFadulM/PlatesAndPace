@@ -29,18 +29,17 @@ export default async function SignInPage({
         </p>
       ) : null}
 
-      {/* The fast path first: most people arriving here have no account yet,
-          and an email they must go and open is the step they drop out at. */}
-      <StartFree locale={locale} />
+      {/* Email and a password lead. They work on every device, for everybody,
+          and send nothing: no inbox to open, no mailer quota to wait on. */}
+      <SignInForm locale={locale} next={next} />
 
       <div className="flex items-center gap-3" aria-hidden="true">
         <span className="h-px flex-1 bg-(--color-border)" />
-        <span className="text-xs uppercase tracking-wide text-(--color-ink-muted)">{t('orEmail')}</span>
+        <span className="text-xs uppercase tracking-wide text-(--color-ink-muted)">{t('orNoEmail')}</span>
         <span className="h-px flex-1 bg-(--color-border)" />
       </div>
 
-      <p className="text-xs text-(--color-ink-muted)">{t('haveAccount')}</p>
-      <SignInForm locale={locale} next={next} />
+      <StartFree locale={locale} />
     </main>
   )
 }

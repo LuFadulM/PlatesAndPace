@@ -109,9 +109,26 @@ it prints, enable the provider in Supabase → Authentication → Providers, and
 
 ## Accounts
 
-Two ways in, and the fast one asks for nothing.
+Three ways in. The first sends nothing at all, which is the point.
 
-**Start without an email.** The sign-in screen leads with it. Supabase issues an anonymous
+**Email and a password.** What the sign-in screen leads with, and what anyone
+other than the author needs. A password is typed once and travels with the
+person: it works on a second phone, a laptop and a friend's browser without a
+message being sent, and it does not queue behind a mailer that allows two
+messages an hour. Sign-up and sign-in are the same form with a toggle; a
+forgotten password falls back to the emailed link, which is the only time an
+inbox is involved.
+
+This needs two project settings, both under **Authentication**: the **Email**
+provider on, and **Confirm email** *off*. With confirmations on, Supabase
+withholds the session until a link is opened, which puts the inbox back in front
+of every new account and hands the mailer's cap the power to stop sign-ups
+entirely. `supabase/config.toml` sets `enable_confirmations = false` so local
+development matches. The address is for recovery; the password is the
+credential.
+
+**Start without an email.** For someone who wants to try the app before
+deciding anything. Supabase issues an anonymous
 user, which is a real row in `auth.users`, so every row level security policy here — all of
 them keyed on `auth.uid() = user_id` — applies unchanged. No address, no link to open, no
 confirmation. The trade is real and the screen says it: the session lives in that browser,
