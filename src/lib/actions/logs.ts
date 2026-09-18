@@ -2,6 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { compareDates, fromISODate, todayInZone } from '@/domain/dates'
+import { getActiveAnswers } from '@/lib/data/profile'
 import { createClient } from '@/lib/supabase/server'
 import type { Json } from '@/types/database'
 
@@ -140,6 +142,57 @@ export async function logWeight(input: unknown) {
     .from('body_measurements')
     .upsert({ user_id: user.id, date: parsed.data.date, weight_kg: Math.round(parsed.data.weightKg * 100) / 100 }, { onConflict: 'user_id,date' })
   if (error) return { ok: false as const }
+  revalidatePath('/', 'layout')
+  return { ok: true as const }
+}
+
+const painSchema = z.object({
+  date: isoDate,
+  exerciseId: z.string().min(1).max(80),
+  /** 0 clears the report, 1 twinge, 2 hurts, 3 stop. */
+  severity: z.number().int().min(0).max(3),
+})
+
+/**
+ * Records that a movement hurt today (CLAUDE.md, rule 2).
+ *
+ * Stored per session and per exercise, not per set: an athlete reports that
+ * squats hurt their knee, not that the third rep did. Reporting zero removes
+ * the entry, because a mis-tap should be undoable and an absent entry means
+ * "not reported" rather than "no pain".
+ */
+export async function reportPain(input: unknown) {
+  const parsed = painSchema.safeParse(input)
+  if (!parsed.success) return { ok: false as const }
+  const { date, exerciseId, severity } = parsed.data
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { ok: false as const }
+
+  // A session in the future has not happened, so there is nothing to report
+  // about it, and the reader's window ends today: a row written there would be
+  // invisible for ever.
+  const answers = await getActiveAnswers()
+  if (answers && compareDates(fromISODate(date), todayInZone(answers.basics.timezone)) > 0) {
+    return { ok: false as const }
+  }
+
+  const id = await ensureSessionLog(date, null)
+  if (!id) return { ok: false as const }
+  const { data: row } = await supabase.from('session_logs').select('pain').eq('id', id).maybeSingle()
+  const current = (row?.pain ?? {}) as Record<string, number>
+  const next = { ...current }
+  if (severity === 0) delete next[exerciseId]
+  else next[exerciseId] = severity
+
+  const { error } = await supabase
+    .from('session_logs')
+    .update({ pain: next as unknown as Json })
+    .eq('id', id)
+    .eq('user_id', user.id)
+  if (error) return { ok: false as const }
+
   revalidatePath('/', 'layout')
   return { ok: true as const }
 }

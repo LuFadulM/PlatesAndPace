@@ -1,4 +1,4 @@
-# Plates & Pace
+# Hyex
 
 A multi-user, bilingual (English / Spanish) training app, installable on phones. Answer a
 questionnaire and get a concrete workout for every calendar day — lifting, running, or both —
@@ -39,7 +39,7 @@ Magic-link emails sent locally land in the mail catcher at http://localhost:5432
 
 The seed creates one demo athlete matching the worked example in `PLAN.md` §1 — a hybrid
 lifter in Bogotá, five gym days and three runs a week, 3 km in 20:00 — with the password
-`demo-password` (email `demo@platesandpace.local`).
+`demo-password` (email `demo@hyex.local`).
 
 ## Scripts
 
@@ -151,21 +151,58 @@ screens only render it. The rules are written out in `CLAUDE.md`; in short:
   accessories by double progression.
 - **Running** (`src/domain/running`): VDOT paces from a recent effort, zones by lactate
   threshold, heart-rate reserve or percent of max, 80/20 polarised weeks, long runs growing at
-  most a tenth a week with every fourth week reduced, and lift-first days.
+  most a tenth a week with every fourth week reduced, and lift-first days. The baseline is
+  learned, not frozen: every logged run of three kilometres or more can pull it faster, never
+  slower, by at most five percent at a time (`baseline.ts`). Run sessions re-derive their
+  targets when opened, each kind holding whatever the generator treated as fixed.
 - **Food** (`src/domain/nutrition`): Mifflin-St Jeor, macros, carbohydrate leaning toward
   training days, deficits and surpluses capped at a safe weekly rate, and a target that
   adapts to the two-week weight trend. Never a deficit for minors, flagged athletes or a
   history of disordered eating.
+- **The week reviews itself** (`src/domain/review`): on the athlete's Monday the engine
+  compares what was planned against what happened and how hard it felt, then scales the week
+  ahead. The cut is taken against the session total and spent from the bottom up, so
+  accessories give way before the opening compound and a reduction always reduces something.
+- **Backing off early** (`strength/deload.ts`): a block deloads every fourth week, and sooner
+  when a compound has stalled across three sessions, readiness has been poor three days
+  running, a muscle has reached MRV, or a movement has hurt twice. Today names the reason and
+  offers the easy week; taking it is the athlete's call.
 - **The plan explains itself** (`plan/explain.ts`): every decision above is a numbered line
   on the Plan page, in both languages.
 
 `src/domain/plan/__tests__/athletes.test.ts` is the fixture suite: named athletes, each of
 whom must get a valid plan.
 
+## The exercise library
+
+Two sources, one browser at `/library`.
+
+- **Coached** (`src/domain/exercises/library.ts`, 129 movements): everything the engine can
+  program. Each row carries the four filter axes the brief asks for (muscle, purpose, type
+  and material) plus force vector, plane, difficulty, tempo, breathing, stimulus-to-fatigue
+  and the contraindicated patterns. Names, aliases, three cues, two common mistakes and
+  three execution steps live in `messages/{en,es}.json`, so both languages are complete or
+  the build fails.
+- **Open catalogue** (`src/data/catalogue.json`, 876 rows): imported from
+  [free-exercise-db](https://github.com/yuhonas/free-exercise-db) (public domain, Unlicense)
+  by `python3 scripts/import-catalogue.py`, mapped onto the same taxonomy. Photos are served
+  from that repository. Its step-by-step instructions exist in English only and the UI says
+  so. Spanish names are built from a term glossary and every one is flagged
+  `nameEsReviewed: false` until a person checks it.
+
+The substitution graph (`src/domain/exercises/graph.ts`) answers "the rack is busy" and "my
+shoulder hurts": authored regression and progression edges, plus substitutes computed from
+the taxonomy and filtered by the athlete's equipment, unavailable machines, banned patterns
+and experience. Search folds accents and reads both languages, so *press de banca*, *bench
+press* and *RDL* all land on the same row.
+
+`wger`, USDA FoodData Central and Open Food Facts were unreachable from the build sandbox;
+only free-exercise-db was imported. No reference site was scraped.
+
 ## What was built without the prototype
 
 The brief referenced a single-user prototype, `plates-and-pace.html`, that never reached the
-repository. The exercise library (`src/domain/exercises/library.ts`, 70 exercises) and the
+repository. The exercise library (`src/domain/exercises/library.ts`, now 129 movements) and the
 SVG figure animations (`src/components/figure`) were authored for this app instead. If the
 original turns up, its library and poses drop into those two places without touching the
 engine.

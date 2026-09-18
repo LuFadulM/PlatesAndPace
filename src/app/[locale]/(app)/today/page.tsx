@@ -1,19 +1,26 @@
 import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { DayHeader, type StripDay } from '@/components/today/day-header'
+import { DeloadCard } from '@/components/today/deload-card'
+import { NextBlockCard } from '@/components/today/next-block-card'
 import { SessionView, type LoggedSet } from '@/components/today/session-view'
 import { ageOn } from '@/domain/profile/types'
 import { estimateNutrition, type NutritionEstimate } from '@/domain/nutrition'
-import { compareDates, fromISODate, isValidPlainDate, todayInZone, toISODate, weekStrip } from '@/domain/dates'
-import { resolveLoads } from '@/domain/plan'
+import { compareDates, endOfPlanWeek, fromISODate, isValidPlainDate, startOfPlanWeek, todayInZone, toISODate, weekStrip } from '@/domain/dates'
+import { resolveLoads, resolveRunPaces } from '@/domain/plan'
+import { applyDeloadToSession, applyReviewToSession } from '@/domain/review'
 import { alternativesFor, catalogueFor } from '@/domain/plan/edit'
 import { buildAthleteModel } from '@/domain/profile/athlete'
 import { DEFAULT_PLATES } from '@/domain/strength/loads'
+import { musclesForFocusArea } from '@/domain/strength/volume'
 import type { Readiness } from '@/domain/strength/autoregulation'
 import { isLocale } from '@/i18n/routing'
 import { getSessionLogWithSets, lastPerformances, latestMaxDetails, type MaxDetail } from '@/lib/data/logs'
-import { getCurrentPlan, getDoneDates, getPlannedDay, getPlannedDays } from '@/lib/data/plan'
+import { blockHasEnded, getCurrentPlan, getDoneDates, getPlannedDay, getPlannedDays, takenDeloadWeeks } from '@/lib/data/plan'
 import { getActiveAnswers, getLatestWeightKg, getRecentWeights, requireProfile } from '@/lib/data/profile'
+import { getLastWeekReview } from '@/lib/data/review'
+import { getCurrentPaces } from '@/lib/data/running'
+import { getDeloadAdvice, getPainReports, painBefore, painOn } from '@/lib/data/deload'
 
 export default async function TodayPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ date?: string }> }) {
   const { locale } = await params
@@ -37,7 +44,27 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
     getActiveAnswers(),
     getLatestWeightKg(),
   ])
-  const recentWeights = await getRecentWeights(toISODate(today))
+  const painReports = await getPainReports(today)
+  const [recentWeights, review, running, deload] = await Promise.all([
+    getRecentWeights(toISODate(today)),
+    getLastWeekReview(today),
+    // Paces learned from logged runs, so a runner who got faster trains faster.
+    answers?.experience.recentRun
+      ? getCurrentPaces(
+          { km: answers.experience.recentRun.km, seconds: answers.experience.recentRun.minutes * 60 },
+          answers.goals.targetRace,
+        )
+      : getCurrentPaces(undefined),
+    getDeloadAdvice(today, painReports),
+  ])
+
+  // An easy week the athlete asked for lands on the same session pipeline as
+  // the scheduled one, so it looks and feels like week four.
+  // Past the last day of the block there is nothing left to plan, so the way
+  // forward replaces the coaching cards rather than sitting under them.
+  const blockOver = plan ? blockHasEnded(plan, today) : false
+  const weekStartIso = toISODate(startOfPlanWeek(today))
+  const deloadTaken = takenDeloadWeeks(plan?.settings).includes(weekStartIso)
   const maxes = Object.fromEntries(Object.entries(maxDetails).map(([id, d]) => [id, d.e1rm]))
   const units = profile.units as 'metric' | 'imperial'
   const plates = answers?.equipment.plates ?? DEFAULT_PLATES[units]
@@ -47,7 +74,30 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
   const lastTime = day?.gym ? await lastPerformances(day.gym.exercises.map((e) => e.exerciseId), iso) : {}
   const lastSets = Object.fromEntries(Object.entries(lastTime).map(([id, p]) => [id, p.sets.map((s) => ({ ...s, done: true }))]))
 
-  const resolved = day?.gym && plan ? { ...day, gym: resolveLoads(day.gym, day.week, plan.weeks, maxes, units, { goal: answers?.goals.primary, lastSets, plates }) } : day
+  // Loads are re-derived first, then last week's verdict is applied on top:
+  // the review scales what this week actually asks for, not a stale number.
+  let resolved = day?.gym && plan ? { ...day, gym: resolveLoads(day.gym, day.week, plan.weeks, maxes, units, { goal: answers?.goals.primary, lastSets, plates }) } : day
+  // Only the current week answers to last week's verdict. A session the
+  // athlete scrolls back to already happened, and one further out will get its
+  // own review when that week arrives.
+  const thisWeek = compareDates(selected, startOfPlanWeek(today)) >= 0 && compareDates(selected, endOfPlanWeek(today)) <= 0
+  if (resolved?.run) {
+    resolved = { ...resolved, run: resolveRunPaces(resolved.run, running?.paces ?? null) }
+  }
+  if (resolved?.gym && deloadTaken && thisWeek) {
+    resolved = { ...resolved, gym: applyDeloadToSession(resolved.gym, { units, plates }) }
+  } else if (resolved?.gym && review && thisWeek) {
+    resolved = { ...resolved, gym: applyReviewToSession(resolved.gym, review, { units, plates, focus: (answers?.preferences.focusAreas ?? []).flatMap(musclesForFocusArea) }) }
+  }
+
+  // What hurt today, and how often each movement has hurt before it, so the
+  // control can say "this has happened before" rather than repeating itself.
+  // Pain is a report about a session that happened, so the control is offered
+  // on today and earlier only. It also could not be read back on a future day:
+  // the window ends today.
+  const reportable = compareDates(selected, today) <= 0
+  const painToday = painOn(painReports, iso)
+  const painHistory = painBefore(painReports, iso)
 
   const stripDays: StripDay[] = days.map((d) => ({ date: d.date, type: d.type, done: doneDates.has(d.date) }))
 
@@ -96,6 +146,11 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
   return (
     <main className="flex flex-col gap-5 px-4 py-6">
       <DayHeader date={iso} today={toISODate(today)} strip={stripDays} />
+      {blockOver && plan && <NextBlockCard weeks={plan.weeks} />}
+      {thisWeek && !blockOver && <DeloadCard advice={deload} weekStart={weekStartIso} taken={deloadTaken} />}
+      {/* Past the block there is no day to show, and "check the Plan tab" is
+          the wrong advice: the card above is the way forward. */}
+      {!(blockOver && !resolved) && (
       <SessionView
         date={iso}
         day={resolved}
@@ -112,7 +167,12 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
         catalogue={catalogue}
         lastTime={lastTime}
         editable={editable}
+        review={thisWeek && !deloadTaken ? review : null}
+        reportable={reportable}
+        painToday={painToday}
+        painHistory={painHistory}
       />
+      )}
     </main>
   )
 }

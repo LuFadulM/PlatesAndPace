@@ -1,67 +1,110 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { ExerciseFigure } from '@/components/figure/exercise-figure'
-import { EXERCISES } from '@/domain/exercises/library'
+import { MuscleMap } from '@/components/library/muscle-map'
+import { matchesFilters, photoUrl, sortEntries, type LibraryEntry, type LibraryFilters } from '@/domain/exercises/catalogue'
+import { buildSearchIndex, search } from '@/domain/exercises/graph'
+import { EXERCISE_TYPES, MATERIALS, PURPOSES, type Difficulty, type ExerciseType, type Material, type Purpose } from '@/domain/exercises/types'
 import { MUSCLE_GROUPS, type MuscleGroup } from '@/domain/strength/volume'
-import type { Implement } from '@/domain/strength/loads'
+import { Link } from '@/i18n/navigation'
 
-const IMPLEMENTS: Implement[] = ['barbell', 'dumbbell', 'machine', 'cable', 'bodyweight']
+const DIFFICULTIES: Difficulty[] = ['beginner', 'intermediate', 'advanced']
+const PAGE = 60
 
-export function LibraryBrowser() {
+export function LibraryBrowser({ entries }: { entries: LibraryEntry[] }) {
   const t = useTranslations('library')
-  const tEx = useTranslations('exercises')
   const tM = useTranslations('muscles')
-  const tI = useTranslations('implements')
-  const tC = useTranslations('categories')
-  const [muscle, setMuscle] = useState<MuscleGroup | 'all'>('all')
-  const [implement, setImplement] = useState<Implement | 'all'>('all')
-  const [openId, setOpenId] = useState<string | null>(null)
+  const tT = useTranslations('taxonomy')
+  const [query, setQuery] = useState('')
+  const [filters, setFilters] = useState<LibraryFilters>({})
+  const [limit, setLimit] = useState(PAGE)
 
-  const list = useMemo(
-    () => EXERCISES.filter((e) => (muscle === 'all' || e.primary === muscle || e.secondary.includes(muscle)) && (implement === 'all' || e.implement === implement)),
-    [muscle, implement],
-  )
-  const chip = (on: boolean) => `min-h-11 rounded-full border px-3 text-sm font-semibold ${on ? 'border-(--color-plate-blue) bg-(--color-plate-blue) text-white' : 'border-(--color-border) bg-(--color-surface)'}`
+  const index = useMemo(() => buildSearchIndex(entries.map((e) => ({ id: e.id, texts: e.terms }))), [entries])
+  const byId = useMemo(() => new Map(entries.map((e) => [e.id, e])), [entries])
+  const materials = useMemo(() => MATERIALS.filter((m) => entries.some((e) => e.materials.includes(m))), [entries])
+
+  const list = useMemo(() => {
+    const pool = query.trim() ? search(index, query, entries.length).map((id) => byId.get(id)!).filter(Boolean) : sortEntries(entries)
+    return pool.filter((e) => matchesFilters(e, filters))
+  }, [query, filters, index, byId, entries])
+
+  const set = <K extends keyof LibraryFilters>(key: K, value: LibraryFilters[K]) => {
+    setFilters((f) => ({ ...f, [key]: f[key] === value ? undefined : value }))
+    setLimit(PAGE)
+  }
+  const active = Object.values(filters).some(Boolean) || query.trim().length > 0
+  const chip = (on: boolean) => `min-h-11 shrink-0 rounded-full border px-3 text-sm font-semibold ${on ? 'border-(--color-plate-blue) bg-(--color-plate-blue) text-white' : 'border-(--color-border) bg-(--color-surface)'}`
 
   return (
     <div className="flex flex-col gap-4">
+      <label className="flex flex-col gap-1">
+        <span className="sr-only">{t('searchLabel')}</span>
+        <input
+          type="search"
+          value={query}
+          onChange={(ev) => { setQuery(ev.target.value); setLimit(PAGE) }}
+          placeholder={t('search')}
+          className="min-h-12 w-full rounded-xl border border-(--color-border) bg-(--color-surface) px-3 text-base"
+        />
+      </label>
+
+      <MuscleMap value={filters.group ?? null} onChange={(g) => { setFilters((f) => ({ ...f, group: g ?? undefined })); setLimit(PAGE) }} />
+
       <div className="flex gap-2 overflow-x-auto pb-1" role="group" aria-label={t('filterMuscle')}>
-        <button type="button" className={chip(muscle === 'all')} onClick={() => setMuscle('all')}>{t('all')}</button>
-        {MUSCLE_GROUPS.map((m) => <button type="button" key={m} className={chip(muscle === m)} onClick={() => setMuscle(m)}>{tM(m)}</button>)}
+        <button type="button" className={chip(!filters.group)} onClick={() => set('group', undefined)}>{t('all')}</button>
+        {MUSCLE_GROUPS.map((m: MuscleGroup) => <button type="button" key={m} aria-pressed={filters.group === m} className={chip(filters.group === m)} onClick={() => set('group', m)}>{tM(m)}</button>)}
+      </div>
+      <div className="flex gap-2 overflow-x-auto pb-1" role="group" aria-label={t('filterPurpose')}>
+        {PURPOSES.map((p: Purpose) => <button type="button" key={p} aria-pressed={filters.purpose === p} className={chip(filters.purpose === p)} onClick={() => set('purpose', p)}>{tT(`purpose.${p}`)}</button>)}
+      </div>
+      <div className="flex gap-2 overflow-x-auto pb-1" role="group" aria-label={t('filterType')}>
+        {EXERCISE_TYPES.map((k: ExerciseType) => <button type="button" key={k} aria-pressed={filters.type === k} className={chip(filters.type === k)} onClick={() => set('type', k)}>{tT(`type.${k}`)}</button>)}
       </div>
       <div className="flex gap-2 overflow-x-auto pb-1" role="group" aria-label={t('filterEquipment')}>
-        <button type="button" className={chip(implement === 'all')} onClick={() => setImplement('all')}>{t('all')}</button>
-        {IMPLEMENTS.map((i) => <button type="button" key={i} className={chip(implement === i)} onClick={() => setImplement(i)}>{tI(i)}</button>)}
+        {materials.map((m: Material) => <button type="button" key={m} aria-pressed={filters.material === m} className={chip(filters.material === m)} onClick={() => set('material', m)}>{tT(`material.${m}`)}</button>)}
       </div>
-      <p className="text-xs text-(--color-ink-muted)">{t('count', { n: list.length })}</p>
-      <ul className="flex flex-col gap-2">
-        {list.map((e) => {
-          const open = openId === e.id
-          return (
-            <li key={e.id} className="rounded-xl border border-(--color-border) bg-(--color-surface)">
-              <button type="button" aria-expanded={open} onClick={() => setOpenId(open ? null : e.id)} className="flex min-h-16 w-full items-center gap-3 px-3 text-left">
-                <ExerciseFigure animation={e.animation} title={tEx(`${e.id}.name`)} className="h-14 w-14 shrink-0 text-(--color-ink)" />
-                <span className="flex-1">
-                  <span className="block font-semibold">{tEx(`${e.id}.name`)}</span>
-                  <span className="block text-xs text-(--color-ink-muted)">{tM(e.primary)} · {tI(e.implement)} · {tC(e.category)}</span>
-                </span>
-              </button>
-              {open && (
-                <div className="border-t border-(--color-border) px-3 py-3 text-sm">
-                  <div className="flex justify-center py-2"><ExerciseFigure animation={e.animation} title={tEx(`${e.id}.name`)} className="h-40 w-40 text-(--color-ink)" /></div>
-                  <h3 className="font-display text-base font-bold">{t('cues')}</h3>
-                  <ul className="list-disc pl-5"><li>{tEx(`${e.id}.cue1`)}</li><li>{tEx(`${e.id}.cue2`)}</li></ul>
-                  <h3 className="mt-2 font-display text-base font-bold">{t('mistakes')}</h3>
-                  <ul className="list-disc pl-5"><li>{tEx(`${e.id}.mistake1`)}</li><li>{tEx(`${e.id}.mistake2`)}</li></ul>
-                  {e.secondary.length > 0 && <p className="mt-2 text-xs text-(--color-ink-muted)">{t('alsoWorks')}: {e.secondary.map((m) => tM(m)).join(', ')}</p>}
-                </div>
+      <div className="flex gap-2 overflow-x-auto pb-1" role="group" aria-label={t('filterDifficulty')}>
+        {DIFFICULTIES.map((d) => <button type="button" key={d} aria-pressed={filters.difficulty === d} className={chip(filters.difficulty === d)} onClick={() => set('difficulty', d)}>{tT(`difficulty.${d}`)}</button>)}
+        <button type="button" aria-pressed={filters.source === 'authored'} className={chip(filters.source === 'authored')} onClick={() => set('source', 'authored')}>{tT('source.authored')}</button>
+      </div>
+
+      <div className="flex items-center justify-between text-xs text-(--color-ink-muted)">
+        <p aria-live="polite">{t('showing', { shown: Math.min(limit, list.length), total: list.length })}</p>
+        {active && <button type="button" className="min-h-11 font-semibold text-(--color-plate-blue)" onClick={() => { setQuery(''); setFilters({}); setLimit(PAGE) }}>{t('clear')}</button>}
+      </div>
+
+      {list.length === 0 && <p className="rounded-xl border border-(--color-border) bg-(--color-surface) p-4 text-sm">{t('noResults')}</p>}
+
+      <ul className="flex flex-col gap-2" aria-label={t('title')}>
+        {list.slice(0, limit).map((e) => (
+          <li key={e.id}>
+            <Link href={`/library/${e.id}`} className="flex min-h-16 items-center gap-3 rounded-xl border border-(--color-border) bg-(--color-surface) px-3 py-2">
+              {e.animation ? (
+                <ExerciseFigure animation={e.animation} title={e.name} className="h-14 w-14 shrink-0 text-(--color-ink)" />
+              ) : e.photo ? (
+                <Image src={photoUrl(e.photo)} alt="" width={56} height={56} unoptimized loading="lazy" className="h-14 w-14 shrink-0 rounded-lg object-cover" />
+              ) : (
+                <span aria-hidden="true" className="h-14 w-14 shrink-0 rounded-lg bg-(--color-border)" />
               )}
-            </li>
-          )
-        })}
+              <span className="min-w-0 flex-1">
+                <span className="block font-semibold break-words">{e.name}</span>
+                {e.altName && <span className="block text-xs text-(--color-ink-muted) break-words">{e.altName}</span>}
+                <span className="block text-xs text-(--color-ink-muted)">{tM(e.group)} · {tT(`material.${e.materials[0]!}`)} · {tT(`difficulty.${e.difficulty}`)}</span>
+              </span>
+              {e.source === 'authored' && <span className="shrink-0 rounded-full bg-(--color-plate-blue)/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-(--color-plate-blue)">{tT('source.authored')}</span>}
+            </Link>
+          </li>
+        ))}
       </ul>
+      {list.length > limit && (
+        <button type="button" className="min-h-12 rounded-xl border border-(--color-border) bg-(--color-surface) font-semibold" onClick={() => setLimit((n) => n + PAGE)}>
+          {t('showMore')}
+        </button>
+      )}
+      <p className="text-xs text-(--color-ink-muted)">{t('attribution')}</p>
     </div>
   )
 }

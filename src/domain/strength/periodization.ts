@@ -20,7 +20,7 @@ export interface PhaseParameters {
   messageKey: string
 }
 
-const PARAMETERS: Record<Phase, Omit<PhaseParameters, 'phase'>> = {
+export const PARAMETERS: Record<Phase, Omit<PhaseParameters, 'phase'>> = {
   calibration: {
     rpeTarget: 7.5,
     volumeMultiplier: 1,

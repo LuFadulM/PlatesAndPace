@@ -1,4 +1,4 @@
--- Plates & Pace — core schema (PLAN.md §7).
+-- Hyex — core schema (PLAN.md §7).
 --
 -- Two invariants run through every table here:
 --   1. A training day is a calendar date in the athlete's own time zone, so

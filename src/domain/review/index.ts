@@ -36,6 +36,9 @@ export interface ReviewOutcome {
   /** Extra sets added to each focus muscle next week. */
   extraFocusSets: number
   completionRate: number
+  /** Sessions the week asked for, and how many happened; the card shows both. */
+  plannedSessions: number
+  completedSessions: number
   /** Median of (logged − target); null when nothing was logged. */
   medianRpeDelta: number | null
   /** Message key for the "Coach's weekly review" card. */
@@ -73,6 +76,8 @@ export function weeklyReview(summary: WeekSummary): ReviewOutcome {
       loadMultiplier: 1,
       extraFocusSets: 0,
       completionRate,
+      plannedSessions: summary.plannedSessions,
+      completedSessions: summary.completedSessions,
       medianRpeDelta,
       messageKey: 'coach.review.struggling',
     }
@@ -85,6 +90,8 @@ export function weeklyReview(summary: WeekSummary): ReviewOutcome {
       loadMultiplier: 1,
       extraFocusSets: 0,
       completionRate,
+      plannedSessions: summary.plannedSessions,
+      completedSessions: summary.completedSessions,
       medianRpeDelta,
       messageKey: 'coach.review.grinding',
     }
@@ -101,6 +108,8 @@ export function weeklyReview(summary: WeekSummary): ReviewOutcome {
       loadMultiplier: 1.025,
       extraFocusSets: 1,
       completionRate,
+      plannedSessions: summary.plannedSessions,
+      completedSessions: summary.completedSessions,
       medianRpeDelta,
       messageKey: 'coach.review.thriving',
     }
@@ -112,7 +121,11 @@ export function weeklyReview(summary: WeekSummary): ReviewOutcome {
     loadMultiplier: 1,
     extraFocusSets: 0,
     completionRate,
+    plannedSessions: summary.plannedSessions,
+    completedSessions: summary.completedSessions,
     medianRpeDelta,
     messageKey: 'coach.review.onTrack',
   }
 }
+export * from './apply'
+export * from './summary'

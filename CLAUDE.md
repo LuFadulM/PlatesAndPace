@@ -1,8 +1,10 @@
-# Plates & Pace — project memory
+# Hyex — project memory
 
-One app, one repository. Lifting, running and nutrition are one plan built from one
-profile. There is no separate "Plates" or "Pace" codebase: Plates is the nutrition side,
-Pace is the cardio side, both live here.
+Hyex (www.hyex.app), formerly Plates & Pace. One app, one repository. Lifting, running and
+nutrition are one plan built from one profile: the nutrition side and the cardio side are
+not separate codebases, they both live here. The repository directory and the offline
+IndexedDB database still carry the old name; renaming either would orphan a phone's
+unsynced queue, so they stay.
 
 ## Stack (keep it; do not rewrite for taste)
 
@@ -90,6 +92,9 @@ never `timestamptz`.
 2. Beginners start at MEV, advanced lifters at mid-MAV; add about one set per muscle per
    week toward MRV; deload when performance stalls two sessions running, readiness is low
    three days running, joint pain is reported twice on a movement, or MRV is reached.
+   `src/domain/strength/deload.ts` implements all four triggers and Today offers the easy
+   week. Joint pain is reported per exercise into `session_logs.pain`; twice on the same
+   movement counts, and the athlete is pointed at a swap.
    Per-session direct volume caps at about 10 sets per muscle. Compounds count 1.0 for the
    primary muscle and 0.5 for secondaries.
 3. Intensity by quality: max strength 1–5 reps, RIR 1–3, 180–300 s; hypertrophy 6–12 (5–30

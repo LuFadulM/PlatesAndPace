@@ -10,12 +10,14 @@ import { nextSetMultiplier, readinessAdjustment, type Readiness } from '@/domain
 import { nearestLoadable, roundToIncrement, type PlateInventory } from '@/domain/strength/loads'
 import { getExercise } from '@/domain/exercises/library'
 import type { NutritionEstimate } from '@/domain/nutrition'
+import type { ReviewOutcome } from '@/domain/review'
 import { createOutbox, setLogKey, type Outbox } from '@/lib/offline'
 import { finishSession, logWeight, saveReadiness, saveRun, saveSets } from '@/lib/actions/logs'
 import type { LastPerformance, MaxDetail } from '@/lib/data/logs'
 import type { Units } from '@/domain/profile/types'
 import { ExerciseFigure } from '@/components/figure/exercise-figure'
 import { AddExercise, ExerciseTools } from './exercise-editor'
+import { PainReport } from './pain-report'
 import { FocusPicker } from './focus-picker'
 import { RestTimer } from './rest-timer'
 import { displayLoad, toKg, unitLabel } from './units'
@@ -52,6 +54,17 @@ interface Props {
   lastTime: Record<string, LastPerformance>
   /** Today or later, and not yet finished: the session may still be changed. */
   editable: boolean
+  /** Last week's verdict, already applied to the session above. */
+  review: ReviewOutcome | null
+  /**
+   * Today or earlier: a session the athlete could have done, so pain can be
+   * reported against it. A future day has nothing to report yet.
+   */
+  reportable: boolean
+  /** Pain already reported for this date, per exercise. */
+  painToday: Record<string, number>
+  /** How many times each movement has hurt before today. */
+  painHistory: Record<string, number>
 }
 
 function Section({ title, children, defaultOpen = false }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
@@ -65,7 +78,7 @@ function Section({ title, children, defaultOpen = false }: { title: string; chil
 
 const input = 'min-h-11 w-full rounded-lg border border-(--color-border) px-2 text-center'
 
-export function SessionView({ date, day, units, plates, maxes, initialSets, initialReadiness, alreadyDone, initialNotes, nutrition, latestWeightKg, alternatives, catalogue, lastTime, editable }: Props) {
+export function SessionView({ date, day, units, plates, maxes, initialSets, initialReadiness, alreadyDone, initialNotes, nutrition, latestWeightKg, alternatives, catalogue, lastTime, editable, review, reportable, painToday, painHistory }: Props) {
   const t = useTranslations('today')
   const tEx = useTranslations('exercises')
   const tCoach = useTranslations()
@@ -272,6 +285,15 @@ export function SessionView({ date, day, units, plates, maxes, initialSets, init
         </div>
       )}
 
+      {review && (
+        <section aria-label={t('review.title')} className="rounded-xl border border-(--color-border) bg-(--color-surface) px-4 py-3">
+          <h2 className="font-display text-sm font-bold uppercase tracking-wide text-(--color-ink-muted)">{t('review.title')}</h2>
+          <p className="mt-1 text-sm">
+            {tCoach(review.messageKey, { done: review.completedSessions, planned: review.plannedSessions })}
+          </p>
+        </section>
+      )}
+
       {gym && (
         <>
           <div>
@@ -339,7 +361,9 @@ export function SessionView({ date, day, units, plates, maxes, initialSets, init
                         <div className="text-xs text-(--color-ink-muted)">
                           <p>{tEx(`${e.exerciseId}.cue1`)}</p>
                           <p>{tEx(`${e.exerciseId}.cue2`)}</p>
+                          <p>{tEx(`${e.exerciseId}.cue3`)}</p>
                           <p className="mt-1 text-(--color-plate-red)">{tEx(`${e.exerciseId}.mistake1`)}</p>
+                          <Link href={`/library/${e.exerciseId}`} className="mt-1 inline-block min-h-11 font-semibold text-(--color-plate-blue)">{t('howTo')}</Link>
                         </div>
                       </div>
                       <p className="text-xs font-semibold text-(--color-plate-blue)">{lastLine(e)}</p>
@@ -372,6 +396,14 @@ export function SessionView({ date, day, units, plates, maxes, initialSets, init
                           </button>
                         )}
                       </div>
+                      {!done && reportable && (
+                        <PainReport
+                          date={date}
+                          exerciseId={e.exerciseId}
+                          initial={painToday[e.exerciseId] ?? 0}
+                          repeated={(painHistory[e.exerciseId] ?? 0) > 0}
+                        />
+                      )}
                       {canEdit && (
                         <ExerciseTools
                           date={date}
