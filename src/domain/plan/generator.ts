@@ -72,7 +72,7 @@ export interface PlannedExercise {
 
 /** Something the engine changed about a session, and why. Never silent. */
 export interface SessionAdjustment {
-  reason: 'time' | 'interference' | 'volume_cap'
+  reason: 'time' | 'interference' | 'volume_cap' | 'review'
   exerciseId: string
   setsRemoved: number
   /** True when the exercise was dropped altogether. */
@@ -157,9 +157,6 @@ export interface GenerateOptions {
   recentlyUsed?: ReadonlySet<string>
   /** Permanent swaps from exercise_preferences. */
   swaps?: ReadonlyMap<string, string>
-  /** Multipliers from the weekly review to apply to week one. */
-  reviewVolumeMultiplier?: number
-  reviewLoadMultiplier?: number
 }
 
 const LABELS = 'ABCDEFGHIJ'
@@ -307,8 +304,6 @@ function buildGymSession(
   let finisher: PlannedExercise | undefined
   let lowerSets = 0
   const sessionDirect = zeroByMuscle()
-  // The weekly review may still scale the first week of a block up or down.
-  const reviewScale = week === 1 ? (options.reviewVolumeMultiplier ?? 1) : 1
 
   template.forEach((slot, slotIndex) => {
     const continuityKey = `${continuityPrefix}:${slotIndex}`
@@ -321,7 +316,7 @@ function buildGymSession(
     if (isVolumeSlot) {
       const m = slot.muscle
       const w = SLOT_WEIGHT[slot.role]
-      const remaining = Math.max(0, volume.targets[m] * reviewScale - volume.done[m])
+      const remaining = Math.max(0, volume.targets[m] - volume.done[m])
       share = volume.remainingWeight[m] > 0 ? (remaining * w) / volume.remainingWeight[m] : 0
       volume.remainingWeight[m] = Math.max(0, volume.remainingWeight[m] - w)
       // The lifts that carry progression are practised even when the week's
@@ -405,7 +400,7 @@ function buildGymSession(
           })
       // Power work moves 30–60% of what the lift could carry, as fast as possible.
       const powerScale = exercise.category === 'power' ? 0.5 : 1
-      const scaled = base * powerScale * phase.loadMultiplier * (week === 1 ? (options.reviewLoadMultiplier ?? 1) : 1)
+      const scaled = base * powerScale * phase.loadMultiplier
       loadKg = roundLoad(scaled, exercise.implement, model.units, model.plates)
     }
 

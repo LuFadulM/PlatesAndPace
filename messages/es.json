@@ -2134,7 +2134,8 @@
       "removed": "{name}: quedó fuera",
       "time": "para que quepa en el tiempo de tu sesión",
       "interference": "por la carrera alrededor de esta sesión",
-      "volume_cap": "pasadas diez series un músculo deja de crecer y empieza a doler"
+      "volume_cap": "pasadas diez series un músculo deja de crecer y empieza a doler",
+      "review": "ajustado tras la semana pasada"
     },
     "maxLine": "Máximo estimado ~{amount} {unit} · {confidence}",
     "confidence": {
@@ -2176,7 +2177,10 @@
     "weighInSave": "Registrar",
     "weighInSaved": "Peso registrado. El plan lee la tendencia de dos semanas, no una mañana.",
     "grams": "{g} g",
-    "howTo": "Cómo hacerlo"
+    "howTo": "Cómo hacerlo",
+    "review": {
+      "title": "La semana pasada"
+    }
   },
   "plan": {
     "title": "Plan",

@@ -2134,7 +2134,8 @@
       "removed": "{name}: left out",
       "time": "to fit your session time",
       "interference": "because of the run around this session",
-      "volume_cap": "past ten sets a muscle stops growing and starts hurting"
+      "volume_cap": "past ten sets a muscle stops growing and starts hurting",
+      "review": "trimmed after last week"
     },
     "maxLine": "Estimated max ~{amount} {unit} · {confidence}",
     "confidence": {
@@ -2176,7 +2177,10 @@
     "weighInSave": "Log",
     "weighInSaved": "Weight logged. The plan reads the two-week trend, not one morning.",
     "grams": "{g} g",
-    "howTo": "How to do it"
+    "howTo": "How to do it",
+    "review": {
+      "title": "Last week"
+    }
   },
   "plan": {
     "title": "Plan",

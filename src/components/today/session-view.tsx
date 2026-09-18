@@ -10,6 +10,7 @@ import { nextSetMultiplier, readinessAdjustment, type Readiness } from '@/domain
 import { nearestLoadable, roundToIncrement, type PlateInventory } from '@/domain/strength/loads'
 import { getExercise } from '@/domain/exercises/library'
 import type { NutritionEstimate } from '@/domain/nutrition'
+import type { ReviewOutcome } from '@/domain/review'
 import { createOutbox, setLogKey, type Outbox } from '@/lib/offline'
 import { finishSession, logWeight, saveReadiness, saveRun, saveSets } from '@/lib/actions/logs'
 import type { LastPerformance, MaxDetail } from '@/lib/data/logs'
@@ -52,6 +53,8 @@ interface Props {
   lastTime: Record<string, LastPerformance>
   /** Today or later, and not yet finished: the session may still be changed. */
   editable: boolean
+  /** Last week's verdict, already applied to the session above. */
+  review: ReviewOutcome | null
 }
 
 function Section({ title, children, defaultOpen = false }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
@@ -65,7 +68,7 @@ function Section({ title, children, defaultOpen = false }: { title: string; chil
 
 const input = 'min-h-11 w-full rounded-lg border border-(--color-border) px-2 text-center'
 
-export function SessionView({ date, day, units, plates, maxes, initialSets, initialReadiness, alreadyDone, initialNotes, nutrition, latestWeightKg, alternatives, catalogue, lastTime, editable }: Props) {
+export function SessionView({ date, day, units, plates, maxes, initialSets, initialReadiness, alreadyDone, initialNotes, nutrition, latestWeightKg, alternatives, catalogue, lastTime, editable, review }: Props) {
   const t = useTranslations('today')
   const tEx = useTranslations('exercises')
   const tCoach = useTranslations()
@@ -270,6 +273,15 @@ export function SessionView({ date, day, units, plates, maxes, initialSets, init
           <p className="font-semibold">{t('sessionDone')}</p>
           {gym && <p className="text-sm">{t('summary', { done: totals.completed, total: totals.planned, amount: volume, unit })}</p>}
         </div>
+      )}
+
+      {review && (
+        <section aria-label={t('review.title')} className="rounded-xl border border-(--color-border) bg-(--color-surface) px-4 py-3">
+          <h2 className="font-display text-sm font-bold uppercase tracking-wide text-(--color-ink-muted)">{t('review.title')}</h2>
+          <p className="mt-1 text-sm">
+            {tCoach(review.messageKey, { done: review.completedSessions, planned: review.plannedSessions })}
+          </p>
+        </section>
       )}
 
       {gym && (
