@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { deloadAdvice, hasStalled, LOW_READINESS_DAYS, musclesAtMrv, readinessIsLow } from '../deload'
+import { deloadAdvice, hasStalled, LOW_READINESS_DAYS, musclesAtMrv, painfulMovements, readinessIsLow } from '../deload'
 import { VOLUME_LANDMARKS } from '../volume'
 
 describe('hasStalled', () => {
@@ -62,6 +62,29 @@ describe('musclesAtMrv', () => {
   })
 })
 
+describe('painfulMovements', () => {
+  it('lets one bad day pass', () => {
+    expect(painfulMovements({ back_squat: [2] })).toEqual([])
+  })
+
+  it('acts when the same movement hurts twice', () => {
+    expect(painfulMovements({ back_squat: [2, 2] })).toEqual(['back_squat'])
+  })
+
+  it('ignores twinges, which are information rather than a signal', () => {
+    expect(painfulMovements({ back_squat: [1, 1, 1] })).toEqual([])
+  })
+
+  it('counts only the reports that crossed the threshold', () => {
+    expect(painfulMovements({ back_squat: [1, 3, 1, 3] })).toEqual(['back_squat'])
+    expect(painfulMovements({ bench_press: [1, 3, 1] })).toEqual([])
+  })
+
+  it('has nothing to say when nothing was reported', () => {
+    expect(painfulMovements()).toEqual([])
+  })
+})
+
 describe('deloadAdvice', () => {
   const quiet = { lifts: [], readinessScores: [5, 5, 5], weeklySets: { chest: 6 } }
 
@@ -86,6 +109,12 @@ describe('deloadAdvice', () => {
     })
     expect(advice.triggers).toEqual(['stalled', 'readiness', 'mrv'])
     expect(advice.overreachedMuscles).toEqual(['chest'])
+  })
+
+  it('treats a movement that keeps hurting as its own reason', () => {
+    const advice = deloadAdvice({ ...quiet, painReports: { back_squat: [3, 2] } })
+    expect(advice.triggers).toEqual(['joint_pain'])
+    expect(advice.painfulLifts).toEqual(['back_squat'])
   })
 
   it('has nothing to say about an athlete who has logged nothing', () => {

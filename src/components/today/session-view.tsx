@@ -17,6 +17,7 @@ import type { LastPerformance, MaxDetail } from '@/lib/data/logs'
 import type { Units } from '@/domain/profile/types'
 import { ExerciseFigure } from '@/components/figure/exercise-figure'
 import { AddExercise, ExerciseTools } from './exercise-editor'
+import { PainReport } from './pain-report'
 import { FocusPicker } from './focus-picker'
 import { RestTimer } from './rest-timer'
 import { displayLoad, toKg, unitLabel } from './units'
@@ -55,6 +56,10 @@ interface Props {
   editable: boolean
   /** Last week's verdict, already applied to the session above. */
   review: ReviewOutcome | null
+  /** Pain already reported for this date, per exercise. */
+  painToday: Record<string, number>
+  /** How many times each movement has hurt before today. */
+  painHistory: Record<string, number>
 }
 
 function Section({ title, children, defaultOpen = false }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
@@ -68,7 +73,7 @@ function Section({ title, children, defaultOpen = false }: { title: string; chil
 
 const input = 'min-h-11 w-full rounded-lg border border-(--color-border) px-2 text-center'
 
-export function SessionView({ date, day, units, plates, maxes, initialSets, initialReadiness, alreadyDone, initialNotes, nutrition, latestWeightKg, alternatives, catalogue, lastTime, editable, review }: Props) {
+export function SessionView({ date, day, units, plates, maxes, initialSets, initialReadiness, alreadyDone, initialNotes, nutrition, latestWeightKg, alternatives, catalogue, lastTime, editable, review, painToday, painHistory }: Props) {
   const t = useTranslations('today')
   const tEx = useTranslations('exercises')
   const tCoach = useTranslations()
@@ -386,6 +391,14 @@ export function SessionView({ date, day, units, plates, maxes, initialSets, init
                           </button>
                         )}
                       </div>
+                      {!done && (
+                        <PainReport
+                          date={date}
+                          exerciseId={e.exerciseId}
+                          initial={painToday[e.exerciseId] ?? 0}
+                          repeated={(painHistory[e.exerciseId] ?? 0) > 0}
+                        />
+                      )}
                       {canEdit && (
                         <ExerciseTools
                           date={date}

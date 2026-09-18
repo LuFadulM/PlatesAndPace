@@ -2180,6 +2180,15 @@
     "howTo": "Cómo hacerlo",
     "review": {
       "title": "La semana pasada"
+    },
+    "pain": {
+      "label": "¿Te molestó alguna articulación?",
+      "none": "No",
+      "twinge": "Una molestia",
+      "hurts": "Me dolió",
+      "stop": "Tuve que parar",
+      "saved": "Anotado. Si vuelve a pasar, cambio este movimiento.",
+      "repeat": "Esto ya te ha dolido antes. Cámbialo por algo que trabaje el mismo músculo."
     }
   },
   "plan": {
@@ -2582,6 +2591,8 @@
     "take": "Tomar una semana suave",
     "taking": "Aligerando esta semana…",
     "taken": "Esta semana es de descarga. Ligero y suave a propósito.",
-    "dismiss": "Ahora no"
+    "dismiss": "Ahora no",
+    "jointPain": "{lifts} te ha dolido más de una vez. Cámbialo y toma la semana suave.",
+    "jointPainPlural": "{lifts} te han dolido más de una vez. Cámbialos y toma la semana suave."
   }
 }

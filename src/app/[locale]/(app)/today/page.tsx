@@ -20,7 +20,7 @@ import { getCurrentPlan, getDoneDates, getPlannedDay, getPlannedDays, takenDeloa
 import { getActiveAnswers, getLatestWeightKg, getRecentWeights, requireProfile } from '@/lib/data/profile'
 import { getLastWeekReview } from '@/lib/data/review'
 import { getCurrentPaces } from '@/lib/data/running'
-import { getDeloadAdvice } from '@/lib/data/deload'
+import { getDeloadAdvice, getPainReports, getSessionPain } from '@/lib/data/deload'
 
 export default async function TodayPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ date?: string }> }) {
   const { locale } = await params
@@ -44,7 +44,7 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
     getActiveAnswers(),
     getLatestWeightKg(),
   ])
-  const [recentWeights, review, running, deload] = await Promise.all([
+  const [recentWeights, review, running, deload, painReports] = await Promise.all([
     getRecentWeights(toISODate(today)),
     getLastWeekReview(today),
     // Paces learned from logged runs, so a runner who got faster trains faster.
@@ -55,6 +55,7 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
         )
       : getCurrentPaces(undefined),
     getDeloadAdvice(today),
+    getPainReports(today),
   ])
 
   // An easy week the athlete asked for lands on the same session pipeline as
@@ -96,6 +97,17 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
   } else if (resolved?.gym && review && thisWeek) {
     resolved = { ...resolved, gym: applyReviewToSession(resolved.gym, review, { units, plates, focus: (answers?.preferences.focusAreas ?? []).flatMap(musclesForFocusArea) }) }
   }
+
+  // What hurt today, and how often each movement has hurt before it, so the
+  // control can say "this has happened before" rather than repeating itself.
+  const painToday: Record<string, number> = {}
+  const painHistory: Record<string, number> = {}
+  for (const [exerciseId, severities] of Object.entries(painReports)) {
+    const before = severities.filter((severity) => severity >= 2).length
+    painHistory[exerciseId] = before
+  }
+  const todaysLog = await getSessionPain(iso)
+  Object.assign(painToday, todaysLog)
 
   const stripDays: StripDay[] = days.map((d) => ({ date: d.date, type: d.type, done: doneDates.has(d.date) }))
 
@@ -162,6 +174,8 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
         lastTime={lastTime}
         editable={editable}
         review={thisWeek ? review : null}
+        painToday={painToday}
+        painHistory={painHistory}
       />
     </main>
   )

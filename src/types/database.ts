@@ -320,6 +320,7 @@ export type Database = {
           completed_at: string | null
           created_at: string
           updated_at: string
+          pain: Json | null
         }
         Insert: {
           id?: string
@@ -333,6 +334,7 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           updated_at?: string
+          pain?: Json | null
         }
         Update: {
           id?: string
@@ -346,6 +348,7 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           updated_at?: string
+          pain?: Json | null
         }
         Relationships: []
       }

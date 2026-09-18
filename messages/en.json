@@ -2180,6 +2180,15 @@
     "howTo": "How to do it",
     "review": {
       "title": "Last week"
+    },
+    "pain": {
+      "label": "Did this hurt a joint?",
+      "none": "No",
+      "twinge": "A twinge",
+      "hurts": "It hurt",
+      "stop": "Had to stop",
+      "saved": "Noted. If it happens again I will swap this movement.",
+      "repeat": "This has hurt before. Swap it for something that trains the same muscle."
     }
   },
   "plan": {
@@ -2582,6 +2591,8 @@
     "take": "Take an easy week",
     "taking": "Lightening this week…",
     "taken": "This week is a deload. Light and easy on purpose.",
-    "dismiss": "Not now"
+    "dismiss": "Not now",
+    "jointPain": "{lifts} has hurt more than once. Swap it, and take the week light.",
+    "jointPainPlural": "{lifts} have hurt more than once. Swap them, and take the week light."
   }
 }

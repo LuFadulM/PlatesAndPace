@@ -29,6 +29,7 @@ export function DeloadCard({ advice, weekStart, taken }: { advice: DeloadAdvice;
 
   const lifts = advice.stalledLifts.map((id) => tEx(`${id}.name`)).join(', ')
   const muscles = advice.overreachedMuscles.map((m) => tM(m)).join(', ')
+  const painful = advice.painfulLifts.map((id) => tEx(`${id}.name`)).join(', ')
 
   return (
     <section aria-label={t('title')} className="flex flex-col gap-2 rounded-xl border-2 border-(--color-plate-yellow) bg-(--color-surface) px-4 py-3">
@@ -40,6 +41,9 @@ export function DeloadCard({ advice, weekStart, taken }: { advice: DeloadAdvice;
         {advice.triggers.includes('readiness') && <li>{t('readiness')}</li>}
         {advice.triggers.includes('mrv') && (
           <li>{t(advice.overreachedMuscles.length > 1 ? 'mrvPlural' : 'mrv', { muscles })}</li>
+        )}
+        {advice.triggers.includes('joint_pain') && (
+          <li>{t(advice.painfulLifts.length > 1 ? 'jointPainPlural' : 'jointPain', { lifts: painful })}</li>
         )}
       </ul>
       <p className="text-xs text-(--color-ink-muted)">{t('why')}</p>

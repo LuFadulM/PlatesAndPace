@@ -29,6 +29,7 @@ export async function getDeloadAdvice(today: PlainDate): Promise<DeloadAdvice> {
   if (!user) return deloadAdvice(empty)
 
   const weekStart = startOfPlanWeek(today)
+  const painReports = await getPainReports(today)
   const [{ data: sets }, { data: logs }, { data: weekSets }] = await Promise.all([
     supabase
       .from('set_logs')
@@ -92,5 +93,55 @@ export async function getDeloadAdvice(today: PlainDate): Promise<DeloadAdvice> {
     for (const m of def.secondary) weeklySets[m] = (weeklySets[m] ?? 0) + SECONDARY_SET_CREDIT
   }
 
-  return deloadAdvice({ lifts, readinessScores, weeklySets })
+  return deloadAdvice({ lifts, readinessScores, weeklySets, painReports })
+}
+
+/**
+ * Pain reported per movement over recent sessions, oldest first, for the
+ * fourth deload trigger and for offering a swap.
+ */
+export async function getPainReports(today: PlainDate, days = 42): Promise<Record<string, number[]>> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return {}
+  const { data } = await supabase
+    .from('session_logs')
+    .select('date, pain')
+    .eq('user_id', user.id)
+    .not('pain', 'is', null)
+    .gte('date', toISODate(addDays(today, -days)))
+    .lte('date', toISODate(today))
+    .order('date')
+
+  const reports: Record<string, number[]> = {}
+  for (const row of data ?? []) {
+    const pain = row.pain as Record<string, unknown> | null
+    if (!pain) continue
+    for (const [exerciseId, value] of Object.entries(pain)) {
+      const severity = Number(value)
+      if (!Number.isFinite(severity) || severity <= 0) continue
+      ;(reports[exerciseId] ??= []).push(severity)
+    }
+  }
+  return reports
+}
+
+/** Pain reported on one date, per exercise, for the control's current state. */
+export async function getSessionPain(date: string): Promise<Record<string, number>> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return {}
+  const { data } = await supabase
+    .from('session_logs')
+    .select('pain')
+    .eq('user_id', user.id)
+    .eq('date', date)
+    .maybeSingle()
+  const pain = (data?.pain ?? {}) as Record<string, unknown>
+  const result: Record<string, number> = {}
+  for (const [exerciseId, value] of Object.entries(pain)) {
+    const severity = Number(value)
+    if (Number.isFinite(severity) && severity > 0) result[exerciseId] = severity
+  }
+  return result
 }

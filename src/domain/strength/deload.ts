@@ -11,6 +11,11 @@ import { VOLUME_LANDMARKS, type MuscleGroup } from './volume'
  * waiting for all three is how people get hurt.
  */
 
+/** Times a movement must be reported painful before the engine acts on it. */
+export const PAIN_REPORTS = 2
+/** At or above this, a report counts: a one-out-of-three twinge is information, not a signal. */
+export const PAIN_THRESHOLD = 2
+
 /** Sessions of no progress on a lift before it counts as stalled. */
 export const STALL_SESSIONS = 2
 /** Consecutive days of poor readiness before it counts. */
@@ -23,7 +28,7 @@ export const LOW_READINESS_SCORE = 2.5
  */
 export const MRV_MARGIN = 0.95
 
-export type DeloadTrigger = 'stalled' | 'readiness' | 'mrv'
+export type DeloadTrigger = 'stalled' | 'readiness' | 'mrv' | 'joint_pain'
 
 /** A lift's best estimated 1RM per session, oldest first. */
 export interface LiftHistory {
@@ -38,6 +43,8 @@ export interface DeloadSignals {
   readinessScores: readonly number[]
   /** Hard sets done this week per muscle. */
   weeklySets: Partial<Record<MuscleGroup, number>>
+  /** Per exercise, the severities reported recently, oldest first. */
+  painReports?: Readonly<Record<string, readonly number[]>>
 }
 
 export interface DeloadAdvice {
@@ -47,6 +54,8 @@ export interface DeloadAdvice {
   stalledLifts: string[]
   /** The muscles at or past what they can recover from. */
   overreachedMuscles: MuscleGroup[]
+  /** Movements that have hurt often enough to come out of the plan. */
+  painfulLifts: string[]
 }
 
 /**
@@ -79,16 +88,32 @@ export function musclesAtMrv(weeklySets: Partial<Record<MuscleGroup, number>>): 
   return reached
 }
 
+/**
+ * Movements the athlete has said hurt, often enough to mean it.
+ *
+ * Pain is the one signal that is not really about fatigue, so it is not only a
+ * reason to deload: a movement that keeps hurting should come out of the plan
+ * and be swapped for one that does the same job. One report is a bad day;
+ * twice on the same movement is a pattern.
+ */
+export function painfulMovements(reports: Readonly<Record<string, readonly number[]>> = {}): string[] {
+  return Object.entries(reports)
+    .filter(([, severities]) => severities.filter((s) => s >= PAIN_THRESHOLD).length >= PAIN_REPORTS)
+    .map(([exerciseId]) => exerciseId)
+}
+
 export function deloadAdvice(signals: DeloadSignals): DeloadAdvice {
   const stalledLifts = signals.lifts.filter((l) => hasStalled(l.e1rms)).map((l) => l.exerciseId)
   const overreachedMuscles = musclesAtMrv(signals.weeklySets)
+  const painfulLifts = painfulMovements(signals.painReports)
 
   const triggers: DeloadTrigger[] = []
   if (stalledLifts.length > 0) triggers.push('stalled')
   if (readinessIsLow(signals.readinessScores)) triggers.push('readiness')
   if (overreachedMuscles.length > 0) triggers.push('mrv')
+  if (painfulLifts.length > 0) triggers.push('joint_pain')
 
-  return { recommended: triggers.length > 0, triggers, stalledLifts, overreachedMuscles }
+  return { recommended: triggers.length > 0, triggers, stalledLifts, overreachedMuscles, painfulLifts }
 }
 
 /**
