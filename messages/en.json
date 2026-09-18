@@ -25,7 +25,7 @@
       "demo": "Try it"
     },
     "stats": {
-      "exercises": "70 exercises, each one animated",
+      "exercises": "129 coached moves, 900+ to browse",
       "everyDay": "A session for every day",
       "languages": "English + Español"
     },
@@ -45,7 +45,7 @@
       },
       "step3": {
         "title": "Log it, and the plan learns",
-        "body": "Tap sets as you go, even offline. Next week's weights come from what you actually lifted."
+        "body": "Tap sets as you go, even offline. Next week's volume and weights come from what you actually lifted, and how hard it felt."
       }
     },
     "programs": {
@@ -59,7 +59,7 @@
       "full_body": "Everything, three times a week.",
       "run": {
         "title": "Run too",
-        "body": "Easy, long and interval runs paced from a run you did last month. 5K, 10K or half marathon."
+        "body": "Easy, long and interval runs paced from your own times, and repaced every time you run faster. 5K, 10K or half marathon."
       }
     },
     "why": {
@@ -70,7 +70,7 @@
       },
       "progress": {
         "title": "Real progression",
-        "body": "Rate how hard each set felt and the next load follows. A lighter week every fourth."
+        "body": "Rate how hard each set felt and the next load follows. A lighter week every fourth, or sooner if a lift stalls, sleep goes or something hurts."
       },
       "gear": {
         "title": "Your body, your gear",

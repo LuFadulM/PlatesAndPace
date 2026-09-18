@@ -25,7 +25,7 @@
       "demo": "Pruébalo"
     },
     "stats": {
-      "exercises": "70 ejercicios, cada uno animado",
+      "exercises": "129 ejercicios guiados, +900 para explorar",
       "everyDay": "Una sesión para cada día",
       "languages": "Español + English"
     },
@@ -45,7 +45,7 @@
       },
       "step3": {
         "title": "Registra, y el plan aprende",
-        "body": "Marca las series mientras entrenas, incluso sin señal. Los pesos de la próxima semana salen de lo que de verdad levantaste."
+        "body": "Marca las series sobre la marcha, incluso sin conexión. El volumen y los pesos de la próxima semana salen de lo que levantaste y de lo que te costó."
       }
     },
     "programs": {
@@ -59,7 +59,7 @@
       "full_body": "Todo el cuerpo, tres veces por semana.",
       "run": {
         "title": "Corre también",
-        "body": "Rodajes suaves, largos e intervalos con ritmos sacados de una carrera tuya reciente. 5K, 10K o media maratón."
+        "body": "Rodajes suaves, tiradas largas y series al ritmo de tus propias marcas, y se recalculan cada vez que corres más rápido. 5K, 10K o media maratón."
       }
     },
     "why": {
@@ -70,7 +70,7 @@
       },
       "progress": {
         "title": "Progreso real",
-        "body": "Califica qué tan dura fue cada serie y el siguiente peso se ajusta. Una semana más liviana cada cuatro."
+        "body": "Califica lo dura que fue cada serie y la siguiente carga se ajusta. Una semana más suave cada cuatro, o antes si un ejercicio se estanca, duermes mal o algo te duele."
       },
       "gear": {
         "title": "Tu cuerpo, tu equipo",

@@ -191,7 +191,7 @@ only free-exercise-db was imported. No reference site was scraped.
 ## What was built without the prototype
 
 The brief referenced a single-user prototype, `plates-and-pace.html`, that never reached the
-repository. The exercise library (`src/domain/exercises/library.ts`, 70 exercises) and the
+repository. The exercise library (`src/domain/exercises/library.ts`, now 129 movements) and the
 SVG figure animations (`src/components/figure`) were authored for this app instead. If the
 original turns up, its library and poses drop into those two places without touching the
 engine.
