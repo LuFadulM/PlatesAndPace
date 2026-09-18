@@ -151,11 +151,22 @@ screens only render it. The rules are written out in `CLAUDE.md`; in short:
   accessories by double progression.
 - **Running** (`src/domain/running`): VDOT paces from a recent effort, zones by lactate
   threshold, heart-rate reserve or percent of max, 80/20 polarised weeks, long runs growing at
-  most a tenth a week with every fourth week reduced, and lift-first days.
+  most a tenth a week with every fourth week reduced, and lift-first days. The baseline is
+  learned, not frozen: every logged run of three kilometres or more can pull it faster, never
+  slower, by at most five percent at a time (`baseline.ts`). Run sessions re-derive their
+  targets when opened, each kind holding whatever the generator treated as fixed.
 - **Food** (`src/domain/nutrition`): Mifflin-St Jeor, macros, carbohydrate leaning toward
   training days, deficits and surpluses capped at a safe weekly rate, and a target that
   adapts to the two-week weight trend. Never a deficit for minors, flagged athletes or a
   history of disordered eating.
+- **The week reviews itself** (`src/domain/review`): on the athlete's Monday the engine
+  compares what was planned against what happened and how hard it felt, then scales the week
+  ahead. The cut is taken against the session total and spent from the bottom up, so
+  accessories give way before the opening compound and a reduction always reduces something.
+- **Backing off early** (`strength/deload.ts`): a block deloads every fourth week, and sooner
+  when a compound has stalled across three sessions, readiness has been poor three days
+  running, a muscle has reached MRV, or a movement has hurt twice. Today names the reason and
+  offers the easy week; taking it is the athlete's call.
 - **The plan explains itself** (`plan/explain.ts`): every decision above is a numbered line
   on the Plan page, in both languages.
 

@@ -159,6 +159,9 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
       <DayHeader date={iso} today={toISODate(today)} strip={stripDays} />
       {blockOver && plan && <NextBlockCard weeks={plan.weeks} />}
       {thisWeek && !blockOver && <DeloadCard advice={deload} weekStart={weekStartIso} taken={deloadTaken} />}
+      {/* Past the block there is no day to show, and "check the Plan tab" is
+          the wrong advice: the card above is the way forward. */}
+      {!(blockOver && !resolved) && (
       <SessionView
         date={iso}
         day={resolved}
@@ -179,6 +182,7 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
         painToday={painToday}
         painHistory={painHistory}
       />
+      )}
     </main>
   )
 }
