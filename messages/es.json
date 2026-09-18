@@ -2188,7 +2188,8 @@
       "hurts": "Me dolió",
       "stop": "Tuve que parar",
       "saved": "Anotado. Si vuelve a pasar, te lo marco y te ofrezco un cambio.",
-      "repeat": "Esto ya te ha dolido antes. Cámbialo abajo por algo que trabaje el mismo músculo."
+      "repeat": "Esto ya te ha dolido antes. Cámbialo abajo por algo que trabaje el mismo músculo.",
+      "error": "No se pudo guardar. Toca de nuevo."
     },
     "nextBlock": {
       "title": "Bloque terminado",

@@ -17,6 +17,11 @@ const LEVELS = [
  * Asked per exercise rather than per set, because that is how an athlete
  * thinks about it. Two reports on the same movement bring up a swap and count
  * toward a deload; one is just a bad day.
+ *
+ * The confirmation waits for the write to land. Showing it the moment the
+ * button is tapped would tell an athlete their report was saved when it may
+ * not have been, and a failed save here costs them the evidence the deload
+ * trigger needs.
  */
 export function PainReport({
   date,
@@ -27,12 +32,26 @@ export function PainReport({
   date: string
   exerciseId: string
   initial: number
-  /** True when this movement has already hurt before. */
+  /** True when this movement has already hurt on an earlier day. */
   repeated: boolean
 }) {
   const t = useTranslations('today.pain')
   const [severity, setSeverity] = useState(initial)
+  const [failed, setFailed] = useState(false)
   const [pending, startTransition] = useTransition()
+
+  const report = (next: number) => {
+    const previous = severity
+    setSeverity(next)
+    setFailed(false)
+    startTransition(async () => {
+      const result = await reportPain({ date, exerciseId, severity: next })
+      if (!result?.ok) {
+        setSeverity(previous)
+        setFailed(true)
+      }
+    })
+  }
 
   return (
     <div className="flex flex-col gap-1 border-t border-(--color-border) pt-2">
@@ -46,10 +65,7 @@ export function PainReport({
               type="button"
               aria-pressed={on}
               disabled={pending}
-              onClick={() => {
-                setSeverity(level.severity)
-                startTransition(async () => { await reportPain({ date, exerciseId, severity: level.severity }) })
-              }}
+              onClick={() => report(level.severity)}
               className={`min-h-11 rounded-full border px-3 text-xs font-semibold ${on ? 'border-(--color-plate-red) bg-(--color-plate-red) text-white' : 'border-(--color-border)'}`}
             >
               {t(level.key)}
@@ -57,7 +73,10 @@ export function PainReport({
           )
         })}
       </div>
-      {severity >= 2 && <p className="text-xs text-(--color-ink-muted)">{t(repeated ? 'repeat' : 'saved')}</p>}
+      {failed && <p role="alert" className="text-xs text-(--color-plate-red)">{t('error')}</p>}
+      {!failed && !pending && severity >= 2 && (
+        <p className="text-xs text-(--color-ink-muted)">{t(repeated ? 'repeat' : 'saved')}</p>
+      )}
     </div>
   )
 }

@@ -2188,7 +2188,8 @@
       "hurts": "It hurt",
       "stop": "Had to stop",
       "saved": "Noted. If it happens again I will flag it and offer a swap.",
-      "repeat": "This has hurt before. Swap it below for something that trains the same muscle."
+      "repeat": "This has hurt before. Swap it below for something that trains the same muscle.",
+      "error": "Could not save that. Tap again."
     },
     "nextBlock": {
       "title": "Block finished",

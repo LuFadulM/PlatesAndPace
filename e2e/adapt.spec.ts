@@ -88,8 +88,14 @@ test('reports joint pain on one exercise and keeps it across a reload', async ({
   await rows.first().getByRole('button').first().click()
 
   const group = page.getByRole('group', { name: 'Did this hurt a joint?' }).first()
-  await group.getByRole('button', { name: 'It hurt' }).click()
+  const hurt = group.getByRole('button', { name: 'It hurt' })
+  await hurt.click()
+
+  // The confirmation only appears once the write has landed, so waiting for it
+  // here is what stops the reload below cancelling the request in flight.
   await expect(page.getByText(/Noted\.|hurt before/i).first()).toBeVisible()
+  await expect(page.getByRole('alert')).toHaveCount(0)
+  await expect(hurt).toHaveAttribute('aria-pressed', 'true')
 
   await page.reload()
   await rows.first().getByRole('button').first().click()
