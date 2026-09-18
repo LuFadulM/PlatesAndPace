@@ -21,6 +21,32 @@ const week = (): PlannedDay[] => [
   gymDay('2026-09-11', [ex('conventional_deadlift', 7)]),
 ]
 
+const runDay = (date: string): PlannedDay => ({ date, week: 1, phase: 'build', type: 'run',
+  run: { kind: 'easy', titleKey: 't', intentKey: 'i', minutes: 40, km: 7, paceSecPerKm: 340, hrZone: 2, hardMinutes: 0 } })
+
+describe('a week of running', () => {
+  // Saving a run writes a run_logs row and never sets the session's done flag,
+  // so a runner used to read as having missed every session they ran.
+  const week = [runDay('2026-09-08'), runDay('2026-09-10'), runDay('2026-09-12')]
+
+  it('counts a run day the athlete actually ran', () => {
+    const summary = summariseWeek(week, new Set(), [], new Set(['2026-09-08', '2026-09-10', '2026-09-12']))
+    expect(summary.completedSessions).toBe(3)
+    expect(weeklyReview(summary).verdict).not.toBe('struggling')
+  })
+
+  it('still counts a run day with no run as missed', () => {
+    const summary = summariseWeek(week, new Set(), [], new Set(['2026-09-08']))
+    expect(summary.completedSessions).toBe(1)
+  })
+
+  it('needs the session finished on a day that is both gym and run', () => {
+    const both: PlannedDay[] = [{ ...runDay('2026-09-08'), type: 'gym_run' }]
+    expect(summariseWeek(both, new Set(), [], new Set(['2026-09-08'])).completedSessions).toBe(0)
+    expect(summariseWeek(both, new Set(['2026-09-08']), [], new Set()).completedSessions).toBe(1)
+  })
+})
+
 describe('summariseWeek', () => {
   it('counts only the days that carried work', () => {
     const summary = summariseWeek(week(), new Set(['2026-09-07', '2026-09-09']), [])

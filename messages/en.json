@@ -2187,8 +2187,8 @@
       "twinge": "A twinge",
       "hurts": "It hurt",
       "stop": "Had to stop",
-      "saved": "Noted. If it happens again I will swap this movement.",
-      "repeat": "This has hurt before. Swap it for something that trains the same muscle."
+      "saved": "Noted. If it happens again I will flag it and offer a swap.",
+      "repeat": "This has hurt before. Swap it below for something that trains the same muscle."
     },
     "nextBlock": {
       "title": "Block finished",
@@ -2262,7 +2262,8 @@
     "backToLibrary": "Back to the library",
     "details": "Details",
     "level": "Level",
-    "showing": "Showing {shown} of {total}"
+    "showing": "Showing {shown} of {total}",
+    "showMore": "Show more"
   },
   "run": {
     "noRun": "No run planned for this day.",

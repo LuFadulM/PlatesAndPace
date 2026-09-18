@@ -62,6 +62,26 @@ describe('improvedBaseline', () => {
   })
 })
 
+describe('a baseline seeded from a short onboarding effort', () => {
+  // The questionnaire accepts any positive distance, so someone can report a
+  // mile. That answer must still seed the ratchet, or their first easy run
+  // becomes the baseline and every pace in the plan gets slower.
+  const mile = { km: 1.6, seconds: 6 * 60 + 30 }
+  const seeded = fiveKEquivalentSeconds(mile.km, mile.seconds)
+
+  it("keeps the athlete's own answer when nothing has been logged", () => {
+    expect(improvedBaseline(mile, [])?.seconds).toBeCloseTo(seeded, 5)
+  })
+
+  it('is not dragged slower by an easy run', () => {
+    expect(improvedBaseline(mile, [{ km: 8, seconds: 52 * 60 }])!.seconds).toBeCloseTo(seeded, 5)
+  })
+
+  it('still caps how far one run may pull it faster', () => {
+    expect(improvedBaseline(mile, [{ km: 5, seconds: 10 * 60 }])!.seconds).toBeCloseTo(seeded * (1 - MAX_IMPROVEMENT), 5)
+  })
+})
+
 describe('racePredictions', () => {
   it('predicts every distance the app knows, slowing as the distance grows', () => {
     const predictions = racePredictions(fiveKIn25)

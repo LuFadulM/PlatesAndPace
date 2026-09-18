@@ -1,4 +1,3 @@
-import { PARAMETERS } from './periodization'
 import { VOLUME_LANDMARKS, type MuscleGroup } from './volume'
 
 /**
@@ -39,8 +38,12 @@ export interface LiftHistory {
 export interface DeloadSignals {
   /** Per lift, the recent session estimates. */
   lifts: readonly LiftHistory[]
-  /** Mean readiness per day the athlete answered, oldest first. */
-  readinessScores: readonly number[]
+  /**
+   * One entry per calendar day ending today, oldest first, with null on a day
+   * the athlete did not answer. Days must be consecutive, not just the answers
+   * that exist, or "three days running" is not what gets measured.
+   */
+  readinessScores: readonly (number | null)[]
   /** Hard sets done this week per muscle. */
   weeklySets: Partial<Record<MuscleGroup, number>>
   /** Per exercise, the severities reported recently, oldest first. */
@@ -72,10 +75,17 @@ export function hasStalled(e1rms: readonly number[]): boolean {
   return window.slice(1).every((value) => value <= best)
 }
 
-/** Readiness counts once it has been poor on every one of the last few days. */
-export function readinessIsLow(scores: readonly number[]): boolean {
+/**
+ * Readiness counts once it has been poor on every one of the last few calendar
+ * days. An unanswered day breaks the run rather than being skipped over: three
+ * flat gym days spread across a week is not the same thing as three flat days,
+ * and the card says "three days running".
+ */
+export function readinessIsLow(scores: readonly (number | null)[]): boolean {
   if (scores.length < LOW_READINESS_DAYS) return false
-  return scores.slice(-LOW_READINESS_DAYS).every((score) => score <= LOW_READINESS_SCORE)
+  return scores
+    .slice(-LOW_READINESS_DAYS)
+    .every((score) => score !== null && score <= LOW_READINESS_SCORE)
 }
 
 /** Muscles whose weekly sets have reached what they can recover from. */
@@ -91,10 +101,11 @@ export function musclesAtMrv(weeklySets: Partial<Record<MuscleGroup, number>>): 
 /**
  * Movements the athlete has said hurt, often enough to mean it.
  *
- * Pain is the one signal that is not really about fatigue, so it is not only a
- * reason to deload: a movement that keeps hurting should come out of the plan
- * and be swapped for one that does the same job. One report is a bad day;
- * twice on the same movement is a pattern.
+ * Pain is the one signal that is not really about fatigue. One report is a bad
+ * day; twice on the same movement is a pattern. The engine flags it and points
+ * the athlete at the swap control rather than removing the movement itself: a
+ * lift vanishing from the session without being asked is worse than a lift the
+ * athlete decides to replace.
  */
 export function painfulMovements(reports: Readonly<Record<string, readonly number[]>> = {}): string[] {
   return Object.entries(reports)
@@ -116,16 +127,3 @@ export function deloadAdvice(signals: DeloadSignals): DeloadAdvice {
   return { recommended: triggers.length > 0, triggers, stalledLifts, overreachedMuscles, painfulLifts }
 }
 
-/**
- * A taken deload expressed the way the session pipeline already understands
- * it, so an athlete who asks for an easy week gets exactly the week the
- * calendar would have given them in week four.
- */
-export interface TakenDeload {
-  volumeMultiplier: number
-  loadMultiplier: number
-}
-
-export function takenDeload(): TakenDeload {
-  return { volumeMultiplier: PARAMETERS.deload.volumeMultiplier, loadMultiplier: PARAMETERS.deload.loadMultiplier }
-}

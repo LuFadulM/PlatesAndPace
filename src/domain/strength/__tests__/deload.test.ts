@@ -86,7 +86,7 @@ describe('painfulMovements', () => {
 })
 
 describe('deloadAdvice', () => {
-  const quiet = { lifts: [], readinessScores: [5, 5, 5], weeklySets: { chest: 6 } }
+  const quiet = { lifts: [], readinessScores: [5, 5, 5] as (number | null)[], weeklySets: { chest: 6 } }
 
   it('says nothing when everything is fine', () => {
     const advice = deloadAdvice(quiet)
@@ -119,5 +119,21 @@ describe('deloadAdvice', () => {
 
   it('has nothing to say about an athlete who has logged nothing', () => {
     expect(deloadAdvice({ lifts: [], readinessScores: [], weeklySets: {} }).recommended).toBe(false)
+  })
+})
+
+describe('readiness over consecutive days', () => {
+  // The reader hands over one entry per calendar day, null where the athlete
+  // did not answer, so "three days running" means what it says.
+  it('does not fire on three flat gym days spread across a week', () => {
+    expect(readinessIsLow([2, null, 2, null, 2])).toBe(false)
+  })
+
+  it('fires on three flat days in a row', () => {
+    expect(readinessIsLow([5, null, 2, 2, 2])).toBe(true)
+  })
+
+  it('treats an unanswered day as breaking the run, not as a bad one', () => {
+    expect(readinessIsLow([2, 2, null])).toBe(false)
   })
 })

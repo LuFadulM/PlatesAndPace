@@ -101,7 +101,7 @@ export function LibraryBrowser({ entries }: { entries: LibraryEntry[] }) {
       </ul>
       {list.length > limit && (
         <button type="button" className="min-h-12 rounded-xl border border-(--color-border) bg-(--color-surface) font-semibold" onClick={() => setLimit((n) => n + PAGE)}>
-          {t('showing', { shown: Math.min(limit + PAGE, list.length), total: list.length })}
+          {t('showMore')}
         </button>
       )}
       <p className="text-xs text-(--color-ink-muted)">{t('attribution')}</p>

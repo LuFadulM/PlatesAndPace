@@ -2,6 +2,7 @@ import { getExercise } from '../exercises/library'
 import { estimateSessionMinutes, type GymSession, type PlannedExercise, type SessionAdjustment } from '../plan/generator'
 import { roundLoad, type PlateInventory } from '../strength/loads'
 import { MAX_SESSION_SETS_PER_MUSCLE, type MuscleGroup } from '../strength/volume'
+import { PARAMETERS } from '../strength/periodization'
 import type { Units } from '../profile/types'
 import type { ReviewOutcome } from '.'
 
@@ -71,7 +72,13 @@ export function applyReviewToSession(
 ): GymSession {
   if (isNoop(outcome)) return session
 
-  const focus = new Set(options.focus ?? [])
+  // With no focus areas chosen there is nothing for an extra set to land on,
+  // so "stepping it up" would silently do nothing on most athletes. Fall back
+  // to the muscle the session opens on: its main work.
+  const chosen = options.focus ?? []
+  const focus = new Set(chosen.length > 0 || session.exercises.length === 0
+    ? chosen
+    : [getExercise(session.exercises[0]!.exerciseId).primary])
   const adjustments: SessionAdjustment[] = []
   const scaled = scaleSets(session.exercises, outcome.volumeMultiplier)
 
@@ -117,5 +124,47 @@ export function applyReviewToSession(
     // untouched; only the working sets answer to the review.
     estimatedMinutes: estimateSessionMinutes(exercises, Boolean(session.finisher)),
     adjustments: [...(session.adjustments ?? []), ...adjustments],
+  }
+}
+
+/**
+ * An easy week the athlete asked for, applied to one session.
+ *
+ * Volume and load are only half of a deload. The stored session also carries
+ * the RPE target and the top-set technique the phase baked in at generation
+ * time, so scaling sets alone leaves the athlete reading "light and easy on
+ * purpose" above a primary lift still asking for RPE 9 and a top set. This
+ * hands over the whole deload, the same numbers the calendar would have given
+ * them in week four.
+ */
+export function applyDeloadToSession(session: GymSession, options: ApplyReviewOptions): GymSession {
+  const deload = PARAMETERS.deload
+  const scaled = applyReviewToSession(
+    session,
+    {
+      verdict: 'struggling',
+      volumeMultiplier: deload.volumeMultiplier,
+      loadMultiplier: deload.loadMultiplier,
+      extraFocusSets: 0,
+      completionRate: 1,
+      plannedSessions: 0,
+      completedSessions: 0,
+      medianRpeDelta: null,
+      messageKey: deload.messageKey,
+    },
+    options,
+  )
+
+  const plain = (exercise: PlannedExercise): PlannedExercise => ({
+    ...exercise,
+    rpeTarget: Math.min(exercise.rpeTarget, deload.rpeTarget),
+    // Top sets, drop sets and rest-pause are the opposite of a deload.
+    technique: exercise.technique === 'tempo' ? 'tempo' : 'straight',
+  })
+
+  return {
+    ...scaled,
+    exercises: scaled.exercises.map(plain),
+    finisher: scaled.finisher ? plain(scaled.finisher) : undefined,
   }
 }

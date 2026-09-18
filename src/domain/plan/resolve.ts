@@ -70,6 +70,8 @@ export function resolveLoads(
 const THRESHOLD_SHOULDER_MINUTES = 20
 /** Easy kilometres either side of an interval session. */
 const INTERVAL_SHOULDER_KM = 3
+/** Warm-up plus cool-down around the reps, as the generator counts them. */
+const INTERVAL_WARMUP_MINUTES = 15
 
 const round1 = (km: number) => Math.round(km * 10) / 10
 
@@ -103,12 +105,16 @@ export function resolveRunPaces(run: RunSession, paces: TrainingPaces | null): R
       if (!run.intervals) return { ...run, paceSecPerKm: paces.interval }
       const intervals = { ...run.intervals, paceSecPerKm: paces.interval }
       const workKm = (intervals.reps * intervals.workMeters) / 1000
+      const hardMinutes = (workKm * paces.interval) / 60
       return {
         ...run,
         intervals,
         paceSecPerKm: paces.interval,
         km: round1(workKm + INTERVAL_SHOULDER_KM),
-        hardMinutes: Math.round((workKm * paces.interval) / 60),
+        hardMinutes: Math.round(hardMinutes),
+        // Warm-up and cool-down, the reps, and the rest between them. Left
+        // alone it would still quote the old pace's total.
+        minutes: Math.round(INTERVAL_WARMUP_MINUTES + hardMinutes + (intervals.reps * intervals.restSec) / 60),
       }
     }
 

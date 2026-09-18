@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { applyReviewToSession, weeklyReview, type ReviewOutcome } from '..'
+import { applyDeloadToSession, applyReviewToSession, weeklyReview, type ReviewOutcome } from '..'
 import type { GymSession, PlannedExercise } from '../../plan/generator'
 
 const exercise = (over: Partial<PlannedExercise> & { exerciseId: string }): PlannedExercise => ({
@@ -80,6 +80,13 @@ describe('applyReviewToSession', () => {
     expect(bench!.loadKg % 2.5).toBeCloseTo(0, 5)
   })
 
+  it("steps up the session\u0027s main work when no focus areas were chosen", () => {
+    const result = applyReviewToSession(session(), outcome({ verdict: 'thriving', extraFocusSets: 1 }), opts)
+    // Bench opens the session, so chest is what gains the set.
+    expect(result.exercises[0]!.sets).toBe(5)
+    expect(result.exercises[1]!.sets).toBe(4)
+  })
+
   it('never pushes a muscle past the per-session ceiling', () => {
     const heavy = session({
       exercises: [
@@ -109,5 +116,40 @@ describe('applyReviewToSession', () => {
     const withFinisher = session({ finisher: exercise({ exerciseId: 'burpee', label: 'F', role: 'finisher', sets: 3, loadKg: 0 }) })
     const result = applyReviewToSession(withFinisher, outcome({ volumeMultiplier: 0.5 }), opts)
     expect(result.finisher?.sets).toBe(3)
+  })
+})
+
+describe('applyDeloadToSession', () => {
+  const hard = session({
+    exercises: [
+      exercise({ exerciseId: 'bench_press', sets: 5, rpeTarget: 9, technique: 'top_set_backoff', loadKg: 80 }),
+      exercise({ exerciseId: 'barbell_row', label: 'B', sets: 4, rpeTarget: 9, technique: 'drop_set', loadKg: 60 }),
+    ],
+  })
+
+  it('takes the intensity down, not only the volume', () => {
+    const result = applyDeloadToSession(hard, opts)
+    for (const e of result.exercises) {
+      expect(e.rpeTarget).toBeLessThanOrEqual(6)
+      expect(e.technique).toBe('straight')
+    }
+  })
+
+  it('still lightens the work', () => {
+    const result = applyDeloadToSession(hard, opts)
+    const before = hard.exercises.reduce((n, e) => n + e.sets, 0)
+    const after = result.exercises.reduce((n, e) => n + e.sets, 0)
+    expect(after).toBeLessThan(before)
+    expect(result.exercises[0]!.loadKg).toBeLessThan(80)
+  })
+
+  it('never raises an RPE target that was already easy', () => {
+    const easy = session({ exercises: [exercise({ exerciseId: 'bench_press', rpeTarget: 5 })] })
+    expect(applyDeloadToSession(easy, opts).exercises[0]!.rpeTarget).toBe(5)
+  })
+
+  it('keeps a tempo prescription, which is not an intensity technique', () => {
+    const tempo = session({ exercises: [exercise({ exerciseId: 'bench_press', technique: 'tempo' })] })
+    expect(applyDeloadToSession(tempo, opts).exercises[0]!.technique).toBe('tempo')
   })
 })

@@ -2187,8 +2187,8 @@
       "twinge": "Una molestia",
       "hurts": "Me dolió",
       "stop": "Tuve que parar",
-      "saved": "Anotado. Si vuelve a pasar, cambio este movimiento.",
-      "repeat": "Esto ya te ha dolido antes. Cámbialo por algo que trabaje el mismo músculo."
+      "saved": "Anotado. Si vuelve a pasar, te lo marco y te ofrezco un cambio.",
+      "repeat": "Esto ya te ha dolido antes. Cámbialo abajo por algo que trabaje el mismo músculo."
     },
     "nextBlock": {
       "title": "Bloque terminado",
@@ -2262,7 +2262,8 @@
     "backToLibrary": "Volver a la biblioteca",
     "details": "Detalles",
     "level": "Nivel",
-    "showing": "Mostrando {shown} de {total}"
+    "showing": "Mostrando {shown} de {total}",
+    "showMore": "Ver más"
   },
   "run": {
     "noRun": "No hay carrera planeada para este día.",

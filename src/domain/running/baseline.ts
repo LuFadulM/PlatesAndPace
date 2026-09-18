@@ -22,7 +22,11 @@ export const MIN_EVIDENCE_KM = 3
  */
 export const MAX_IMPROVEMENT = 0.05
 
-/** A run only ever makes the baseline faster; an easy long run is not a bad day. */
+/**
+ * Whether a *logged* run is worth learning from. The athlete's own answer at
+ * onboarding is not held to this: it is what they told us they can do, not
+ * noisy evidence, and it seeds the baseline whatever distance they gave.
+ */
 export function isEvidence(effort: RecentRun): boolean {
   return effort.km >= MIN_EVIDENCE_KM && effort.seconds > 0
 }
@@ -39,7 +43,13 @@ export function improvedBaseline(
   starting: RecentRun | undefined,
   efforts: readonly RecentRun[],
 ): RecentRun | undefined {
-  let best = starting && isEvidence(starting) ? fiveKEquivalentSeconds(starting.km, starting.seconds) : undefined
+  // Seeded from the athlete's own answer at any distance. Holding it to the
+  // three-kilometre rule would drop the seed for someone who reported a mile,
+  // and the first easy run they logged would then become the baseline outright,
+  // with no direction check and no cap: the opposite of a ratchet.
+  let best = starting && starting.km > 0 && starting.seconds > 0
+    ? fiveKEquivalentSeconds(starting.km, starting.seconds)
+    : undefined
 
   for (const effort of efforts) {
     if (!isEvidence(effort)) continue
@@ -74,7 +84,8 @@ export function racePredictions(recent: RecentRun, band = 0.03): RacePrediction[
   return (Object.keys(RACE_DISTANCES_KM) as RaceDistanceKey[]).map((race) => {
     const km = RACE_DISTANCES_KM[race]
     const seconds = riegelPredictSeconds(recent.km, recent.seconds, km)
-    // One extra percentage point of uncertainty per doubling away from the effort.
+    // The band widens by its own width for every doubling away from the known
+    // effort: ±3% at the distance itself, ±6% at twice it, ±9% at four times.
     const stretch = Math.abs(Math.log2(km / recent.km))
     const spread = band * (1 + stretch)
     return {

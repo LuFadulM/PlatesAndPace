@@ -8,8 +8,7 @@ import { ageOn } from '@/domain/profile/types'
 import { estimateNutrition, type NutritionEstimate } from '@/domain/nutrition'
 import { compareDates, endOfPlanWeek, fromISODate, isValidPlainDate, startOfPlanWeek, todayInZone, toISODate, weekStrip } from '@/domain/dates'
 import { resolveLoads, resolveRunPaces } from '@/domain/plan'
-import { applyReviewToSession } from '@/domain/review'
-import { takenDeload } from '@/domain/strength/deload'
+import { applyDeloadToSession, applyReviewToSession } from '@/domain/review'
 import { alternativesFor, catalogueFor } from '@/domain/plan/edit'
 import { buildAthleteModel } from '@/domain/profile/athlete'
 import { DEFAULT_PLATES } from '@/domain/strength/loads'
@@ -21,7 +20,7 @@ import { blockHasEnded, getCurrentPlan, getDoneDates, getPlannedDay, getPlannedD
 import { getActiveAnswers, getLatestWeightKg, getRecentWeights, requireProfile } from '@/lib/data/profile'
 import { getLastWeekReview } from '@/lib/data/review'
 import { getCurrentPaces } from '@/lib/data/running'
-import { getDeloadAdvice, getPainReports } from '@/lib/data/deload'
+import { getDeloadAdvice, getPainReports, painBefore, painOn } from '@/lib/data/deload'
 
 export default async function TodayPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ date?: string }> }) {
   const { locale } = await params
@@ -86,29 +85,15 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
     resolved = { ...resolved, run: resolveRunPaces(resolved.run, running?.paces ?? null) }
   }
   if (resolved?.gym && deloadTaken && thisWeek) {
-    const easy = takenDeload()
-    resolved = { ...resolved, gym: applyReviewToSession(resolved.gym, {
-      verdict: 'struggling',
-      volumeMultiplier: easy.volumeMultiplier,
-      loadMultiplier: easy.loadMultiplier,
-      extraFocusSets: 0,
-      completionRate: 1,
-      plannedSessions: 0,
-      completedSessions: 0,
-      medianRpeDelta: null,
-      messageKey: 'coach.phase.deload',
-    }, { units, plates }) }
+    resolved = { ...resolved, gym: applyDeloadToSession(resolved.gym, { units, plates }) }
   } else if (resolved?.gym && review && thisWeek) {
     resolved = { ...resolved, gym: applyReviewToSession(resolved.gym, review, { units, plates, focus: (answers?.preferences.focusAreas ?? []).flatMap(musclesForFocusArea) }) }
   }
 
   // What hurt today, and how often each movement has hurt before it, so the
   // control can say "this has happened before" rather than repeating itself.
-  const painToday = iso === toISODate(today) ? painReports.today : {}
-  const painHistory: Record<string, number> = {}
-  for (const [exerciseId, severities] of Object.entries(painReports.byExercise)) {
-    painHistory[exerciseId] = severities.filter((severity) => severity >= 2).length
-  }
+  const painToday = painOn(painReports, iso)
+  const painHistory = painBefore(painReports, iso)
 
   const stripDays: StripDay[] = days.map((d) => ({ date: d.date, type: d.type, done: doneDates.has(d.date) }))
 
@@ -178,7 +163,7 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
         catalogue={catalogue}
         lastTime={lastTime}
         editable={editable}
-        review={thisWeek ? review : null}
+        review={thisWeek && !deloadTaken ? review : null}
         painToday={painToday}
         painHistory={painHistory}
       />
