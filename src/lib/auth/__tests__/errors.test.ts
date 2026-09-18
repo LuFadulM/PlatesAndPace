@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { classifyExchangeFailure, classifySendFailure } from '../errors'
+import { classifyExchangeFailure, classifySendFailure, classifyVerifyFailure } from '../errors'
 
 describe('classifySendFailure', () => {
   it('recognises the email quota by status, by code and by message', () => {
@@ -8,9 +8,28 @@ describe('classifySendFailure', () => {
     expect(classifySendFailure({ message: 'email rate limit exceeded' })).toBe('rateLimited')
   })
 
+  it('names a switched-off email provider rather than blaming the network', () => {
+    // Verbatim from the project's auth log: a 422 no amount of retrying fixes.
+    expect(classifySendFailure({ status: 422, message: 'Email logins are disabled' })).toBe('emailDisabled')
+    expect(classifySendFailure({ code: 'email_provider_disabled' })).toBe('emailDisabled')
+  })
+
+  it('still calls the quota a quota when the provider is on', () => {
+    expect(classifySendFailure({ status: 429, message: 'email rate limit exceeded' })).toBe('rateLimited')
+  })
+
   it('treats anything else as a plain send failure', () => {
     expect(classifySendFailure({ status: 500, message: 'smtp down' })).toBe('sendFailed')
     expect(classifySendFailure({})).toBe('sendFailed')
+  })
+})
+
+describe('classifyVerifyFailure', () => {
+  it('separates a spent code from a mistyped one', () => {
+    expect(classifyVerifyFailure({ message: 'Token has expired or is invalid' })).toBe('codeExpired')
+    expect(classifyVerifyFailure({ message: 'One-time token not found' })).toBe('codeExpired')
+    expect(classifyVerifyFailure({ message: 'invalid token' })).toBe('codeInvalid')
+    expect(classifyVerifyFailure({})).toBe('codeInvalid')
   })
 })
 
