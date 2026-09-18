@@ -22,14 +22,13 @@ function dateOf(row: { session_logs?: unknown }): string | undefined {
  * running, and whether this week's volume has reached what the athlete can
  * recover from.
  */
-export async function getDeloadAdvice(today: PlainDate): Promise<DeloadAdvice> {
+export async function getDeloadAdvice(today: PlainDate, pain: PainHistory): Promise<DeloadAdvice> {
   const empty = { lifts: [], readinessScores: [], weeklySets: {} }
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return deloadAdvice(empty)
 
   const weekStart = startOfPlanWeek(today)
-  const painReports = await getPainReports(today)
   const [{ data: sets }, { data: logs }, { data: weekSets }] = await Promise.all([
     supabase
       .from('set_logs')
@@ -93,17 +92,25 @@ export async function getDeloadAdvice(today: PlainDate): Promise<DeloadAdvice> {
     for (const m of def.secondary) weeklySets[m] = (weeklySets[m] ?? 0) + SECONDARY_SET_CREDIT
   }
 
-  return deloadAdvice({ lifts, readinessScores, weeklySets, painReports })
+  return deloadAdvice({ lifts, readinessScores, weeklySets, painReports: pain.byExercise })
+}
+
+export interface PainHistory {
+  /** Per exercise, the severities reported over the window, oldest first. */
+  byExercise: Record<string, number[]>
+  /** What was reported for `today` itself, for the control's current state. */
+  today: Record<string, number>
 }
 
 /**
- * Pain reported per movement over recent sessions, oldest first, for the
- * fourth deload trigger and for offering a swap.
+ * Pain reported per movement over recent sessions, oldest first. One read
+ * serves both the fourth deload trigger and the per-exercise control, which
+ * would otherwise ask the same column two different ways.
  */
-export async function getPainReports(today: PlainDate, days = 42): Promise<Record<string, number[]>> {
+export async function getPainReports(today: PlainDate, days = 42): Promise<PainHistory> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return {}
+  if (!user) return { byExercise: {}, today: {} }
   const { data } = await supabase
     .from('session_logs')
     .select('date, pain')
@@ -113,35 +120,19 @@ export async function getPainReports(today: PlainDate, days = 42): Promise<Recor
     .lte('date', toISODate(today))
     .order('date')
 
-  const reports: Record<string, number[]> = {}
+  const todayIso = toISODate(today)
+  const byExercise: Record<string, number[]> = {}
+  const onDay: Record<string, number> = {}
   for (const row of data ?? []) {
     const pain = row.pain as Record<string, unknown> | null
     if (!pain) continue
     for (const [exerciseId, value] of Object.entries(pain)) {
       const severity = Number(value)
       if (!Number.isFinite(severity) || severity <= 0) continue
-      ;(reports[exerciseId] ??= []).push(severity)
+      ;(byExercise[exerciseId] ??= []).push(severity)
+      if (row.date === todayIso) onDay[exerciseId] = severity
     }
   }
-  return reports
+  return { byExercise, today: onDay }
 }
 
-/** Pain reported on one date, per exercise, for the control's current state. */
-export async function getSessionPain(date: string): Promise<Record<string, number>> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return {}
-  const { data } = await supabase
-    .from('session_logs')
-    .select('pain')
-    .eq('user_id', user.id)
-    .eq('date', date)
-    .maybeSingle()
-  const pain = (data?.pain ?? {}) as Record<string, unknown>
-  const result: Record<string, number> = {}
-  for (const [exerciseId, value] of Object.entries(pain)) {
-    const severity = Number(value)
-    if (Number.isFinite(severity) && severity > 0) result[exerciseId] = severity
-  }
-  return result
-}
