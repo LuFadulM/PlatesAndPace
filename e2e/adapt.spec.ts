@@ -93,8 +93,11 @@ test('reports joint pain on one exercise and keeps it across a reload', async ({
 
   // The confirmation only appears once the write has landed, so waiting for it
   // here is what stops the reload below cancelling the request in flight.
-  await expect(page.getByText(/Noted\.|hurt before/i).first()).toBeVisible()
-  await expect(page.getByRole('alert')).toHaveCount(0)
+  // Matched exactly, and the failure message is its own assertion: the control
+  // shows this line on a save that worked and a different one on a save that
+  // did not.
+  await expect(page.getByText('Noted. If it happens again I will flag it and offer a swap.')).toBeVisible()
+  await expect(page.getByText('Could not save that. Tap again.')).toHaveCount(0)
   await expect(hurt).toHaveAttribute('aria-pressed', 'true')
 
   await page.reload()
