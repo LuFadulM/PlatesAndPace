@@ -1,12 +1,14 @@
 import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { DayHeader, type StripDay } from '@/components/today/day-header'
+import { DeloadCard } from '@/components/today/deload-card'
 import { SessionView, type LoggedSet } from '@/components/today/session-view'
 import { ageOn } from '@/domain/profile/types'
 import { estimateNutrition, type NutritionEstimate } from '@/domain/nutrition'
 import { compareDates, endOfPlanWeek, fromISODate, isValidPlainDate, startOfPlanWeek, todayInZone, toISODate, weekStrip } from '@/domain/dates'
 import { resolveLoads, resolveRunPaces } from '@/domain/plan'
 import { applyReviewToSession } from '@/domain/review'
+import { takenDeload } from '@/domain/strength/deload'
 import { alternativesFor, catalogueFor } from '@/domain/plan/edit'
 import { buildAthleteModel } from '@/domain/profile/athlete'
 import { DEFAULT_PLATES } from '@/domain/strength/loads'
@@ -14,10 +16,11 @@ import { musclesForFocusArea } from '@/domain/strength/volume'
 import type { Readiness } from '@/domain/strength/autoregulation'
 import { isLocale } from '@/i18n/routing'
 import { getSessionLogWithSets, lastPerformances, latestMaxDetails, type MaxDetail } from '@/lib/data/logs'
-import { getCurrentPlan, getDoneDates, getPlannedDay, getPlannedDays } from '@/lib/data/plan'
+import { getCurrentPlan, getDoneDates, getPlannedDay, getPlannedDays, takenDeloadWeeks } from '@/lib/data/plan'
 import { getActiveAnswers, getLatestWeightKg, getRecentWeights, requireProfile } from '@/lib/data/profile'
 import { getLastWeekReview } from '@/lib/data/review'
 import { getCurrentPaces } from '@/lib/data/running'
+import { getDeloadAdvice } from '@/lib/data/deload'
 
 export default async function TodayPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ date?: string }> }) {
   const { locale } = await params
@@ -41,7 +44,7 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
     getActiveAnswers(),
     getLatestWeightKg(),
   ])
-  const [recentWeights, review, running] = await Promise.all([
+  const [recentWeights, review, running, deload] = await Promise.all([
     getRecentWeights(toISODate(today)),
     getLastWeekReview(today),
     // Paces learned from logged runs, so a runner who got faster trains faster.
@@ -51,7 +54,13 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
           answers.goals.targetRace,
         )
       : getCurrentPaces(undefined),
+    getDeloadAdvice(today),
   ])
+
+  // An easy week the athlete asked for lands on the same session pipeline as
+  // the scheduled one, so it looks and feels like week four.
+  const weekStartIso = toISODate(startOfPlanWeek(today))
+  const deloadTaken = takenDeloadWeeks(plan?.settings).includes(weekStartIso)
   const maxes = Object.fromEntries(Object.entries(maxDetails).map(([id, d]) => [id, d.e1rm]))
   const units = profile.units as 'metric' | 'imperial'
   const plates = answers?.equipment.plates ?? DEFAULT_PLATES[units]
@@ -71,7 +80,20 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
   if (resolved?.run) {
     resolved = { ...resolved, run: resolveRunPaces(resolved.run, running?.paces ?? null) }
   }
-  if (resolved?.gym && review && thisWeek) {
+  if (resolved?.gym && deloadTaken && thisWeek) {
+    const easy = takenDeload()
+    resolved = { ...resolved, gym: applyReviewToSession(resolved.gym, {
+      verdict: 'struggling',
+      volumeMultiplier: easy.volumeMultiplier,
+      loadMultiplier: easy.loadMultiplier,
+      extraFocusSets: 0,
+      completionRate: 1,
+      plannedSessions: 0,
+      completedSessions: 0,
+      medianRpeDelta: null,
+      messageKey: 'coach.phase.deload',
+    }, { units, plates }) }
+  } else if (resolved?.gym && review && thisWeek) {
     resolved = { ...resolved, gym: applyReviewToSession(resolved.gym, review, { units, plates, focus: (answers?.preferences.focusAreas ?? []).flatMap(musclesForFocusArea) }) }
   }
 
@@ -122,6 +144,7 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
   return (
     <main className="flex flex-col gap-5 px-4 py-6">
       <DayHeader date={iso} today={toISODate(today)} strip={stripDays} />
+      {thisWeek && <DeloadCard advice={deload} weekStart={weekStartIso} taken={deloadTaken} />}
       <SessionView
         date={iso}
         day={resolved}

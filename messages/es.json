@@ -2570,5 +2570,18 @@
       "repetition": "Cortas y rápidas, para velocidad más que para fondo."
     },
     "empty": "Cuéntanos una carrera reciente, o registra una, y tus ritmos aparecerán aquí."
+  },
+  "deload": {
+    "title": "Toca una semana suave",
+    "stalled": "{lifts} no se ha movido en {n} sesiones.",
+    "stalledPlural": "{lifts} no se han movido en {n} sesiones.",
+    "readiness": "Llevas tres días seguidos calificándote sin energía.",
+    "mrv": "{muscles} está en el máximo del que puedes recuperarte esta semana.",
+    "mrvPlural": "{muscles} están en el máximo del que puedes recuperarte esta semana.",
+    "why": "Con una sola de estas basta. Bajar ahora es lo que hace que el próximo bloque suba.",
+    "take": "Tomar una semana suave",
+    "taking": "Aligerando esta semana…",
+    "taken": "Esta semana es de descarga. Ligero y suave a propósito.",
+    "dismiss": "Ahora no"
   }
 }

@@ -92,6 +92,9 @@ never `timestamptz`.
 2. Beginners start at MEV, advanced lifters at mid-MAV; add about one set per muscle per
    week toward MRV; deload when performance stalls two sessions running, readiness is low
    three days running, joint pain is reported twice on a movement, or MRV is reached.
+   `src/domain/strength/deload.ts` implements the stall, readiness and MRV triggers and
+   Today offers the easy week; joint pain has no structured input yet, so that trigger is
+   still unbuilt.
    Per-session direct volume caps at about 10 sets per muscle. Compounds count 1.0 for the
    primary muscle and 0.5 for secondaries.
 3. Intensity by quality: max strength 1–5 reps, RIR 1–3, 180–300 s; hypertrophy 6–12 (5–30

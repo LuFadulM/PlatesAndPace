@@ -2570,5 +2570,18 @@
       "repetition": "Short and fast, for speed rather than fitness."
     },
     "empty": "Tell us a recent run, or log one, and your paces will appear here."
+  },
+  "deload": {
+    "title": "Time for an easy week",
+    "stalled": "{lifts} has not moved in {n} sessions.",
+    "stalledPlural": "{lifts} have not moved in {n} sessions.",
+    "readiness": "You have rated yourself flat three days running.",
+    "mrv": "{muscles} is at the most you can recover from this week.",
+    "mrvPlural": "{muscles} are at the most you can recover from this week.",
+    "why": "Any one of these is enough. Backing off now is how the next block goes up.",
+    "take": "Take an easy week",
+    "taking": "Lightening this week…",
+    "taken": "This week is a deload. Light and easy on purpose.",
+    "dismiss": "Not now"
   }
 }

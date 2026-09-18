@@ -193,3 +193,42 @@ export async function refocusDay(raw: unknown): Promise<{ ok: true } | { ok: fal
   revalidatePath('/', 'layout')
   return { ok: true }
 }
+
+const deloadSchema = z.object({ weekStart: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) })
+
+/**
+ * Marks a week as an easy one, on the athlete's say-so (CLAUDE.md, rule 2).
+ *
+ * The engine deloads every fourth week whatever happens, but a body that has
+ * stalled, slept badly for days or piled up more volume than it can recover
+ * from needs the easy week now. The recommendation is the engine's; taking it
+ * is the athlete's, because a surprise half-session is worse coaching than a
+ * hard one they chose.
+ *
+ * Stored on the plan rather than in a table of its own: it is a property of
+ * this block, and it disappears with it.
+ */
+export async function takeDeloadWeek(input: unknown) {
+  const parsed = deloadSchema.safeParse(input)
+  if (!parsed.success) return { ok: false as const }
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { ok: false as const }
+
+  const plan = await getCurrentPlan()
+  if (!plan) return { ok: false as const }
+
+  const settings = (plan.settings ?? {}) as Record<string, unknown>
+  const taken = Array.isArray(settings.takenDeloads) ? (settings.takenDeloads as string[]) : []
+  if (taken.includes(parsed.data.weekStart)) return { ok: true as const }
+
+  const { error } = await supabase
+    .from('plans')
+    .update({ settings: { ...settings, takenDeloads: [...taken, parsed.data.weekStart] } as unknown as Json })
+    .eq('id', plan.id)
+    .eq('user_id', user.id)
+  if (error) return { ok: false as const }
+
+  revalidatePath('/', 'layout')
+  return { ok: true as const }
+}

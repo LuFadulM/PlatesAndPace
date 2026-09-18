@@ -51,4 +51,10 @@ export async function getDoneDates(from: PlainDate, to: PlainDate): Promise<Set<
   return new Set((data ?? []).map((r) => r.date))
 }
 
+/** Week starts the athlete has already chosen to take easy, for this block. */
+export function takenDeloadWeeks(settings: unknown): string[] {
+  const value = (settings as { takenDeloads?: unknown } | null)?.takenDeloads
+  return Array.isArray(value) ? value.filter((v): v is string => typeof v === 'string') : []
+}
+
 export { addDays }
