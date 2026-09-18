@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { addDays, toISODate, type PlainDate } from '@/domain/dates'
+import { addDays, compareDates, fromISODate, toISODate, type PlainDate } from '@/domain/dates'
 import type { PlannedDay } from '@/domain/plan'
 import type { Tables } from '@/types/database'
 
@@ -49,6 +49,15 @@ export async function getDoneDates(from: PlainDate, to: PlainDate): Promise<Set<
     .gte('date', toISODate(from))
     .lte('date', toISODate(to))
   return new Set((data ?? []).map((r) => r.date))
+}
+
+/**
+ * True once every day of the block has passed. A block is four to twelve
+ * weeks; after the last one the athlete needs a new block, not an empty day.
+ */
+export function blockHasEnded(plan: Pick<PlanRow, 'start_date' | 'weeks'>, today: PlainDate): boolean {
+  const lastDay = addDays(fromISODate(plan.start_date), plan.weeks * 7 - 1)
+  return compareDates(today, lastDay) > 0
 }
 
 /** Week starts the athlete has already chosen to take easy, for this block. */

@@ -11,7 +11,7 @@ import { anyHealthFlag, hasRedFlag, questionnaireSchema } from '@/domain/profile
 import { planSeed } from '@/domain/strength/rng'
 import { MUSCLE_GROUPS, type MuscleGroup } from '@/domain/strength/volume'
 import { exerciseIdsUsedSince, getSwaps, latestMaxes } from '@/lib/data/logs'
-import { getCurrentPlan, getPlannedDay } from '@/lib/data/plan'
+import { blockHasEnded, getCurrentPlan, getPlannedDay } from '@/lib/data/plan'
 import { getActiveAnswers } from '@/lib/data/profile'
 import { createClient } from '@/lib/supabase/server'
 import type { Json } from '@/types/database'
@@ -231,4 +231,41 @@ export async function takeDeloadWeek(input: unknown) {
 
   revalidatePath('/', 'layout')
   return { ok: true as const }
+}
+
+/**
+ * Starts the next training block when the current one has run out.
+ *
+ * A block is four to twelve weeks. Without this the app simply stopped: Today
+ * said "nothing planned for this day" for ever and the athlete had to guess
+ * that re-answering the questionnaire was what restarted it. The next block
+ * carries everything the last one taught, because `materialise` already reads
+ * the logged maxes, the permanent swaps, what was trained recently and the
+ * running baseline learned from logged runs.
+ */
+export async function startNextBlock(): Promise<{ ok: true } | { ok: false; errorKey: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { ok: false, errorKey: 'auth.errors.signedOut' }
+
+  const answers = await getActiveAnswers()
+  if (!answers) return { ok: false, errorKey: 'today.edit.error' }
+
+  const today = todayInZone(answers.basics.timezone)
+  const plan = await getCurrentPlan()
+  // Only when the current block is genuinely over: starting a new one mid-block
+  // would throw away the weeks the athlete has already banked.
+  if (plan && !blockHasEnded(plan, today)) return { ok: false, errorKey: 'today.nextBlock.notYet' }
+
+  let model
+  try {
+    model = buildAthleteModel(answers, today)
+  } catch {
+    return { ok: false, errorKey: 'onboarding.errors.underage' }
+  }
+
+  const result = await materialise(user.id, model, today)
+  if (!result.ok) return result
+  revalidatePath('/', 'layout')
+  return { ok: true }
 }

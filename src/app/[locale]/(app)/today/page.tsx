@@ -2,6 +2,7 @@ import { setRequestLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { DayHeader, type StripDay } from '@/components/today/day-header'
 import { DeloadCard } from '@/components/today/deload-card'
+import { NextBlockCard } from '@/components/today/next-block-card'
 import { SessionView, type LoggedSet } from '@/components/today/session-view'
 import { ageOn } from '@/domain/profile/types'
 import { estimateNutrition, type NutritionEstimate } from '@/domain/nutrition'
@@ -16,7 +17,7 @@ import { musclesForFocusArea } from '@/domain/strength/volume'
 import type { Readiness } from '@/domain/strength/autoregulation'
 import { isLocale } from '@/i18n/routing'
 import { getSessionLogWithSets, lastPerformances, latestMaxDetails, type MaxDetail } from '@/lib/data/logs'
-import { getCurrentPlan, getDoneDates, getPlannedDay, getPlannedDays, takenDeloadWeeks } from '@/lib/data/plan'
+import { blockHasEnded, getCurrentPlan, getDoneDates, getPlannedDay, getPlannedDays, takenDeloadWeeks } from '@/lib/data/plan'
 import { getActiveAnswers, getLatestWeightKg, getRecentWeights, requireProfile } from '@/lib/data/profile'
 import { getLastWeekReview } from '@/lib/data/review'
 import { getCurrentPaces } from '@/lib/data/running'
@@ -60,6 +61,9 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
 
   // An easy week the athlete asked for lands on the same session pipeline as
   // the scheduled one, so it looks and feels like week four.
+  // Past the last day of the block there is nothing left to plan, so the way
+  // forward replaces the coaching cards rather than sitting under them.
+  const blockOver = plan ? blockHasEnded(plan, today) : false
   const weekStartIso = toISODate(startOfPlanWeek(today))
   const deloadTaken = takenDeloadWeeks(plan?.settings).includes(weekStartIso)
   const maxes = Object.fromEntries(Object.entries(maxDetails).map(([id, d]) => [id, d.e1rm]))
@@ -153,7 +157,8 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
   return (
     <main className="flex flex-col gap-5 px-4 py-6">
       <DayHeader date={iso} today={toISODate(today)} strip={stripDays} />
-      {thisWeek && <DeloadCard advice={deload} weekStart={weekStartIso} taken={deloadTaken} />}
+      {blockOver && plan && <NextBlockCard weeks={plan.weeks} />}
+      {thisWeek && !blockOver && <DeloadCard advice={deload} weekStart={weekStartIso} taken={deloadTaken} />}
       <SessionView
         date={iso}
         day={resolved}

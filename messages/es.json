@@ -2189,6 +2189,14 @@
       "stop": "Tuve que parar",
       "saved": "Anotado. Si vuelve a pasar, cambio este movimiento.",
       "repeat": "Esto ya te ha dolido antes. Cámbialo por algo que trabaje el mismo músculo."
+    },
+    "nextBlock": {
+      "title": "Bloque terminado",
+      "body": "Van {weeks} semanas completadas. El próximo bloque arranca desde lo que levantaste y corriste en este.",
+      "start": "Empezar el próximo bloque",
+      "starting": "Armándolo…",
+      "notYet": "A este bloque todavía le quedan días.",
+      "error": "No se pudo empezar el próximo bloque. Inténtalo de nuevo."
     }
   },
   "plan": {

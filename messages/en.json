@@ -2189,6 +2189,14 @@
       "stop": "Had to stop",
       "saved": "Noted. If it happens again I will swap this movement.",
       "repeat": "This has hurt before. Swap it for something that trains the same muscle."
+    },
+    "nextBlock": {
+      "title": "Block finished",
+      "body": "That is {weeks} weeks done. The next block starts from what you lifted and ran in this one.",
+      "start": "Start the next block",
+      "starting": "Building it…",
+      "notYet": "This block still has days left in it.",
+      "error": "Could not start the next block. Try again."
     }
   },
   "plan": {
