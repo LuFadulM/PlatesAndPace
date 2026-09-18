@@ -3,9 +3,8 @@ import { admin, completeOnboarding, createUser, hasSupabase, signIn, unique } fr
 
 test.skip(!hasSupabase, 'needs a local Supabase stack')
 
+/** The app's own clock: the browser runs in Bogotá, so the profile does too. */
 const BOGOTA = 'America/Bogota'
-/** The onboarding helper books Monday, Wednesday and Friday. */
-const GYM_WEEKDAYS = [1, 3, 5]
 
 function todayIso(): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone: BOGOTA, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
@@ -17,73 +16,55 @@ function shift(iso: string, days: number): string {
   return d.toISOString().slice(0, 10)
 }
 
-/** A gym day inside the current plan week, today or later; null if the week is spent. */
-function gymDayThisWeek(): string | null {
-  const today = todayIso()
-  const weekday = new Date(`${today}T00:00:00Z`).getUTCDay() || 7
-  for (let offset = 0; weekday + offset <= 7; offset += 1) {
-    const candidate = shift(today, offset)
-    if (GYM_WEEKDAYS.includes(new Date(`${candidate}T00:00:00Z`).getUTCDay())) return candidate
-  }
-  return null
-}
-
-/** Today's ISO weekday, so a fixture can book the gym on the day the test runs. */
 function todayWeekday(): number {
   return new Date(`${todayIso()}T00:00:00Z`).getUTCDay() || 7
 }
 
 /**
- * The coaching rule that a movement which keeps hurting comes out of the plan
- * (CLAUDE.md, rule 2). Two reports on the same lift reach the athlete as an
- * offer of an easy week, naming the lift.
+ * Today, plus one other day because the questionnaire wants at least two gym
+ * days. Booking today means it always carries a session, so neither test
+ * depends on which day CI runs on.
  */
-test('a movement that hurts twice brings up the easy week', async ({ page }) => {
-  const email = unique('pain')
-  const user = await createUser(email)
+function gymWeekdays(): number[] {
+  const today = todayWeekday()
+  return [today, today === 1 ? 3 : 1]
+}
 
+/** Two past sessions where the same movement hurt. Reported, not inferred. */
+async function seedPain(userId: string, exerciseId: string) {
   const today = todayIso()
   for (const date of [shift(today, -7), shift(today, -4)]) {
-    await admin().from('session_logs').insert({ user_id: user.id, date, done: true, pain: { back_squat: 3 } })
+    await admin().from('session_logs').insert({ user_id: userId, date, done: true, pain: { [exerciseId]: 3 } })
   }
+}
+
+/**
+ * The coaching rule that a movement which keeps hurting comes out of the plan
+ * (CLAUDE.md, rule 2). Two reports reach the athlete as an offer of an easy
+ * week that names the lift, and taking it has to lighten the work rather than
+ * only announce itself.
+ */
+test('a movement that hurts twice brings up the easy week, and taking it lightens the session', async ({ page }) => {
+  const email = unique('pain')
+  const user = await createUser(email)
+  await seedPain(user.id, 'back_squat')
 
   await signIn(page, email, 'en')
-  await completeOnboarding(page, 'en', { name: 'Pia' })
-  await page.goto('/en/today')
+  await completeOnboarding(page, 'en', { name: 'Pia', gymWeekdays: gymWeekdays() })
+  await page.goto(`/en/today?date=${todayIso()}`)
 
   const card = page.getByRole('region', { name: 'Time for an easy week' })
   await expect(card).toBeVisible()
   await expect(card).toContainText(/hurt more than once/i)
   await expect(card).toContainText(/squat/i)
 
-  await card.getByRole('button', { name: 'Take an easy week' }).click()
-  await expect(page.getByText('This week is a deload. Light and easy on purpose.')).toBeVisible()
-})
-
-/** Taking the easy week has to actually lighten the work, not just say so. */
-test('taking the easy week shortens the session', async ({ page }) => {
-  const gymDate = gymDayThisWeek()
-  test.skip(gymDate === null, 'no gym day left in the current week')
-
-  const email = unique('easy')
-  const user = await createUser(email)
-  const today = todayIso()
-  for (const date of [shift(today, -7), shift(today, -4)]) {
-    await admin().from('session_logs').insert({ user_id: user.id, date, done: true, pain: { back_squat: 3 } })
-  }
-
-  await signIn(page, email, 'en')
-  await completeOnboarding(page, 'en', { name: 'Eve' })
-  await page.goto(`/en/today?date=${gymDate}`)
-
-  const rows = page.getByRole('list', { name: 'Exercises' }).locator(':scope > li')
-  const setsBefore = await rows.count()
-  expect(setsBefore).toBeGreaterThan(0)
-  const estimate = page.getByText(/\d+\s*min/).first()
+  // The session estimate, "~48 min", is the first minutes on the page.
+  const estimate = page.getByText(/~\s*\d+\s*min/).first()
   const minutes = async () => Number(/(\d+)\s*min/.exec((await estimate.textContent()) ?? '')?.[1] ?? 0)
   const before = await minutes()
+  expect(before).toBeGreaterThan(0)
 
-  await page.getByRole('region', { name: 'Time for an easy week' }).getByRole('button', { name: 'Take an easy week' }).click()
+  await card.getByRole('button', { name: 'Take an easy week' }).click()
   await expect(page.getByText('This week is a deload. Light and easy on purpose.')).toBeVisible()
 
   expect(await minutes()).toBeLessThan(before)
@@ -98,8 +79,8 @@ test('reports joint pain on one exercise and keeps it across a reload', async ({
   await createUser(email)
   await signIn(page, email, 'en')
   // Pain is reported against a session that has happened, so the fixture books
-  // the gym on today rather than on a day the athlete has not reached yet.
-  await completeOnboarding(page, 'en', { name: 'Rae', gymWeekdays: [todayWeekday()] })
+  // the gym on today rather than a day the athlete has not reached yet.
+  await completeOnboarding(page, 'en', { name: 'Rae', gymWeekdays: gymWeekdays() })
   await page.goto(`/en/today?date=${todayIso()}`)
 
   const rows = page.getByRole('list', { name: 'Exercises' }).locator(':scope > li')

@@ -51,6 +51,12 @@ export async function completeOnboarding(
   /** `gymWeekdays` defaults to Monday, Wednesday and Friday. */
   opts: { name: string; runner?: boolean; gymWeekdays?: readonly number[] },
 ) {
+  // The questionnaire wants at least two gym days. One would leave the wizard
+  // stuck on the schedule step with no way forward, which reads as a hung test
+  // rather than a bad fixture.
+  if (opts.gymWeekdays && opts.gymWeekdays.length < 2) {
+    throw new Error(`completeOnboarding needs at least two gym days, got ${opts.gymWeekdays.length}`)
+  }
   const t = locale === 'es'
     ? { next: 'Siguiente', finish: 'Crear mi plan', mon: 'Lun', wed: 'Mié', fri: 'Vie', tue: 'Mar', sat: 'Sáb' }
     : { next: 'Next', finish: 'Build my plan', mon: 'Mon', wed: 'Wed', fri: 'Fri', tue: 'Tue', sat: 'Sat' }
