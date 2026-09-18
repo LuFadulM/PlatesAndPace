@@ -339,7 +339,9 @@ export function SessionView({ date, day, units, plates, maxes, initialSets, init
                         <div className="text-xs text-(--color-ink-muted)">
                           <p>{tEx(`${e.exerciseId}.cue1`)}</p>
                           <p>{tEx(`${e.exerciseId}.cue2`)}</p>
+                          <p>{tEx(`${e.exerciseId}.cue3`)}</p>
                           <p className="mt-1 text-(--color-plate-red)">{tEx(`${e.exerciseId}.mistake1`)}</p>
+                          <Link href={`/library/${e.exerciseId}`} className="mt-1 inline-block min-h-11 font-semibold text-(--color-plate-blue)">{t('howTo')}</Link>
                         </div>
                       </div>
                       <p className="text-xs font-semibold text-(--color-plate-blue)">{lastLine(e)}</p>

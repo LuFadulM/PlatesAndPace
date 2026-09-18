@@ -162,6 +162,32 @@ screens only render it. The rules are written out in `CLAUDE.md`; in short:
 `src/domain/plan/__tests__/athletes.test.ts` is the fixture suite: named athletes, each of
 whom must get a valid plan.
 
+## The exercise library
+
+Two sources, one browser at `/library`.
+
+- **Coached** (`src/domain/exercises/library.ts`, 129 movements): everything the engine can
+  program. Each row carries the four filter axes the brief asks for (muscle, purpose, type
+  and material) plus force vector, plane, difficulty, tempo, breathing, stimulus-to-fatigue
+  and the contraindicated patterns. Names, aliases, three cues, two common mistakes and
+  three execution steps live in `messages/{en,es}.json`, so both languages are complete or
+  the build fails.
+- **Open catalogue** (`src/data/catalogue.json`, 876 rows): imported from
+  [free-exercise-db](https://github.com/yuhonas/free-exercise-db) (public domain, Unlicense)
+  by `python3 scripts/import-catalogue.py`, mapped onto the same taxonomy. Photos are served
+  from that repository. Its step-by-step instructions exist in English only and the UI says
+  so. Spanish names are built from a term glossary and every one is flagged
+  `nameEsReviewed: false` until a person checks it.
+
+The substitution graph (`src/domain/exercises/graph.ts`) answers "the rack is busy" and "my
+shoulder hurts": authored regression and progression edges, plus substitutes computed from
+the taxonomy and filtered by the athlete's equipment, unavailable machines, banned patterns
+and experience. Search folds accents and reads both languages, so *press de banca*, *bench
+press* and *RDL* all land on the same row.
+
+`wger`, USDA FoodData Central and Open Food Facts were unreachable from the build sandbox;
+only free-exercise-db was imported. No reference site was scraped.
+
 ## What was built without the prototype
 
 The brief referenced a single-user prototype, `plates-and-pace.html`, that never reached the

@@ -2175,7 +2175,8 @@
     "weighIn": "Morning weight ({unit}) · last {last}",
     "weighInSave": "Log",
     "weighInSaved": "Weight logged. The plan reads the two-week trend, not one morning.",
-    "grams": "{g} g"
+    "grams": "{g} g",
+    "howTo": "How to do it"
   },
   "plan": {
     "title": "Plan",
@@ -2201,11 +2202,46 @@
     "title": "Exercise library",
     "all": "All",
     "filterMuscle": "Filter by muscle",
-    "filterEquipment": "Filter by equipment",
+    "filterEquipment": "Filter by material",
+    "filterPurpose": "Filter by purpose",
+    "filterType": "Filter by type",
+    "filterDifficulty": "Filter by level",
+    "filterSource": "Filter by source",
     "count": "{n} exercises",
+    "search": "Search in English or Spanish: bench press, press de banca, RDL…",
+    "searchLabel": "Search exercises",
+    "clear": "Clear filters",
+    "noResults": "Nothing matches. Try fewer filters or another name.",
     "cues": "How to do it",
+    "steps": "Step by step",
     "mistakes": "Common mistakes",
-    "alsoWorks": "Also works"
+    "alsoWorks": "Also works",
+    "primaryMuscle": "Main muscle",
+    "material": "Material",
+    "tempo": "Tempo",
+    "tempoHint": "Seconds down, pause, up, pause. X means fast.",
+    "tempoHold": "Hold",
+    "tempoExplosive": "Explosive",
+    "breathing": "Breathing",
+    "avoidIf": "Skip this if you flagged",
+    "substitutes": "Swap for",
+    "substitutesHint": "Same movement and muscle, with your equipment.",
+    "easier": "Easier",
+    "harder": "Harder",
+    "sourceAuthored": "Coached by Plates & Pace",
+    "sourceOpen": "From the open exercise catalogue",
+    "openSteps": "Steps from the open catalogue, in English only.",
+    "openName": "Name translated automatically; the original is {name}.",
+    "curatedTwin": "Coached version",
+    "attribution": "Photos and open-catalogue steps: free-exercise-db, public domain.",
+    "photoAlt": "{name}, position {n}",
+    "front": "Front",
+    "back": "Back",
+    "muscleMap": "Pick a muscle on the body",
+    "backToLibrary": "Back to the library",
+    "details": "Details",
+    "level": "Level",
+    "showing": "Showing {shown} of {total}"
   },
   "run": {
     "noRun": "No run planned for this day.",
@@ -2436,6 +2472,68 @@
     "safety": {
       "clearance": "One of your answers is a red flag for hard exercise. This is training guidance, not medical advice: please check with a doctor.",
       "adapts": "Nothing here is fixed. Log your sessions, your readiness and your weight, and the plan adapts every week."
+    }
+  },
+  "taxonomy": {
+    "purpose": {
+      "strengthen": "Get stronger",
+      "stabilise": "Stability",
+      "mobilise": "Mobility",
+      "cardio": "Conditioning",
+      "nervous_system": "Power and speed"
+    },
+    "type": {
+      "training": "Training",
+      "warmup": "Warm-up",
+      "rehab": "Rehab",
+      "stretch": "Stretch"
+    },
+    "material": {
+      "bodyweight": "Bodyweight",
+      "barbell": "Barbell",
+      "dumbbell": "Dumbbells",
+      "kettlebell": "Kettlebell",
+      "machine": "Machine",
+      "cable": "Cable",
+      "band": "Band",
+      "bench": "Bench",
+      "box": "Box",
+      "medicine_ball": "Medicine ball",
+      "stability_ball": "Stability ball",
+      "suspension": "Suspension straps",
+      "bar": "Pull-up bar",
+      "other": "Other"
+    },
+    "difficulty": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
+    "movement": {
+      "squat": "Squat",
+      "hinge": "Hinge",
+      "lunge": "Lunge",
+      "horizontal_push": "Horizontal push",
+      "vertical_push": "Vertical push",
+      "horizontal_pull": "Horizontal pull",
+      "vertical_pull": "Vertical pull",
+      "carry": "Carry",
+      "rotation": "Rotation",
+      "anti_rotation": "Anti-rotation",
+      "anti_extension": "Anti-extension",
+      "anti_lateral_flexion": "Anti-lateral flexion",
+      "gait": "Locomotion",
+      "isolation": "Isolation"
+    },
+    "breathing": {
+      "brace": "Brace before the rep, exhale at the top",
+      "exhale_effort": "Exhale on the effort",
+      "continuous": "Keep breathing through the set",
+      "slow": "Slow, deep breaths"
+    },
+    "source": {
+      "authored": "Coached",
+      "open": "Open catalogue"
     }
   }
 }

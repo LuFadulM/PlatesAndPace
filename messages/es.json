@@ -2175,7 +2175,8 @@
     "weighIn": "Peso de la mañana ({unit}) · último {last}",
     "weighInSave": "Registrar",
     "weighInSaved": "Peso registrado. El plan lee la tendencia de dos semanas, no una mañana.",
-    "grams": "{g} g"
+    "grams": "{g} g",
+    "howTo": "Cómo hacerlo"
   },
   "plan": {
     "title": "Plan",
@@ -2201,11 +2202,46 @@
     "title": "Biblioteca de ejercicios",
     "all": "Todos",
     "filterMuscle": "Filtrar por músculo",
-    "filterEquipment": "Filtrar por equipo",
+    "filterEquipment": "Filtrar por material",
+    "filterPurpose": "Filtrar por objetivo",
+    "filterType": "Filtrar por tipo",
+    "filterDifficulty": "Filtrar por nivel",
+    "filterSource": "Filtrar por fuente",
     "count": "{n} ejercicios",
+    "search": "Busca en español o inglés: press de banca, bench press, RDL…",
+    "searchLabel": "Buscar ejercicios",
+    "clear": "Quitar filtros",
+    "noResults": "Nada coincide. Prueba con menos filtros u otro nombre.",
     "cues": "Cómo hacerlo",
+    "steps": "Paso a paso",
     "mistakes": "Errores comunes",
-    "alsoWorks": "También trabaja"
+    "alsoWorks": "También trabaja",
+    "primaryMuscle": "Músculo principal",
+    "material": "Material",
+    "tempo": "Tempo",
+    "tempoHint": "Segundos de bajada, pausa, subida, pausa. X significa rápido.",
+    "tempoHold": "Mantener",
+    "tempoExplosive": "Explosivo",
+    "breathing": "Respiración",
+    "avoidIf": "Evítalo si marcaste",
+    "substitutes": "Cámbialo por",
+    "substitutesHint": "Mismo patrón y músculo, con tu equipo.",
+    "easier": "Más fácil",
+    "harder": "Más difícil",
+    "sourceAuthored": "Con coaching de Plates & Pace",
+    "sourceOpen": "Del catálogo abierto de ejercicios",
+    "openSteps": "Pasos del catálogo abierto, solo en inglés.",
+    "openName": "Nombre traducido automáticamente; el original es {name}.",
+    "curatedTwin": "Versión con coaching",
+    "attribution": "Fotos y pasos del catálogo abierto: free-exercise-db, dominio público.",
+    "photoAlt": "{name}, posición {n}",
+    "front": "Frente",
+    "back": "Espalda",
+    "muscleMap": "Elige un músculo en el cuerpo",
+    "backToLibrary": "Volver a la biblioteca",
+    "details": "Detalles",
+    "level": "Nivel",
+    "showing": "Mostrando {shown} de {total}"
   },
   "run": {
     "noRun": "No hay carrera planeada para este día.",
@@ -2436,6 +2472,68 @@
     "safety": {
       "clearance": "Una de tus respuestas es una señal de alerta para el ejercicio intenso. Esto es una guía de entrenamiento, no consejo médico: consulta con un médico.",
       "adapts": "Nada aquí es fijo. Registra tus sesiones, tu estado y tu peso, y el plan se adapta cada semana."
+    }
+  },
+  "taxonomy": {
+    "purpose": {
+      "strengthen": "Ganar fuerza",
+      "stabilise": "Estabilidad",
+      "mobilise": "Movilidad",
+      "cardio": "Acondicionamiento",
+      "nervous_system": "Potencia y velocidad"
+    },
+    "type": {
+      "training": "Entrenamiento",
+      "warmup": "Calentamiento",
+      "rehab": "Rehabilitación",
+      "stretch": "Estiramiento"
+    },
+    "material": {
+      "bodyweight": "Peso corporal",
+      "barbell": "Barra",
+      "dumbbell": "Mancuernas",
+      "kettlebell": "Kettlebell",
+      "machine": "Máquina",
+      "cable": "Polea",
+      "band": "Banda",
+      "bench": "Banco",
+      "box": "Cajón",
+      "medicine_ball": "Balón medicinal",
+      "stability_ball": "Fitball",
+      "suspension": "Cintas de suspensión",
+      "bar": "Barra de dominadas",
+      "other": "Otro"
+    },
+    "difficulty": {
+      "beginner": "Principiante",
+      "intermediate": "Intermedio",
+      "advanced": "Avanzado"
+    },
+    "movement": {
+      "squat": "Sentadilla",
+      "hinge": "Bisagra",
+      "lunge": "Zancada",
+      "horizontal_push": "Empuje horizontal",
+      "vertical_push": "Empuje vertical",
+      "horizontal_pull": "Tirón horizontal",
+      "vertical_pull": "Tirón vertical",
+      "carry": "Transporte",
+      "rotation": "Rotación",
+      "anti_rotation": "Antirrotación",
+      "anti_extension": "Antiextensión",
+      "anti_lateral_flexion": "Antiflexión lateral",
+      "gait": "Locomoción",
+      "isolation": "Aislamiento"
+    },
+    "breathing": {
+      "brace": "Aprieta el tronco antes de la repetición y exhala arriba",
+      "exhale_effort": "Exhala en el esfuerzo",
+      "continuous": "Sigue respirando durante la serie",
+      "slow": "Respiraciones lentas y profundas"
+    },
+    "source": {
+      "authored": "Con coaching",
+      "open": "Catálogo abierto"
     }
   }
 }
