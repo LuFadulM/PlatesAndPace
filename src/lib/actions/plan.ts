@@ -264,7 +264,12 @@ export async function startNextBlock(): Promise<{ ok: true } | { ok: false; erro
     return { ok: false, errorKey: 'onboarding.errors.underage' }
   }
 
-  const result = await materialise(user.id, model, today)
+  // The questionnaire's start date belongs to the first block and is now weeks
+  // or months old. Generating from it would produce a block that has already
+  // ended: every day would fall before today, materialise would write no
+  // sessions at all, and the card would reappear for ever. The next block
+  // starts from the week the athlete is actually in.
+  const result = await materialise(user.id, { ...model, startDate: today }, today)
   if (!result.ok) return result
   revalidatePath('/', 'layout')
   return { ok: true }
