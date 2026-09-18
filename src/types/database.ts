@@ -64,6 +64,45 @@ export type Database = {
         }
         Relationships: []
       }
+      food_logs: {
+        Row: {
+          id: string
+          user_id: string
+          date: string
+          name: string
+          kcal: number
+          protein_g: number
+          carbs_g: number
+          fat_g: number
+          logged_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          date: string
+          name: string
+          kcal: number
+          protein_g?: number
+          carbs_g?: number
+          fat_g?: number
+          logged_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          date?: string
+          name?: string
+          kcal?: number
+          protein_g?: number
+          carbs_g?: number
+          fat_g?: number
+          logged_at?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       group_invites: {
         Row: {
           id: string

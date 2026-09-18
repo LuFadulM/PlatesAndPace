@@ -188,8 +188,13 @@
       "linkInvalid": "Ese enlace no funcionó. Pide uno nuevo.",
       "signedOut": "Se cerró tu sesión. Vuelve a iniciar sesión para continuar.",
       "rateLimited": "Se pidieron demasiados enlaces por ahora. Espera un rato e intenta de nuevo, o usa el enlace que ya recibiste.",
-      "otherDevice": "Ese enlace se abrió en un navegador distinto al que lo pidió. Ábrelo en el mismo navegador, o pide uno nuevo desde aquí."
-    }
+      "otherDevice": "Ese enlace se abrió en un navegador distinto al que lo pidió. Ábrelo en el mismo navegador, o pide uno nuevo desde aquí.",
+      "anonymousDisabled": "Empezar sin correo está desactivado en este momento. Entra con tu correo."
+    },
+    "startFree": "Empezar sin correo",
+    "startFreeHint": "Sin enlaces que abrir. Tu plan se guarda en este dispositivo y puedes agregar un correo después para conservarlo.",
+    "orEmail": "O entra con tu correo",
+    "haveAccount": "¿Ya empezaste en otro dispositivo?"
   },
   "coach": {
     "phase": {
@@ -2346,7 +2351,18 @@
     "deleteHelp": "Elimina tu cuenta y todos tus datos. No se puede deshacer.",
     "deleteConfirmLabel": "Escribe ELIMINAR para confirmar",
     "deleteWord": "ELIMINAR",
-    "deleteButton": "Eliminar mi cuenta"
+    "deleteButton": "Eliminar mi cuenta",
+    "account": {
+      "title": "Tu cuenta",
+      "anonymous": "Esta cuenta existe solo en este dispositivo.",
+      "anonymousHelp": "Agrega un correo y podrás entrar desde cualquier teléfono. Hasta entonces, si borras los datos de este navegador pierdes tu plan.",
+      "email": "Correo",
+      "attach": "Agregar mi correo",
+      "attaching": "Enviando…",
+      "attachSent": "Revisa tu correo y abre el enlace para terminar. No pierdes nada si lo haces más tarde.",
+      "attachFailed": "No se pudo agregar ese correo. Puede que ya pertenezca a otra cuenta.",
+      "signedInAs": "Sesión iniciada como {email}"
+    }
   },
   "privacy": {
     "title": "Privacidad",
@@ -2604,5 +2620,25 @@
     "dismiss": "Ahora no",
     "jointPain": "{lifts} te ha dolido más de una vez. Cámbialo y toma la semana suave.",
     "jointPainPlural": "{lifts} te han dolido más de una vez. Cámbialos y toma la semana suave."
+  },
+  "food": {
+    "title": "Lo que comiste",
+    "empty": "Aún no has registrado nada hoy.",
+    "eaten": "{kcal} de {target} kcal",
+    "over": "{kcal} de más",
+    "left": "quedan {kcal}",
+    "add": "Agregar comida",
+    "name": "¿Qué fue?",
+    "namePlaceholder": "Pollo con arroz",
+    "kcal": "kcal",
+    "protein": "Proteína",
+    "carbs": "Carbohidratos",
+    "fat": "Grasa",
+    "save": "Agregar",
+    "saving": "Agregando…",
+    "remove": "Quitar {name}",
+    "again": "Registrar otra vez",
+    "error": "No se pudo agregar. Inténtalo de nuevo.",
+    "noDatabase": "Tú pones tus propios números. Hyex no busca los alimentos, así que aquí no hay nada adivinado."
   }
 }

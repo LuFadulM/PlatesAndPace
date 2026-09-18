@@ -188,8 +188,13 @@
       "linkInvalid": "That link did not work. Ask for a new one.",
       "signedOut": "You have been signed out. Sign in again to continue.",
       "rateLimited": "Too many links requested for now. Wait a little while and try again, or use the link you already received.",
-      "otherDevice": "That link was opened in a different browser than the one that asked for it. Open it in the same browser, or ask for a new one from here."
-    }
+      "otherDevice": "That link was opened in a different browser than the one that asked for it. Open it in the same browser, or ask for a new one from here.",
+      "anonymousDisabled": "Starting without an email is switched off for this app right now. Use an email instead."
+    },
+    "startFree": "Start without an email",
+    "startFreeHint": "No link to click. Your plan is saved on this device, and you can add an email later to keep it.",
+    "orEmail": "Or sign in with an email",
+    "haveAccount": "Already started on another device?"
   },
   "coach": {
     "phase": {
@@ -2346,7 +2351,18 @@
     "deleteHelp": "Deletes your account and every piece of data with it. This cannot be undone.",
     "deleteConfirmLabel": "Type DELETE to confirm",
     "deleteWord": "DELETE",
-    "deleteButton": "Delete my account"
+    "deleteButton": "Delete my account",
+    "account": {
+      "title": "Your account",
+      "anonymous": "This account lives only on this device.",
+      "anonymousHelp": "Add an email and you can get back in from any phone. Until then, clearing this browser's data loses your plan.",
+      "email": "Email",
+      "attach": "Add my email",
+      "attaching": "Sending…",
+      "attachSent": "Check your inbox and open the link to finish. Nothing is lost if you do it later.",
+      "attachFailed": "Could not add that address. It may already belong to another account.",
+      "signedInAs": "Signed in as {email}"
+    }
   },
   "privacy": {
     "title": "Privacy",
@@ -2604,5 +2620,25 @@
     "dismiss": "Not now",
     "jointPain": "{lifts} has hurt more than once. Swap it, and take the week light.",
     "jointPainPlural": "{lifts} have hurt more than once. Swap them, and take the week light."
+  },
+  "food": {
+    "title": "What you ate",
+    "empty": "Nothing logged yet today.",
+    "eaten": "{kcal} of {target} kcal",
+    "over": "{kcal} over",
+    "left": "{kcal} left",
+    "add": "Add food",
+    "name": "What was it?",
+    "namePlaceholder": "Chicken and rice",
+    "kcal": "kcal",
+    "protein": "Protein",
+    "carbs": "Carbs",
+    "fat": "Fat",
+    "save": "Add",
+    "saving": "Adding…",
+    "remove": "Remove {name}",
+    "again": "Log again",
+    "error": "Could not add that. Try again.",
+    "noDatabase": "You enter your own numbers. Hyex does not look foods up, so nothing here is guessed."
   }
 }
