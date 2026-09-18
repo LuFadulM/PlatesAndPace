@@ -39,5 +39,7 @@ test('a wrong password says so without revealing whether the account exists', as
   await page.getByLabel('Email').fill(unique('nobody'))
   await page.getByLabel('Password').fill('not-the-right-password')
   await page.getByRole('button', { name: 'Sign in', exact: true }).click()
-  await expect(page.getByRole('alert')).toContainText('do not match an account')
+  // Not getByRole('alert'): Next renders a route announcer with the same role,
+  // so the form's own error has to be addressed by its id.
+  await expect(page.locator('#sign-in-error')).toContainText('do not match an account')
 })
