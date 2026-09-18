@@ -2604,5 +2604,25 @@
     "dismiss": "Ahora no",
     "jointPain": "{lifts} te ha dolido más de una vez. Cámbialo y toma la semana suave.",
     "jointPainPlural": "{lifts} te han dolido más de una vez. Cámbialos y toma la semana suave."
+  },
+  "food": {
+    "title": "Lo que comiste",
+    "empty": "Aún no has registrado nada hoy.",
+    "eaten": "{kcal} de {target} kcal",
+    "over": "{kcal} de más",
+    "left": "quedan {kcal}",
+    "add": "Agregar comida",
+    "name": "¿Qué fue?",
+    "namePlaceholder": "Pollo con arroz",
+    "kcal": "kcal",
+    "protein": "Proteína",
+    "carbs": "Carbohidratos",
+    "fat": "Grasa",
+    "save": "Agregar",
+    "saving": "Agregando…",
+    "remove": "Quitar {name}",
+    "again": "Registrar otra vez",
+    "error": "No se pudo agregar. Inténtalo de nuevo.",
+    "noDatabase": "Tú pones tus propios números. Hyex no busca los alimentos, así que aquí no hay nada adivinado."
   }
 }

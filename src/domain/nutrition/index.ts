@@ -276,3 +276,4 @@ export function estimateNutrition(input: NutritionInput): NutritionEstimate {
     noteKeys,
   }
 }
+export * from './intake'

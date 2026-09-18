@@ -2604,5 +2604,25 @@
     "dismiss": "Not now",
     "jointPain": "{lifts} has hurt more than once. Swap it, and take the week light.",
     "jointPainPlural": "{lifts} have hurt more than once. Swap them, and take the week light."
+  },
+  "food": {
+    "title": "What you ate",
+    "empty": "Nothing logged yet today.",
+    "eaten": "{kcal} of {target} kcal",
+    "over": "{kcal} over",
+    "left": "{kcal} left",
+    "add": "Add food",
+    "name": "What was it?",
+    "namePlaceholder": "Chicken and rice",
+    "kcal": "kcal",
+    "protein": "Protein",
+    "carbs": "Carbs",
+    "fat": "Fat",
+    "save": "Add",
+    "saving": "Adding…",
+    "remove": "Remove {name}",
+    "again": "Log again",
+    "error": "Could not add that. Try again.",
+    "noDatabase": "You enter your own numbers. Hyex does not look foods up, so nothing here is guessed."
   }
 }

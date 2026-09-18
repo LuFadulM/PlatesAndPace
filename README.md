@@ -158,7 +158,11 @@ screens only render it. The rules are written out in `CLAUDE.md`; in short:
 - **Food** (`src/domain/nutrition`): Mifflin-St Jeor, macros, carbohydrate leaning toward
   training days, deficits and surpluses capped at a safe weekly rate, and a target that
   adapts to the two-week weight trend. Never a deficit for minors, flagged athletes or a
-  history of disordered eating.
+  history of disordered eating. The athlete logs what they ate against that target
+  (`intake.ts`), with one-tap repeats built from their own history. Entries are their own
+  words and their own numbers: the brief named USDA FoodData Central and Open Food Facts,
+  neither is reachable from this environment, and inventing macros for a named food would
+  be fabricating a nutritional claim, so the app asks rather than guesses.
 - **The week reviews itself** (`src/domain/review`): on the athlete's Monday the engine
   compares what was planned against what happened and how hard it felt, then scales the week
   ahead. The cut is taken against the session total and spent from the bottom up, so

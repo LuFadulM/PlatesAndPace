@@ -9,7 +9,7 @@ import type { ResolvedExercise } from '@/domain/plan/resolve'
 import { nextSetMultiplier, readinessAdjustment, type Readiness } from '@/domain/strength/autoregulation'
 import { nearestLoadable, roundToIncrement, type PlateInventory } from '@/domain/strength/loads'
 import { getExercise } from '@/domain/exercises/library'
-import type { NutritionEstimate } from '@/domain/nutrition'
+import type { FoodEntry, FrequentFood, NutritionEstimate } from '@/domain/nutrition'
 import type { ReviewOutcome } from '@/domain/review'
 import { createOutbox, setLogKey, type Outbox } from '@/lib/offline'
 import { finishSession, logWeight, saveReadiness, saveRun, saveSets } from '@/lib/actions/logs'
@@ -17,6 +17,7 @@ import type { LastPerformance, MaxDetail } from '@/lib/data/logs'
 import type { Units } from '@/domain/profile/types'
 import { ExerciseFigure } from '@/components/figure/exercise-figure'
 import { AddExercise, ExerciseTools } from './exercise-editor'
+import { FoodLog } from './food-log'
 import { PainReport } from './pain-report'
 import { FocusPicker } from './focus-picker'
 import { RestTimer } from './rest-timer'
@@ -61,6 +62,9 @@ interface Props {
    * reported against it. A future day has nothing to report yet.
    */
   reportable: boolean
+  /** What the athlete has logged eating on this date, and their usual foods. */
+  food: FoodEntry[]
+  frequentFoods: FrequentFood[]
   /** Pain already reported for this date, per exercise. */
   painToday: Record<string, number>
   /** How many times each movement has hurt before today. */
@@ -78,7 +82,7 @@ function Section({ title, children, defaultOpen = false }: { title: string; chil
 
 const input = 'min-h-11 w-full rounded-lg border border-(--color-border) px-2 text-center'
 
-export function SessionView({ date, day, units, plates, maxes, initialSets, initialReadiness, alreadyDone, initialNotes, nutrition, latestWeightKg, alternatives, catalogue, lastTime, editable, review, reportable, painToday, painHistory }: Props) {
+export function SessionView({ date, day, units, plates, maxes, initialSets, initialReadiness, alreadyDone, initialNotes, nutrition, latestWeightKg, alternatives, catalogue, lastTime, editable, review, reportable, food, frequentFoods, painToday, painHistory }: Props) {
   const t = useTranslations('today')
   const tEx = useTranslations('exercises')
   const tCoach = useTranslations()
@@ -336,7 +340,7 @@ export function SessionView({ date, day, units, plates, maxes, initialSets, init
 
           <Section title={t('warmup')}><p className="text-sm">{tCoach(gym.warmupKey)}</p></Section>
 
-          {nutrition && <FuelCard nutrition={nutrition} trainingDay date={date} units={units} latestWeightKg={latestWeightKg} />}
+          {nutrition && <FuelCard nutrition={nutrition} trainingDay date={date} units={units} latestWeightKg={latestWeightKg} food={food} frequentFoods={frequentFoods} reportable={reportable} />}
 
           <ol className="flex flex-col gap-2" aria-label={t('exercises')}>
             {exercises.map((e, index) => {
@@ -433,7 +437,7 @@ export function SessionView({ date, day, units, plates, maxes, initialSets, init
         </>
       )}
 
-      {!gym && nutrition && <FuelCard nutrition={nutrition} trainingDay={run !== undefined} date={date} units={units} latestWeightKg={latestWeightKg} />}
+      {!gym && nutrition && <FuelCard nutrition={nutrition} trainingDay={run !== undefined} date={date} units={units} latestWeightKg={latestWeightKg} food={food} frequentFoods={frequentFoods} reportable={reportable} />}
 
       {run && day.order === 'lift_first' && gym && <p role="note" className="rounded-full bg-(--color-plate-yellow) px-3 py-1 text-center text-xs font-semibold">{t('liftFirst')}</p>}
       {run && <RunCard run={run} date={date} locale={locale} />}
@@ -465,7 +469,7 @@ export function SessionView({ date, day, units, plates, maxes, initialSets, init
  * every caveat the estimator raised, and the scale reading that keeps the
  * adaptive loop honest.
  */
-function FuelCard({ nutrition, trainingDay, date, units, latestWeightKg }: { nutrition: NutritionEstimate; trainingDay: boolean; date: string; units: Units; latestWeightKg: number | null }) {
+function FuelCard({ nutrition, trainingDay, date, units, latestWeightKg, food, frequentFoods, reportable }: { nutrition: NutritionEstimate; trainingDay: boolean; date: string; units: Units; latestWeightKg: number | null; food: FoodEntry[]; frequentFoods: FrequentFood[]; reportable: boolean }) {
   const t = useTranslations('today')
   const tN = useTranslations()
   const [weight, setWeight] = useState('')
@@ -494,6 +498,9 @@ function FuelCard({ nutrition, trainingDay, date, units, latestWeightKg }: { nut
         <button type="submit" disabled={pending || !weight} className="min-h-11 rounded-lg bg-(--color-ink) px-4 text-sm font-semibold text-(--color-bg) disabled:opacity-60">{t('weighInSave')}</button>
       </form>
       {saved && <p role="status" className="mt-1 text-xs font-semibold text-(--color-plate-green)">{t('weighInSaved')}</p>}
+      {/* A meal cannot be eaten in advance, so the log is offered on today and
+          earlier only, the same rule the pain control follows. */}
+      {reportable && <FoodLog date={date} entries={food} frequent={frequentFoods} targetKcal={kcal} macros={day} />}
     </Section>
   )
 }

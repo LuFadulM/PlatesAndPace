@@ -21,6 +21,7 @@ import { getActiveAnswers, getLatestWeightKg, getRecentWeights, requireProfile }
 import { getLastWeekReview } from '@/lib/data/review'
 import { getCurrentPaces } from '@/lib/data/running'
 import { getDeloadAdvice, getPainReports, painBefore, painOn } from '@/lib/data/deload'
+import { getFoodLog, getFrequentFoods } from '@/lib/data/food'
 
 export default async function TodayPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ date?: string }> }) {
   const { locale } = await params
@@ -45,7 +46,7 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
     getLatestWeightKg(),
   ])
   const painReports = await getPainReports(today)
-  const [recentWeights, review, running, deload] = await Promise.all([
+  const [recentWeights, review, running, deload, food, frequentFoods] = await Promise.all([
     getRecentWeights(toISODate(today)),
     getLastWeekReview(today),
     // Paces learned from logged runs, so a runner who got faster trains faster.
@@ -56,6 +57,8 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
         )
       : getCurrentPaces(undefined),
     getDeloadAdvice(today, painReports),
+    getFoodLog(iso),
+    getFrequentFoods(today),
   ])
 
   // An easy week the athlete asked for lands on the same session pipeline as
@@ -169,6 +172,8 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
         editable={editable}
         review={thisWeek && !deloadTaken ? review : null}
         reportable={reportable}
+        food={food}
+        frequentFoods={frequentFoods}
         painToday={painToday}
         painHistory={painHistory}
       />
