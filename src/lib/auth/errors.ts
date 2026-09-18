@@ -59,3 +59,40 @@ export function classifyExchangeFailure(error: AuthFailure): ExchangeFailure {
   if (/code verifier/i.test(error.message ?? '')) return 'other_device'
   return 'exchange_failed'
 }
+
+export type PasswordFailure =
+  | 'emailDisabled'
+  | 'signUpDisabled'
+  | 'invalidCredentials'
+  | 'emailNotConfirmed'
+  | 'accountExists'
+  | 'weakPassword'
+  | 'rateLimited'
+  | 'passwordFailed'
+
+/**
+ * Failures from signing in or signing up with a password.
+ *
+ * Two of these are project settings rather than anything the person did, and
+ * saying so saves them from retyping a password that was right all along:
+ * `emailDisabled` when the Email provider is off, and `emailNotConfirmed` when
+ * "Confirm email" is on — the setting that puts a link back in the way of every
+ * new account, which is exactly what a password is here to avoid.
+ *
+ * `invalidCredentials` deliberately does not say which half was wrong. Supabase
+ * answers the same way for an unknown address and a bad password, and so does
+ * this: telling them apart would turn the form into a "does this person use
+ * Hyex?" oracle.
+ */
+export function classifyPasswordFailure(error: AuthFailure): PasswordFailure {
+  const message = error.message ?? ''
+  if (error.code === 'email_provider_disabled') return 'emailDisabled'
+  if (/email (logins|provider).*disabled/i.test(message)) return 'emailDisabled'
+  if (error.code === 'signup_disabled' || /signups? (are )?disabled|not allowed for this instance/i.test(message)) return 'signUpDisabled'
+  if (error.code === 'email_not_confirmed' || /email not confirmed/i.test(message)) return 'emailNotConfirmed'
+  if (error.code === 'invalid_credentials' || /invalid login credentials/i.test(message)) return 'invalidCredentials'
+  if (error.code === 'user_already_exists' || /already registered|already been registered/i.test(message)) return 'accountExists'
+  if (error.code === 'weak_password' || /password.*(at least|too short|weak)/i.test(message)) return 'weakPassword'
+  if (error.status === 429 || /rate limit/i.test(message)) return 'rateLimited'
+  return 'passwordFailed'
+}

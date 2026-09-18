@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { cookies, headers } from 'next/headers'
 import { z } from 'zod'
 import { defaultLocale, isLocale, type Locale } from '@/i18n/routing'
-import { classifySendFailure, classifyVerifyFailure } from '@/lib/auth/errors'
+import { classifyPasswordFailure, classifySendFailure, classifyVerifyFailure } from '@/lib/auth/errors'
 import { safeRedirectPath } from '@/lib/auth/routes'
 import { createClient } from '@/lib/supabase/server'
 
@@ -178,4 +178,82 @@ export async function signOut(locale: string) {
   const supabase = await createClient()
   await supabase.auth.signOut()
   redirect(`/${target}`)
+}
+
+/**
+ * A password is eight characters or more. Supabase's own floor is six; the two
+ * extra are cheap here and this is the only secret on the account.
+ */
+const passwordSchema = z.object({
+  email: z.string().trim().min(1).email(),
+  password: z.string().min(8).max(72),
+  locale: z.string().refine(isLocale),
+  next: z.string().optional(),
+})
+
+/**
+ * Signing in with a password.
+ *
+ * This is the way in that costs nothing and asks nothing of an inbox. A magic
+ * link has to be sent, delivered, found and opened in the right browser every
+ * single time, on every device; a password is typed once and travels with the
+ * person. It is also what makes the app usable by anyone other than its author,
+ * because a second person can make their own account without waiting on a
+ * mailer that allows two messages an hour.
+ */
+export async function signInWithPassword(
+  _previous: SignInState,
+  formData: FormData,
+): Promise<SignInState> {
+  const parsed = passwordSchema.safeParse({
+    email: formData.get('email'),
+    password: formData.get('password'),
+    locale: formData.get('locale'),
+    next: formData.get('next') ?? undefined,
+  })
+  if (!parsed.success) return { errorKey: 'auth.errors.invalidCredentials' }
+
+  const { email, password, locale, next } = parsed.data
+  const supabase = await createClient()
+  const { error } = await supabase.auth.signInWithPassword({ email, password })
+  if (error) return { errorKey: `auth.errors.${classifyPasswordFailure(error)}` }
+
+  redirect(safeRedirectPath(next ?? null, locale) as Route)
+}
+
+/**
+ * Making an account with a password.
+ *
+ * With "Confirm email" off in the project, this signs the person straight in
+ * and no message is ever sent. With it on, Supabase withholds the session until
+ * a link is opened — so the absence of a session is the signal, and the screen
+ * says to go and confirm rather than pretending it worked.
+ */
+export async function signUpWithPassword(
+  _previous: SignInState,
+  formData: FormData,
+): Promise<SignInState> {
+  const parsed = passwordSchema.safeParse({
+    email: formData.get('email'),
+    password: formData.get('password'),
+    locale: formData.get('locale'),
+    next: formData.get('next') ?? undefined,
+  })
+  if (!parsed.success) return { errorKey: 'auth.errors.weakPassword' }
+
+  const { email, password, locale, next } = parsed.data
+  const origin = (await headers()).get('origin') ?? ''
+  const callback = new URL('/auth/callback', origin || 'http://localhost:3000')
+  callback.searchParams.set('locale', locale)
+
+  const supabase = await createClient()
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { emailRedirectTo: callback.toString() },
+  })
+  if (error) return { errorKey: `auth.errors.${classifyPasswordFailure(error)}` }
+  if (!data.session) return { errorKey: 'auth.errors.confirmFirst' }
+
+  redirect(safeRedirectPath(next ?? `/${locale}/onboarding`, locale) as Route)
 }

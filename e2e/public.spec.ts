@@ -13,7 +13,9 @@ test('serves both languages and the install manifest', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'Empezar' }).first()).toBeVisible()
   await page.getByRole('link', { name: 'Iniciar sesión' }).first().click()
   await expect(page).toHaveURL(/\/es\/sign-in$/)
-  await expect(page.getByRole('button', { name: 'Enviarme el enlace' })).toBeVisible()
+  // The password form leads now; the emailed link is a fallback behind a
+  // toggle, so it is no longer the button this screen renders first.
+  await expect(page.getByRole('button', { name: 'Entrar', exact: true })).toBeVisible()
   const manifest = await page.request.get('/manifest.webmanifest')
   expect(manifest.ok()).toBe(true)
   expect((await manifest.json()).name).toBe('Hyex')

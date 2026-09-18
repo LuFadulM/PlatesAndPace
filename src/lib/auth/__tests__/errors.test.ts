@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { classifyExchangeFailure, classifySendFailure, classifyVerifyFailure } from '../errors'
+import { classifyExchangeFailure, classifyPasswordFailure, classifySendFailure, classifyVerifyFailure } from '../errors'
 
 describe('classifySendFailure', () => {
   it('recognises the email quota by status, by code and by message', () => {
@@ -41,5 +41,31 @@ describe('classifyExchangeFailure', () => {
   it('leaves a consumed or expired link as a plain exchange failure', () => {
     expect(classifyExchangeFailure({ message: 'invalid flow state, no valid flow state found' })).toBe('exchange_failed')
     expect(classifyExchangeFailure({})).toBe('exchange_failed')
+  })
+})
+
+describe('classifyPasswordFailure', () => {
+  it('names the two project settings that no retype can fix', () => {
+    expect(classifyPasswordFailure({ status: 422, message: 'Email logins are disabled' })).toBe('emailDisabled')
+    expect(classifyPasswordFailure({ code: 'email_not_confirmed' })).toBe('emailNotConfirmed')
+    expect(classifyPasswordFailure({ code: 'signup_disabled' })).toBe('signUpDisabled')
+  })
+
+  it('gives one answer for a bad password and an unknown address', () => {
+    // Supabase answers identically for both, and so does this: a form that told
+    // them apart would report whether an address has an account here.
+    expect(classifyPasswordFailure({ code: 'invalid_credentials' })).toBe('invalidCredentials')
+    expect(classifyPasswordFailure({ message: 'Invalid login credentials' })).toBe('invalidCredentials')
+  })
+
+  it('recognises a taken address and a short password', () => {
+    expect(classifyPasswordFailure({ code: 'user_already_exists' })).toBe('accountExists')
+    expect(classifyPasswordFailure({ message: 'User already registered' })).toBe('accountExists')
+    expect(classifyPasswordFailure({ code: 'weak_password' })).toBe('weakPassword')
+  })
+
+  it('falls back rather than guessing', () => {
+    expect(classifyPasswordFailure({ status: 500 })).toBe('passwordFailed')
+    expect(classifyPasswordFailure({})).toBe('passwordFailed')
   })
 })
