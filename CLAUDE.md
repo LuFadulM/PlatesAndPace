@@ -1,8 +1,10 @@
-# Plates & Pace — project memory
+# Hyex — project memory
 
-One app, one repository. Lifting, running and nutrition are one plan built from one
-profile. There is no separate "Plates" or "Pace" codebase: Plates is the nutrition side,
-Pace is the cardio side, both live here.
+Hyex (www.hyex.app), formerly Plates & Pace. One app, one repository. Lifting, running and
+nutrition are one plan built from one profile: the nutrition side and the cardio side are
+not separate codebases, they both live here. The repository directory and the offline
+IndexedDB database still carry the old name; renaming either would orphan a phone's
+unsynced queue, so they stay.
 
 ## Stack (keep it; do not rewrite for taste)
 

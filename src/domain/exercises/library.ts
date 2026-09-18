@@ -7,7 +7,7 @@ const GYM_DB = ['full_gym', 'dumbbells_bench'] as const
 /**
  * The exercise library.
  *
- * Authored for Plates & Pace rather than ported from the prototype, which was
+ * Authored for Hyex rather than ported from the prototype, which was
  * not available. Ratios are reference working loads for a male intermediate
  * lifter as a fraction of bodyweight; sex and experience factors are applied
  * by the load engine. Dumbbell ratios are per hand.

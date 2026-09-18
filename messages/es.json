@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Plates & Pace",
+    "name": "Hyex",
     "tagline": "Tu plan, tu ritmo."
   },
   "nav": {
@@ -149,7 +149,7 @@
   },
   "disclaimer": {
     "short": "Guía general de entrenamiento, no consejo médico.",
-    "long": "Plates & Pace da una guía general de entrenamiento y nutrición. No es consejo médico, diagnóstico ni tratamiento. Consulta a un médico antes de empezar a entrenar fuerte, sobre todo si tienes alguna condición de salud o algún síntoma."
+    "long": "Hyex da una guía general de entrenamiento y nutrición. No es consejo médico, diagnóstico ni tratamiento. Consulta a un médico antes de empezar a entrenar fuerte, sobre todo si tienes alguna condición de salud o algún síntoma."
   },
   "dates": {
     "today": "Hoy",
@@ -1858,7 +1858,7 @@
   "onboarding": {
     "errors": {
       "invalid": "Faltan respuestas o hay alguna inválida.",
-      "underage": "Plates & Pace es para personas de 16 años o más.",
+      "underage": "Hyex es para personas de 16 años o más.",
       "save": "No pudimos guardar tus respuestas. Inténtalo de nuevo.",
       "medical": "Confirma el aviso médico antes de continuar."
     },
@@ -1868,7 +1868,7 @@
     "back": "Atrás",
     "finish": "Crear mi plan",
     "building": "Creando tu plan…",
-    "disclaimer": "Plates & Pace da una guía general de entrenamiento, no consejo médico. Si tienes alguna condición de salud, consulta a un médico antes de entrenar fuerte.",
+    "disclaimer": "Hyex da una guía general de entrenamiento, no consejo médico. Si tienes alguna condición de salud, consulta a un médico antes de entrenar fuerte.",
     "steps": {
       "basics": {
         "title": "Sobre ti",
@@ -1908,7 +1908,7 @@
         "recentSurgery": "¿Te operaron en los últimos seis meses?",
         "disorderedEating": "¿Has tenido problemas con la alimentación (trastornos alimentarios)? Si es así, la app nunca te pedirá comer menos.",
         "medicalTitle": "Habla primero con un médico",
-        "medicalBody": "Una de tus respuestas es una señal de alerta para el ejercicio intenso. Plates & Pace puede armarte un plan cuidadoso, pero es una guía de entrenamiento, no un consejo médico. Consulta con un médico antes de empezar.",
+        "medicalBody": "Una de tus respuestas es una señal de alerta para el ejercicio intenso. Hyex puede armarte un plan cuidadoso, pero es una guía de entrenamiento, no un consejo médico. Consulta con un médico antes de empezar.",
         "medicalAck": "Entiendo, y me hago responsable de consultar con un médico antes de entrenar fuerte."
       },
       "goals": {
@@ -2228,7 +2228,7 @@
     "substitutesHint": "Mismo patrón y músculo, con tu equipo.",
     "easier": "Más fácil",
     "harder": "Más difícil",
-    "sourceAuthored": "Con coaching de Plates & Pace",
+    "sourceAuthored": "Con coaching de Hyex",
     "sourceOpen": "Del catálogo abierto de ejercicios",
     "openSteps": "Pasos del catálogo abierto, solo en inglés.",
     "openName": "Nombre traducido automáticamente; el original es {name}.",
@@ -2327,7 +2327,7 @@
   },
   "privacy": {
     "title": "Privacidad",
-    "intro": "Plates & Pace guarda lo necesario para crear y adaptar tu plan, y nada se comparte con otras personas a menos que decidas unirte a un grupo.",
+    "intro": "Hyex guarda lo necesario para crear y adaptar tu plan, y nada se comparte con otras personas a menos que decidas unirte a un grupo.",
     "stored": {
       "title": "Qué guardamos",
       "body": "Tus respuestas del cuestionario, medidas corporales, el plan que generamos y las series y carreras que registras. Todo está ligado únicamente a tu cuenta."

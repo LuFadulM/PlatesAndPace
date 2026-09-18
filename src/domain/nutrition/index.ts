@@ -207,7 +207,7 @@ function macrosFor(kcal: number, weightKg: number, goal: PrimaryGoal, inDeficit:
 
 export function estimateNutrition(input: NutritionInput): NutritionEstimate {
   if (input.ageYears < MINIMUM_AGE) {
-    throw new RangeError(`Plates & Pace is not for athletes under ${MINIMUM_AGE}`)
+    throw new RangeError(`Hyex is not for athletes under ${MINIMUM_AGE}`)
   }
 
   const noteKeys = ['nutrition.notes.estimateOnly']

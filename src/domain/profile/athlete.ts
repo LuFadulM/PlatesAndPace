@@ -118,7 +118,7 @@ export interface AthleteModel {
 
 export class UnderageError extends RangeError {
   constructor(age: number) {
-    super(`Plates & Pace is for athletes aged ${MINIMUM_AGE} and over; this one is ${age}`)
+    super(`Hyex is for athletes aged ${MINIMUM_AGE} and over; this one is ${age}`)
     this.name = 'UnderageError'
   }
 }

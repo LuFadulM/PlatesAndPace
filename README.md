@@ -1,4 +1,4 @@
-# Plates & Pace
+# Hyex
 
 A multi-user, bilingual (English / Spanish) training app, installable on phones. Answer a
 questionnaire and get a concrete workout for every calendar day — lifting, running, or both —
@@ -39,7 +39,7 @@ Magic-link emails sent locally land in the mail catcher at http://localhost:5432
 
 The seed creates one demo athlete matching the worked example in `PLAN.md` §1 — a hybrid
 lifter in Bogotá, five gym days and three runs a week, 3 km in 20:00 — with the password
-`demo-password` (email `demo@platesandpace.local`).
+`demo-password` (email `demo@hyex.local`).
 
 ## Scripts
 

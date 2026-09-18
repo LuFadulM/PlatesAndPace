@@ -28,7 +28,7 @@ export function SettingsPanel({ locale, units, timezone, displayName }: Props) {
     if (!json) return
     const blob = new Blob([json], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
-    const a = document.createElement('a'); a.href = url; a.download = 'plates-and-pace-export.json'; a.click()
+    const a = document.createElement('a'); a.href = url; a.download = 'hyex-export.json'; a.click()
     URL.revokeObjectURL(url)
   })
 

@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-/* Plates & Pace design tokens — see PLAN.md §9.
+/* Hyex design tokens — see PLAN.md §9.
    Plate colours: blue = weights, yellow = runs, green = done, red = today. */
 @theme {
   --color-bg: #eceff2;

@@ -9,6 +9,8 @@ import type { OutboxEntry, OutboxStorage } from './outbox'
  * blocked. A logging screen that crashes because storage is disabled is worse
  * than one that quietly keeps the queue in memory for the session.
  */
+// Named before the app was called Hyex. Renaming the database would orphan
+// any sets a phone logged offline and has not yet synced, so it stays.
 const DB_NAME = 'plates-and-pace'
 const STORE = 'outbox'
 const VERSION = 1

@@ -17,7 +17,7 @@ values (
   'd0000000-0000-4000-8000-000000000001',
   'authenticated',
   'authenticated',
-  'demo@platesandpace.local',
+  'demo@hyex.local',
   crypt('demo-password', gen_salt('bf')),
   now(), now(), now(),
   '{"provider":"email","providers":["email"]}'::jsonb,

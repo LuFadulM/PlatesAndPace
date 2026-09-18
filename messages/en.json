@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Plates & Pace",
+    "name": "Hyex",
     "tagline": "Your plan, your pace."
   },
   "nav": {
@@ -149,7 +149,7 @@
   },
   "disclaimer": {
     "short": "General training guidance, not medical advice.",
-    "long": "Plates & Pace gives general training and nutrition guidance. It is not medical advice, diagnosis or treatment. Talk to a doctor before starting hard training, especially if you have a health condition or any symptoms."
+    "long": "Hyex gives general training and nutrition guidance. It is not medical advice, diagnosis or treatment. Talk to a doctor before starting hard training, especially if you have a health condition or any symptoms."
   },
   "dates": {
     "today": "Today",
@@ -1858,7 +1858,7 @@
   "onboarding": {
     "errors": {
       "invalid": "Some answers are missing or invalid.",
-      "underage": "Plates & Pace is for people aged 16 and over.",
+      "underage": "Hyex is for people aged 16 and over.",
       "save": "We could not save your answers. Try again.",
       "medical": "Please confirm the medical notice before continuing."
     },
@@ -1868,7 +1868,7 @@
     "back": "Back",
     "finish": "Build my plan",
     "building": "Building your plan…",
-    "disclaimer": "Plates & Pace gives general training guidance, not medical advice. If you have a health condition, talk to a doctor before training hard.",
+    "disclaimer": "Hyex gives general training guidance, not medical advice. If you have a health condition, talk to a doctor before training hard.",
     "steps": {
       "basics": {
         "title": "About you",
@@ -1908,7 +1908,7 @@
         "recentSurgery": "Have you had surgery in the last six months?",
         "disorderedEating": "Have you struggled with disordered eating? If so, the app will never ask you to eat less.",
         "medicalTitle": "Talk to a doctor first",
-        "medicalBody": "One of your answers is a red flag for hard exercise. Plates & Pace can still build you a careful plan, but it is training guidance, not medical advice. Please check with a doctor before you start.",
+        "medicalBody": "One of your answers is a red flag for hard exercise. Hyex can still build you a careful plan, but it is training guidance, not medical advice. Please check with a doctor before you start.",
         "medicalAck": "I understand, and I take responsibility for getting medical advice before training hard."
       },
       "goals": {
@@ -2228,7 +2228,7 @@
     "substitutesHint": "Same movement and muscle, with your equipment.",
     "easier": "Easier",
     "harder": "Harder",
-    "sourceAuthored": "Coached by Plates & Pace",
+    "sourceAuthored": "Coached by Hyex",
     "sourceOpen": "From the open exercise catalogue",
     "openSteps": "Steps from the open catalogue, in English only.",
     "openName": "Name translated automatically; the original is {name}.",
@@ -2327,7 +2327,7 @@
   },
   "privacy": {
     "title": "Privacy",
-    "intro": "Plates & Pace stores what it needs to build and adapt your plan, and nothing is shared with other people unless you choose to join a group.",
+    "intro": "Hyex stores what it needs to build and adapt your plan, and nothing is shared with other people unless you choose to join a group.",
     "stored": {
       "title": "What we store",
       "body": "Your questionnaire answers, body measurements, the plan we generate, and the sets and runs you log. All of it is tied to your account only."

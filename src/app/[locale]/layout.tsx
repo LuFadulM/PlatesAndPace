@@ -33,9 +33,13 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: 'app' })
 
   return {
+    // Absolute URLs for Open Graph and canonicals; Vercel's preview URL wins on
+    // a preview deploy so shared links point at what was actually deployed.
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? (process.env.VERCEL_ENV === 'production' ? 'https://www.hyex.app' : process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')),
     title: t('name'),
     description: t('tagline'),
     manifest: '/manifest.webmanifest',
+    openGraph: { title: t('name'), description: t('tagline'), siteName: t('name'), locale, type: 'website' },
     appleWebApp: { capable: true, statusBarStyle: 'default', title: t('name') },
     icons: { icon: '/icons/icon.svg', apple: '/apple-touch-icon.png' },
   }
