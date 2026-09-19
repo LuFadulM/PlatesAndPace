@@ -58,6 +58,11 @@ describe('classifyPasswordFailure', () => {
     expect(classifyPasswordFailure({ message: 'Invalid login credentials' })).toBe('invalidCredentials')
   })
 
+  it('spots a password change that changes nothing', () => {
+    expect(classifyPasswordFailure({ code: 'same_password' })).toBe('samePassword')
+    expect(classifyPasswordFailure({ message: 'New password should be different from the old password.' })).toBe('samePassword')
+  })
+
   it('recognises a taken address and a short password', () => {
     expect(classifyPasswordFailure({ code: 'user_already_exists' })).toBe('accountExists')
     expect(classifyPasswordFailure({ message: 'User already registered' })).toBe('accountExists')

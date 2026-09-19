@@ -202,6 +202,7 @@
       "confirmFirst": "Cuenta creada. Abre el enlace que acabamos de enviarte para terminar, y luego entra.",
       "accountExists": "Ya existe una cuenta con ese correo. Entra con tu contraseña, o pide un enlace si la olvidaste.",
       "weakPassword": "Esa contraseña es muy corta. Usa al menos 8 caracteres.",
+      "samePassword": "Esa es la contraseña que ya tienes. Elige una diferente.",
       "signUpDisabled": "La creación de cuentas está desactivada en esta app ahora mismo.",
       "passwordFailed": "No funcionó. Inténtalo de nuevo en un momento.",
       "linkExpired": "Ese enlace ya venció. Pide uno nuevo.",
@@ -2390,6 +2391,18 @@
       "attachFailed": "No se pudo agregar ese correo. Puede que ya pertenezca a otra cuenta.",
       "attachNotAllowed": "Esta cuenta ya tiene un correo.",
       "signedInAs": "Sesión iniciada como {email}"
+    },
+    "password": {
+      "title": "Contraseña",
+      "change": "Cambiar mi contraseña",
+      "current": "Contraseña actual",
+      "next": "Contraseña nueva",
+      "hint": "Mínimo 8 caracteres. Pedimos la actual para que un teléfono prestado no pueda dejarte fuera de tu propia cuenta.",
+      "save": "Guardar contraseña nueva",
+      "saving": "Guardando…",
+      "changed": "Contraseña cambiada. Funciona en todos lados desde ahora.",
+      "wrongCurrent": "Esa no es tu contraseña actual.",
+      "noEmail": "Esta cuenta todavía no tiene correo, así que no tiene contraseña. Agrega un correo arriba primero."
     }
   },
   "privacy": {

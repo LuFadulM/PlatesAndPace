@@ -68,6 +68,7 @@ export type PasswordFailure =
   | 'accountExists'
   | 'weakPassword'
   | 'rateLimited'
+  | 'samePassword'
   | 'passwordFailed'
 
 /**
@@ -93,6 +94,7 @@ export function classifyPasswordFailure(error: AuthFailure): PasswordFailure {
   if (error.code === 'invalid_credentials' || /invalid login credentials/i.test(message)) return 'invalidCredentials'
   if (error.code === 'user_already_exists' || /already registered|already been registered/i.test(message)) return 'accountExists'
   if (error.code === 'weak_password' || /password.*(at least|too short|weak)/i.test(message)) return 'weakPassword'
+  if (error.code === 'same_password' || /should be different from the old password/i.test(message)) return 'samePassword'
   if (error.status === 429 || /rate limit/i.test(message)) return 'rateLimited'
   return 'passwordFailed'
 }
