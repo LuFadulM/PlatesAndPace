@@ -119,6 +119,12 @@ messages an hour. Sign-up and sign-in are the same form with a toggle; a
 forgotten password falls back to the emailed link, which is the only time an
 inbox is involved.
 
+Changing it lives in Settings, behind "Change my password". It asks for the
+current one before accepting a new one: a session cookie is something a borrowed
+or unlocked phone already has, while the old password is something only the
+owner knows, so without that check a phone left on a bench would be enough to
+lock its owner out for good.
+
 This needs two project settings, both under **Authentication**: the **Email**
 provider on, and **Confirm email** *off*. With confirmations on, Supabase
 withholds the session until a link is opened, which puts the inbox back in front
@@ -126,6 +132,19 @@ of every new account and hands the mailer's cap the power to stop sign-ups
 entirely. `supabase/config.toml` sets `enable_confirmations = false` so local
 development matches. The address is for recovery; the password is the
 credential.
+
+If a project's dashboard cannot be reached to set those — which happens when the
+project was provisioned through the Vercel marketplace rather than created on
+Supabase directly — the symptom is a `400 Email signups are disabled` or
+`422 Email logins are disabled` line in Authentication → Logs, on every attempt,
+no matter how many times the toggle appears to be saved. The way out is a
+project whose dashboard you own: apply the migrations to it, move the rows
+across, and repoint `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+at it. Accounts can be seeded straight into `auth.users` with
+`crypt(<password>, gen_salt('bf'))`, an `email_confirmed_at`, and a matching
+`auth.identities` row — GoTrue looks accounts up through the identity, so
+without that row a password sign-in fails on an account that otherwise looks
+complete.
 
 **Start without an email.** For someone who wants to try the app before
 deciding anything. Supabase issues an anonymous

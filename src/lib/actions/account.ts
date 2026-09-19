@@ -5,6 +5,7 @@ import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { defaultLocale, isLocale } from '@/i18n/routing'
+import { classifyPasswordFailure } from '@/lib/auth/errors'
 import { createClient } from '@/lib/supabase/server'
 
 export async function exportMyData(): Promise<string | null> {
@@ -102,6 +103,47 @@ export async function attachEmail(input: unknown): Promise<{ ok: true } | { ok: 
   // "does this person use Hyex?" oracle. Nothing here can tell a sent link from
   // a silently dropped one, so the copy promises a link only if the address is
   // free rather than claiming one is on its way.
+  revalidatePath('/', 'layout')
+  return { ok: true }
+}
+
+const changePasswordSchema = z.object({
+  current: z.string().min(1).max(72),
+  next: z.string().min(8).max(72),
+})
+
+/**
+ * Changing the password on an account that has one.
+ *
+ * The current password is checked first, by signing in with it, rather than
+ * trusting the session alone. A session cookie is something a borrowed or
+ * stolen phone already has; the old password is something only the account's
+ * owner knows, and without that check an unlocked phone left on a bench would
+ * be enough to lock its owner out for good.
+ *
+ * Supabase issues a fresh session on that sign-in, for the same user, so the
+ * person stays signed in throughout.
+ */
+export async function changePassword(input: unknown): Promise<{ ok: true } | { ok: false; errorKey: string }> {
+  const parsed = changePasswordSchema.safeParse(input)
+  if (!parsed.success) return { ok: false, errorKey: 'auth.errors.weakPassword' }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { ok: false, errorKey: 'auth.errors.signedOut' }
+  // An account with no address has no password to change: it is reached by the
+  // session cookie alone, and Settings offers it an email instead.
+  if (!user.email) return { ok: false, errorKey: 'settings.password.noEmail' }
+
+  const { error: reauth } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: parsed.data.current,
+  })
+  if (reauth) return { ok: false, errorKey: 'settings.password.wrongCurrent' }
+
+  const { error } = await supabase.auth.updateUser({ password: parsed.data.next })
+  if (error) return { ok: false, errorKey: `auth.errors.${classifyPasswordFailure(error)}` }
+
   revalidatePath('/', 'layout')
   return { ok: true }
 }

@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import type { Locale } from '@/i18n/routing'
-import { attachEmail } from '@/lib/actions/account'
+import { attachEmail, changePassword } from '@/lib/actions/account'
 
 /**
  * Turning a device-only account into one that survives a lost phone.
@@ -28,6 +28,7 @@ export function AccountCard({ locale, email, anonymous }: { locale: Locale; emai
       <section className={row}>
         <h2 className="font-display text-lg font-bold">{t('title')}</h2>
         {email && <p className="text-sm text-(--color-ink-muted)">{t('signedInAs', { email })}</p>}
+        <PasswordForm />
       </section>
     )
   }
@@ -77,5 +78,98 @@ export function AccountCard({ locale, email, anonymous }: { locale: Locale; emai
         </form>
       )}
     </section>
+  )
+}
+
+const field =
+  'min-h-11 rounded-lg border border-(--color-border) bg-(--color-surface) px-3 text-base font-normal'
+
+/**
+ * Changing the password, from inside Settings.
+ *
+ * It sits behind a disclosure because most visits here are not about this, and
+ * it asks for the current password because a session cookie alone is a weaker
+ * claim to the account than knowing the secret it was opened with.
+ */
+function PasswordForm() {
+  const t = useTranslations('settings.password')
+  const tAuth = useTranslations('auth')
+  const [open, setOpen] = useState(false)
+  const [done, setDone] = useState(false)
+  const [errorKey, setErrorKey] = useState<string | null>(null)
+  const [pending, startTransition] = useTransition()
+  const [form, setForm] = useState({ current: '', next: '' })
+
+  const message = (key: string) =>
+    key.startsWith('auth.') ? tAuth(key.replace('auth.', '')) : t(key.replace('settings.password.', ''))
+
+  if (done) {
+    return <p role="status" className="text-sm font-semibold text-(--color-plate-green)">{t('changed')}</p>
+  }
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="min-h-11 text-left text-sm font-semibold text-(--color-plate-blue) underline-offset-2 hover:underline"
+      >
+        {t('change')}
+      </button>
+    )
+  }
+
+  return (
+    <form
+      className="flex flex-col gap-2"
+      onSubmit={(ev) => {
+        ev.preventDefault()
+        setErrorKey(null)
+        startTransition(async () => {
+          const result = await changePassword(form)
+          if (result.ok) setDone(true)
+          else setErrorKey(result.errorKey)
+        })
+      }}
+    >
+      <label className="flex flex-col gap-1 text-sm font-medium">
+        {t('current')}
+        <input
+          type="password"
+          autoComplete="current-password"
+          required
+          value={form.current}
+          onChange={(e) => setForm({ ...form, current: e.target.value })}
+          className={field}
+        />
+      </label>
+
+      <label className="flex flex-col gap-1 text-sm font-medium">
+        {t('next')}
+        <input
+          type="password"
+          autoComplete="new-password"
+          required
+          minLength={8}
+          value={form.next}
+          onChange={(e) => setForm({ ...form, next: e.target.value })}
+          className={field}
+        />
+      </label>
+
+      <p className="text-xs text-(--color-ink-muted)">{t('hint')}</p>
+
+      {errorKey && (
+        <p role="alert" className="text-sm text-(--color-plate-red)">{message(errorKey)}</p>
+      )}
+
+      <button
+        type="submit"
+        disabled={pending || !form.current || form.next.length < 8}
+        className="min-h-11 rounded-lg bg-(--color-plate-blue) font-semibold text-white disabled:opacity-60"
+      >
+        {pending ? t('saving') : t('save')}
+      </button>
+    </form>
   )
 }

@@ -202,6 +202,7 @@
       "confirmFirst": "Account created. Open the link we just emailed you to finish, then sign in.",
       "accountExists": "There is already an account with that email. Sign in instead, or ask for a link if you forgot the password.",
       "weakPassword": "That password is too short. Use at least 8 characters.",
+      "samePassword": "That is the password you already have. Choose a different one.",
       "signUpDisabled": "New accounts are switched off for this app right now.",
       "passwordFailed": "That did not work. Try again in a moment.",
       "linkExpired": "That link has expired. Ask for a new one.",
@@ -2390,6 +2391,18 @@
       "attachFailed": "Could not add that address. It may already belong to another account.",
       "attachNotAllowed": "This account already has an email on it.",
       "signedInAs": "Signed in as {email}"
+    },
+    "password": {
+      "title": "Password",
+      "change": "Change my password",
+      "current": "Current password",
+      "next": "New password",
+      "hint": "At least 8 characters. We ask for the current one so a borrowed phone cannot lock you out of your own account.",
+      "save": "Save new password",
+      "saving": "Saving…",
+      "changed": "Password changed. It works everywhere from now on.",
+      "wrongCurrent": "That is not your current password.",
+      "noEmail": "This account has no email yet, so it has no password. Add an email above first."
     }
   },
   "privacy": {
